@@ -1,2 +1,2 @@
 # aether-web-flow
-Portal web do ecossistema Aether responsável pela integração mobile-web e pelo acesso às funcionalidades inteligentes da plataforma.
+Este é o repositório responsável pelo portal web do ecossistema Aether, responsável pelo gerenciamento e visualização de relatórios via WEB.
