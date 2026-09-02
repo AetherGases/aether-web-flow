@@ -1,12 +1,12 @@
 import aetherLogo from '../../assets/logos/logo.svg'
 import analistaIcon from '../../assets/icons/analista-icon.svg'
 import adminIcon from '../../assets/icons/admin-icon.svg'
-import './login.css'
+import * as S from './styles'
+
 function LoginPage() {
     return (
-      <main className="login-page">
-        <svg
-          className="login-page__background-shape"
+      <S.Page>
+        <S.BackgroundShape
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
           aria-hidden="true"
@@ -30,19 +30,15 @@ function LoginPage() {
             d="M 0 0 H 44 C 52 20, 50 34, 48 43 C 45 56, 42 65, 44 85 C 45 95, 49 103, 49 100 H 0 Z"
             fill="url(#login-background-gradient)"
           />
-        </svg>
+        </S.BackgroundShape>
 
-        <section
-          className="login-page__presentation"
-          aria-labelledby="presentation-title"
-        >
-            <img
+        <S.Presentation aria-labelledby="presentation-title">
+            <S.Logo
                 src={aetherLogo}
                 alt="Aether"
-                className="login-page__logo"
             />
   
-          <div className="login-page__presentation-content">
+          <S.PresentationContent>
             <h2 id="presentation-title">
               Inteligência para decisões que reduzem custos
             </h2>
@@ -51,59 +47,53 @@ function LoginPage() {
               Analistas ganham clareza. Administradores ganham controle.
               Toda a operação unificada.
             </p>
-          </div>
-        </section>
+          </S.PresentationContent>
+        </S.Presentation>
   
-        <section
-          className="login-page__authentication"
-          aria-labelledby="login-title"
-        >
-          <div className="login-page__authentication-content">
-            <header className="login-page__header">
+        <S.Authentication aria-labelledby="login-title">
+          <S.AuthenticationContent>
+            <S.Header>
               <h1 id="login-title">Entre na sua conta</h1>
   
               <p>
                 Bem-vindo de volta! Acesse a plataforma com suas credenciais.
               </p>
-            </header>
+            </S.Header>
   
             <section
-              className="login-page__profiles"
               aria-labelledby="profiles-title"
             >
   
-              <ul className="login-page__profile-list">
+              <S.ProfileList>
                 <li>
-                  <article className="login-page__profile-card">
+                  <S.ProfileCard>
                     <img
                         src={analistaIcon}
                         alt="Analista"
-                        className="analista-card__icon"
                     />
                     <h3>Analista</h3>
                     <p>Dados e análises</p>
-                  </article>
+                  </S.ProfileCard>
                 </li>
   
                 <li>
-                  <article className="login-page__profile-card">
+                  <S.ProfileCard>
                   <img
                         src={adminIcon}
                         alt="Admin"
-                        className="admin-card__icon"
                     />
                     <h3>Administrador</h3>
                     <p>Gestão da plataforma</p>
-                  </article>
+                  </S.ProfileCard>
                 </li>
-              </ul>
+              </S.ProfileList>
             </section>
   
-            <form className="login-form">
-              <div className="login-form__field">
-                <label htmlFor="email">E-mail</label>
+            <S.Form>
+              <S.Field>
+                <S.Label htmlFor="email">E-mail</S.Label>
   
-                <input
+                <S.Input
                   id="email"
                   name="email"
                   type="email"
@@ -111,12 +101,12 @@ function LoginPage() {
                   placeholder="voce@empresa.com"
                   required
                 />
-              </div>
+              </S.Field>
   
-              <div className="login-form__field">
-                <label htmlFor="password">Senha</label>
+              <S.Field>
+                <S.Label htmlFor="password">Senha</S.Label>
   
-                <input
+                <S.Input
                   id="password"
                   name="password"
                   type="password"
@@ -124,15 +114,15 @@ function LoginPage() {
                   placeholder='********'
                   required
                 />
-              </div>
+              </S.Field>
   
-              <button className="login-form__submit" type="submit">
+              <S.SubmitButton type="submit">
                 Entrar
-              </button>
-            </form>
-          </div>
-        </section>
-      </main>
+              </S.SubmitButton>
+            </S.Form>
+          </S.AuthenticationContent>
+        </S.Authentication>
+      </S.Page>
     )
   }
   
