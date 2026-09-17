@@ -2,8 +2,17 @@ import aetherLogo from '../../assets/logos/logo.svg'
 import analistaIcon from '../../assets/icons/analista-icon.svg'
 import adminIcon from '../../assets/icons/admin-icon.svg'
 import * as S from './styles'
+import type { FormEvent } from 'react'
 
-function LoginPage() {
+interface LoginPageProps {
+  onLogin: () => void
+}
+
+function LoginPage({ onLogin }: LoginPageProps) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    onLogin()
+  }
     return (
       <S.Page>
         <S.BackgroundShape
@@ -89,7 +98,7 @@ function LoginPage() {
               </S.ProfileList>
             </section>
   
-            <S.Form>
+            <S.Form onSubmit={handleSubmit}>
               <S.Field>
                 <S.Label htmlFor="email">E-mail</S.Label>
   
