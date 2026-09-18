@@ -24,9 +24,6 @@ interface OverviewPageProps {
 }
 
 function OverviewPage({ data, onLogout }: OverviewPageProps) {
-  const maxReduction = Math.max(
-    ...data.plantPerformance.map((plant) => plant.reduction),
-  )
   return (
     <S.Page>
       <Sidebar
