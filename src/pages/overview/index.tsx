@@ -119,11 +119,6 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
 
             <tbody>
               {data.plantPerformance.map((plant, index) => {
-                const barWidth =
-                  maxReduction === 0
-                    ? 0
-                    : (plant.reduction / maxReduction) * 100
-
                 return (
                   <tr key={plant.id}>
                     <td>
