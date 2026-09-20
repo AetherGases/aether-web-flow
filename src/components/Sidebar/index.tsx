@@ -40,7 +40,7 @@ function Sidebar({
           </li>
 
           <li>
-            <S.NavigationLink href="/analysis">
+            <S.NavigationLink href="/data-analysis">
               <S.Icon src={AnaliseLogo} alt="" aria-hidden="true" />
               Análise de dados
             </S.NavigationLink>
