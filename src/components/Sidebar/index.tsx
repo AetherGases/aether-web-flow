@@ -6,6 +6,7 @@ import CalculadoraLogo from '../../assets/icons/calculator.svg'
 import ChatbotLogo from '../../assets/icons/chatbot.svg'
 import type { UserRole } from '../../types/overview'
 import sair from '../../assets/icons/sair.svg'
+import { useLocation } from 'react-router-dom'
 
 
 interface SidebarProps {
@@ -20,6 +21,7 @@ function Sidebar({
   userRole,
   onLogout,
 }: SidebarProps) {
+  const { pathname } = useLocation()
   const userInitial = userName.charAt(0).toUpperCase()
 
   const roleLabel =
@@ -33,28 +35,34 @@ function Sidebar({
       <S.Navigation>
         <S.NavigationList>
           <li>
-            <S.NavigationLink href="/overview" aria-current="page">
+            <S.NavigationLink
+              to="/overview"
+              aria-current={pathname === '/overview' ? 'page' : undefined}
+            >
               <S.Icon src={OverviewLogo} alt="" aria-hidden="true" />
               Visão geral
             </S.NavigationLink>
           </li>
 
           <li>
-            <S.NavigationLink href="/data-analysis">
+            <S.NavigationLink
+              to="/data-analysis"
+              aria-current={pathname === '/data-analysis' ? 'page' : undefined}
+            >
               <S.Icon src={AnaliseLogo} alt="" aria-hidden="true" />
               Análise de dados
             </S.NavigationLink>
           </li>
 
           <li>
-            <S.NavigationLink href="/calculator">
+            <S.NavigationLink to="/calculator">
               <S.Icon src={CalculadoraLogo} alt="" aria-hidden="true" />
               Calculadora
             </S.NavigationLink>
           </li>
 
           <li>
-            <S.NavigationLink href="/assistant">
+            <S.NavigationLink to="/assistant">
               <S.Icon src={ChatbotLogo} alt="" aria-hidden="true" />
               Assistente Aether
             </S.NavigationLink>

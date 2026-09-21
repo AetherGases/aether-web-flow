@@ -42,7 +42,10 @@ function App() {
         path="/data-analysis"
         element={
           isAuthenticated ? (
-            <DataAnalysisPage />
+            <DataAnalysisPage
+              data={analystOverviewMock}
+              onLogout={() => setIsAuthenticated(false)}
+            />
           ) : (
             <Navigate to="/" replace />
           )
