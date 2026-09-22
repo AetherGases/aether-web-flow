@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 export const Container = styled.aside`
   position: sticky;
@@ -40,7 +41,7 @@ export const NavigationList = styled.ul`
   list-style: none;
 `
 
-export const NavigationLink = styled.a`
+export const NavigationLink = styled(Link)`
   display: flex;
   align-items: center;
   gap: var(--space-3);
