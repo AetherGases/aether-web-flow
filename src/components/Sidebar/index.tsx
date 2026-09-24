@@ -55,7 +55,10 @@ function Sidebar({
           </li>
 
           <li>
-            <S.NavigationLink to="/calculator">
+            <S.NavigationLink
+              to="/calculator"
+              aria-current={pathname === '/calculator' ? 'page' : undefined}
+            >
               <S.Icon src={CalculadoraLogo} alt="" aria-hidden="true" />
               Calculadora
             </S.NavigationLink>
