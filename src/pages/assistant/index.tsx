@@ -4,7 +4,6 @@ import assistantAvatarBackground from '../../assets/icons/chatbot/assistant-avat
 import assistantIcon from '../../assets/icons/chatbot/assistant-icon.svg'
 import potentialSavingsChart from '../../assets/icons/chatbot/potential-savings-chart.svg'
 import sendIcon from '../../assets/icons/chatbot/send-icon.svg'
-import sparkleIcon from '../../assets/icons/chatbot/sparkle-icon.svg'
 import Sidebar from '../../components/Sidebar'
 import type { OverviewData } from '../../types/overview'
 import * as S from './styles'
