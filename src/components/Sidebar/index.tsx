@@ -65,7 +65,10 @@ function Sidebar({
           </li>
 
           <li>
-            <S.NavigationLink to="/assistant">
+            <S.NavigationLink
+              to="/assistant"
+              aria-current={pathname === '/assistant' ? 'page' : undefined}
+            >
               <S.Icon src={ChatbotLogo} alt="" aria-hidden="true" />
               Assistente Aether
             </S.NavigationLink>
