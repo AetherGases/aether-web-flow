@@ -1,0 +1,71 @@
+<svg
+  preserveAspectRatio="none"
+  viewBox="0 0 225 52"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <linearGradient
+      id="chart-gradient"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop offset="0%" stop-color="#2DBD7E" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#2DBD7E" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Área abaixo da linha -->
+  <path
+    d="
+      M0 49.25
+      H15.26
+      L30.5 42.75
+      H46
+      L59 39.25
+      L73.5 38.25
+      L87 35.75
+      H103.5
+      L119.5 34.25
+      L135.5 26.75
+      L156.5 25.25
+      L166 23.75
+      L179.5 22.25
+      L190 16.25
+      L204.5 14.25
+      L224 1.25
+      L224 51
+      H0
+      Z
+    "
+    fill="url(#chart-gradient)"
+  />
+
+  <!-- Linha do gráfico -->
+  <path
+    d="
+      M0 49.25
+      H15.26
+      L30.5 42.75
+      H46
+      L59 39.25
+      L73.5 38.25
+      L87 35.75
+      H103.5
+      L119.5 34.25
+      L135.5 26.75
+      L156.5 25.25
+      L166 23.75
+      L179.5 22.25
+      L190 16.25
+      L204.5 14.25
+      L224 1.25
+    "
+    stroke="#2DBD7E"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

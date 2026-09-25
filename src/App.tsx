@@ -5,6 +5,7 @@ import LoginPage from './pages/login'
 import OverviewPage from './pages/overview'
 import DataAnalysisPage from './pages/data-analysis'
 import CalculatorPage from './pages/calculator'
+import AssistantPage from './pages/assistant'
 import { analystOverviewMock } from './mocks/overview'
 
 function App() {
@@ -58,6 +59,20 @@ function App() {
         element={
           isAuthenticated ? (
             <CalculatorPage
+              data={analystOverviewMock}
+              onLogout={() => setIsAuthenticated(false)}
+            />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+
+      <Route
+        path="/assistant"
+        element={
+          isAuthenticated ? (
+            <AssistantPage
               data={analystOverviewMock}
               onLogout={() => setIsAuthenticated(false)}
             />
