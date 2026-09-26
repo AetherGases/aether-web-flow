@@ -6,6 +6,7 @@ import OverviewPage from './pages/overview'
 import DataAnalysisPage from './pages/data-analysis'
 import CalculatorPage from './pages/calculator'
 import AssistantPage from './pages/assistant'
+import ErrorPage from './pages/error'
 import { analystOverviewMock } from './mocks/overview'
 
 function App() {
@@ -82,7 +83,7 @@ function App() {
         }
       />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   )
 }
