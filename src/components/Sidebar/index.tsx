@@ -46,8 +46,8 @@ function Sidebar({
 
           <li>
             <S.NavigationLink
-              to="/data-analysis"
-              aria-current={pathname === '/data-analysis' ? 'page' : undefined}
+              to="/data-analysis/upload"
+              aria-current={pathname.startsWith('/data-analysis') ? 'page' : undefined}
             >
               <S.Icon src={AnaliseLogo} alt="" aria-hidden="true" />
               Análise de dados
