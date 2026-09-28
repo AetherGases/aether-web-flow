@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 
 import LoginPage from './pages/login'
 import OverviewPage from './pages/overview'
 import DataAnalysisPage from './pages/data-analysis'
+import DataAnalysisChoicePage from './pages/data-analysis-choice'
 import DataUploadPage from './pages/data-upload'
 import CalculatorPage from './pages/calculator'
 import AssistantPage from './pages/assistant'
@@ -12,6 +13,7 @@ import { analystOverviewMock } from './mocks/overview'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <Routes>
@@ -39,6 +41,17 @@ function App() {
           ) : (
             <Navigate to="/" replace />
           )
+        }
+      />
+
+      <Route
+        path="/data-analysis/select"
+        element={
+          <DataAnalysisChoicePage
+            data={{ ...analystOverviewMock, role: 'administrator' }}
+            onLogout={() => setIsAuthenticated(false)}
+            onSelectPlant={() => navigate('/data-analysis/upload')}
+          />
         }
       />
 
