@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from './pages/login'
 import OverviewPage from './pages/overview'
 import DataAnalysisPage from './pages/data-analysis'
+import DataUploadPage from './pages/data-upload'
 import CalculatorPage from './pages/calculator'
 import AssistantPage from './pages/assistant'
 import ErrorPage from './pages/error'
@@ -32,6 +33,20 @@ function App() {
         element={
           isAuthenticated ? (
             <OverviewPage
+              data={analystOverviewMock}
+              onLogout={() => setIsAuthenticated(false)}
+            />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+
+      <Route
+        path="/data-analysis/upload"
+        element={
+          isAuthenticated ? (
+            <DataUploadPage
               data={analystOverviewMock}
               onLogout={() => setIsAuthenticated(false)}
             />
