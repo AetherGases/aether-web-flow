@@ -7,6 +7,7 @@ import ChatbotLogo from '../../assets/icons/chatbot.svg'
 import type { UserRole } from '../../types/overview'
 import sair from '../../assets/icons/sair.svg'
 import { useLocation } from 'react-router-dom'
+import perfil from '../../assets/icons/perfil.svg'
 
 
 interface SidebarProps {
@@ -71,6 +72,16 @@ function Sidebar({
             >
               <S.Icon src={ChatbotLogo} alt="" aria-hidden="true" />
               Assistente Aether
+            </S.NavigationLink>
+          </li>
+
+          <li>
+            <S.NavigationLink
+              to="/profile"
+              aria-current={pathname === '/profile' ? 'page' : undefined}
+            >
+              <S.Icon src={perfil} alt="" aria-hidden="true" />
+              Perfil
             </S.NavigationLink>
           </li>
         </S.NavigationList>
