@@ -10,6 +10,8 @@ import CalculatorPage from './pages/calculator'
 import AssistantPage from './pages/assistant'
 import ErrorPage from './pages/error'
 import { analystOverviewMock } from './mocks/overview'
+import ProfilePage from './pages/profile'
+import { analystProfileMock } from './mocks/profile'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -103,6 +105,21 @@ function App() {
           isAuthenticated ? (
             <AssistantPage
               data={analystOverviewMock}
+              onLogout={() => setIsAuthenticated(false)}
+            />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          isAuthenticated ? (
+            <ProfilePage
+              data={analystOverviewMock}
+              profile={analystProfileMock}
               onLogout={() => setIsAuthenticated(false)}
             />
           ) : (
