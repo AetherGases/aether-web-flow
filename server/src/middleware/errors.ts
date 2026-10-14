@@ -12,7 +12,7 @@ export class ApiError extends Error {
 }
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, _request, response, _next) => {
-  void _next 
+  void _next
   let failure = error instanceof ApiError ? error : new ApiError(500, 'INTERNAL_ERROR', 'Não foi possível concluir a operação.')
   if (error instanceof SyntaxError) failure = new ApiError(400, 'INVALID_JSON', 'Envie um JSON válido.')
   if (typeof error === 'object' && error !== null && 'type' in error && error.type === 'entity.too.large') {

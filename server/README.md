@@ -7,7 +7,7 @@ Node 24 + TypeScript + Express. O processo do BFF é separado do Vite. O navegad
 1. Na raiz: `npm ci`.
 2. Na pasta server: `npm ci` e `Copy-Item .env.example .env`.
 3. Preencha `SESSION_SECRET` com uma chave aleatória de pelo menos 32 caracteres e confirme `MS_AUTH_URL`. A URL local padrão do exemplo é `http://localhost:8080`, conforme API_PORT padrão do serviço.
-4. Inicie o ms-auth com suas dependências/configuração próprias e as alterações da feature/33.
+4. Inicie o ms-auth com suas dependências/configuração próprias com o contrato de role descrito abaixo disponível no login e no refresh.
 5. Na raiz, terminal 1: `npm run dev:bff`. Terminal 2: `npm run dev`.
 6. Acesse `http://localhost:5173`. Se a origem/porta mudar, ajuste FRONTEND_ORIGIN. O proxy do Vite encaminha `/api` para `127.0.0.1:3001`.
 
@@ -41,7 +41,7 @@ O ms-auth precisa retornar no login e refresh:
 
 `role` aceita apenas analyst/administrator. Ausência/valor desconhecido bloqueia o login; nenhum fallback usa email ou dados mockados. O endpoint GET /api/profile deve retornar id/name/email coerentes com a identidade autenticada. CPF, tokens e outros campos não são devolvidos pelo contrato de sessão.
 
-Regra confirmada para o portal: funcionário com a permissão literal `user:analytics:visibility:high` recebe administrator; demais recebem analyst. A tabela separada administrator não faz parte deste fluxo. O backend calcula o papel e atualiza permissões no refresh. O BFF não decodifica JWT para confiar em claims; usa o endpoint protegido do ms-auth, responsável pela validação.
+A definição de administrator/analyst pertence ao ms-auth e deve acompanhar a regra de permissões aprovada pelo backend. O BFF utiliza apenas a role retornada pelo serviço. A tabela separada administrator não faz parte deste fluxo. O backend calcula o papel e atualiza permissões no refresh. O BFF não decodifica JWT para confiar em claims; usa o endpoint protegido do ms-auth, responsável pela validação.
 
 ## Sessão e limites
 
@@ -55,4 +55,4 @@ Desenvolvimento sem REDIS_URL usa MemoryStore e perde sessões ao reiniciar. Pro
 
 Na raiz: `npm run build`, `npm run lint`, `npm test`, `npm run typecheck:bff` e `npm run test:bff`. Os testes do BFF utilizam um ms-auth HTTP simulado e nunca credenciais reais. Testes de Redis/HTTPS e E2E com os serviços implantados ainda devem ser feitos no ambiente integrado.
 
-As outras telas continuam com dados demonstrativos, explicitamente sinalizados. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção de análise é restrita a administrator; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
+As outras telas continuam com dados demonstrativos; apenas a autenticação e a identidade da sessão estão integradas nesta entrega. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção de análise é restrita a administrator; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
