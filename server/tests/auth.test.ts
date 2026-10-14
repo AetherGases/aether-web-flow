@@ -21,9 +21,13 @@ async function listen(server: Server): Promise<string> {
   return `http://127.0.0.1:${address.port}`
 }
 
-async function harness(t: TestContext, initialTokens = token()) {
-  const state = { tokens: initialTokens, refreshTokens: token(), status: 200, profileStatus: 200, refreshStatus: 200, refreshCalls: 0, loginCalls: 0, delay: false }
-  const upstream = createServer((request, response) => {
+async function harness(t: TestContext, initialTokens = token(), production = false) {
+  let releaseRefresh: (() => void) | undefined
+  let signalRefresh: (() => void) | undefined
+  const refreshStarted = new Promise<void>((resolve) => { signalRefresh = resolve })
+  const refreshGate = new Promise<void>((resolve) => { releaseRefresh = resolve })
+  const state = { tokens: initialTokens, refreshTokens: token(), status: 200, profileStatus: 200, refreshStatus: 200, refreshCalls: 0, loginCalls: 0, delay: false, holdRefresh: false }
+  const upstream = createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json')
     if (request.url === '/api/auth/login') {
       state.loginCalls++
@@ -32,6 +36,8 @@ async function harness(t: TestContext, initialTokens = token()) {
       response.end(JSON.stringify(state.status === 200 ? state.tokens : { internal: 'private-stack-password' }))
     } else if (request.url?.startsWith('/api/auth/refresh/')) {
       state.refreshCalls++
+      signalRefresh?.()
+      if (state.holdRefresh) await refreshGate
       assert.equal(request.method, 'PUT')
       assert.equal(request.headers.authorization, 'Bearer private-refresh-token')
       response.statusCode = state.refreshStatus
@@ -43,13 +49,19 @@ async function harness(t: TestContext, initialTokens = token()) {
     } else { response.statusCode = 404; response.end('{}') }
   })
   const upstreamUrl = await listen(upstream)
-  const config = readConfig({ NODE_ENV: 'test', SESSION_SECRET: 'test-only-secret-with-at-least-32-characters', FRONTEND_ORIGIN: origin, MS_AUTH_URL: upstreamUrl, UPSTREAM_TIMEOUT_MS: '150' })
+  const config = readConfig({ NODE_ENV: 'test', SESSION_SECRET: 'test-only-secret-with-at-least-32-characters', FRONTEND_ORIGIN: origin, MS_AUTH_URL: upstreamUrl, UPSTREAM_TIMEOUT_MS: '1000' })
+  if (production) Object.assign(config, { NODE_ENV: 'production', TRUST_PROXY_HOPS: 1 })
   const store = new session.MemoryStore()
   const appServer = createServer(createApp(config, store))
+  const logoutStarted = new Promise<void>((resolve) => {
+    appServer.prependListener('request', (request) => {
+      if (request.url === '/api/v1/auth/logout') resolve()
+    })
+  })
   const base = await listen(appServer)
   t.after(() => { appServer.closeAllConnections(); appServer.close(); upstream.closeAllConnections(); upstream.close(); store.clear(() => {}) })
   async function post(path: string, body: unknown = credentials, cookie?: string, requestOrigin = origin) {
-    return fetch(`${base}/api/v1/auth/${path}`, { method: 'POST', headers: { Origin: requestOrigin, 'Content-Type': 'application/json', ...(cookie ? { Cookie: cookie } : {}) }, body: JSON.stringify(body) })
+    return fetch(`${base}/api/v1/auth/${path}`, { method: 'POST', headers: { ...(production ? { 'X-Forwarded-Proto': 'https' } : {}), Origin: requestOrigin, 'Content-Type': 'application/json', ...(cookie ? { Cookie: cookie } : {}) }, body: JSON.stringify(body) })
   }
   async function login() {
     const response = await post('login')
@@ -58,7 +70,7 @@ async function harness(t: TestContext, initialTokens = token()) {
     assert(cookie)
     return { response, cookie }
   }
-  return { state, base, post, login, store }
+  return { state, base, post, login, store, logoutStarted, refreshStarted, releaseRefresh: () => releaseRefresh?.(), stopUpstream: async () => { upstream.closeAllConnections(); await new Promise<void>((resolve) => upstream.close(() => resolve())) } }
 }
 
 test('login dos dois papéis, sessão recuperada e tokens somente no servidor', async (t) => {
@@ -165,4 +177,65 @@ test('logout remove sessão no store e exige origem válida', async (t) => {
 test('configuração recusa segredos curtos e produção sem Redis/HTTPS', () => {
   assert.throws(() => readConfig({ SESSION_SECRET: 'short' }))
   assert.throws(() => readConfig({ NODE_ENV: 'production', SESSION_SECRET: 'a'.repeat(32), FRONTEND_ORIGIN: origin, MS_AUTH_URL: 'http://localhost:8080' }))
+})
+
+test('logout durante refresh atrasado não permite recuperar sessão antiga', async (t) => {
+  const h = await harness(t, token('analyst', Date.now() + 10000))
+  const { cookie } = await h.login()
+  h.state.holdRefresh = true
+  const recovering = fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })
+  await h.refreshStarted
+  const loggingOut = h.post('logout', {}, cookie)
+  await h.logoutStarted
+  h.releaseRefresh()
+  await recovering
+  assert.equal((await loggingOut).status, 204)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    assert.equal((await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })).status, 401)
+  }
+})
+
+test('logouts simultâneos encerram a sessão de forma idempotente', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  const results = await Promise.all([h.post('logout', {}, cookie), h.post('logout', {}, cookie)])
+  for (const result of results) assert.equal(result.status, 204)
+  assert.equal((await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })).status, 401)
+})
+
+test('ms-auth desligado retorna indisponibilidade sem criar sessão', async (t) => {
+  const h = await harness(t)
+  await h.stopUpstream()
+  const response = await h.post('login')
+  assert.equal(response.status, 502)
+  assert.equal((await response.json()).error.code, 'AUTH_UNAVAILABLE')
+  assert.equal(response.headers.get('set-cookie'), null)
+})
+
+test('perfil recusado impede login e invalida sessão já existente', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  h.state.profileStatus = 403
+  assert.equal((await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })).status, 403)
+  assert.equal((await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })).status, 401)
+  const rejected = await h.post('login')
+  assert.equal(rejected.status, 403)
+  assert.equal(rejected.headers.get('set-cookie'), null)
+})
+
+test('cookie de produção possui Secure, HttpOnly, SameSite e prefixo Host', async (t) => {
+  // Simula o HTTPS informado por um proxy confiável; não valida TLS ou Redis reais.
+  const h = await harness(t, token(), true)
+  const { response } = await h.login()
+  const cookie = response.headers.get('set-cookie') ?? ''
+  assert.match(cookie, /^__Host-aether\.sid=/)
+  assert.match(cookie, /; Secure/)
+  assert.match(cookie, /; HttpOnly/)
+  assert.match(cookie, /; SameSite=Lax/)
+  assert.match(cookie, /; Path=\//)
+  assert(!/; Domain=/i.test(cookie))
+  assert.equal(response.headers.get('cache-control'), 'no-store')
+  const body = await response.json()
+  assert.deepEqual(Object.keys(body), ['user'])
+  assert.deepEqual(Object.keys(body.user).sort(), ['email', 'id', 'name', 'role'])
 })
