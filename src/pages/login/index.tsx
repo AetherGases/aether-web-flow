@@ -2,17 +2,10 @@ import aetherLogo from '../../assets/logos/logo.svg'
 import analistaIcon from '../../assets/icons/analista-icon.svg'
 import adminIcon from '../../assets/icons/admin-icon.svg'
 import * as S from './styles'
-import type { FormEvent } from 'react'
+import { useLogin } from '../../hooks/useLogin'
 
-interface LoginPageProps {
-  onLogin: () => void
-}
-
-function LoginPage({ onLogin }: LoginPageProps) {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    onLogin()
-  }
+function LoginPage() {
+  const { form, setForm, loading, errors, error, handleSubmit } = useLogin()
     return (
       <S.Page>
         <S.BackgroundShape
@@ -98,7 +91,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
               </S.ProfileList>
             </section>
   
-            <S.Form onSubmit={handleSubmit}>
+            <S.Form onSubmit={handleSubmit} noValidate aria-busy={loading}>
               <S.Field>
                 <S.Label htmlFor="email">E-mail</S.Label>
   
@@ -109,7 +102,14 @@ function LoginPage({ onLogin }: LoginPageProps) {
                   autoComplete="email"
                   placeholder="voce@empresa.com"
                   required
+                  maxLength={255}
+                  value={form.email}
+                  disabled={loading}
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
+                  onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
                 />
+                {errors.email && <p id="email-error" role="alert">{errors.email}</p>}
               </S.Field>
   
               <S.Field>
@@ -122,11 +122,20 @@ function LoginPage({ onLogin }: LoginPageProps) {
                   autoComplete="current-password"
                   placeholder='********'
                   required
+                  maxLength={128}
+                  value={form.password}
+                  disabled={loading}
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
+                  onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
                 />
+                {errors.password && <p id="password-error" role="alert">{errors.password}</p>}
               </S.Field>
   
-              <S.SubmitButton type="submit">
-                Entrar
+              {error && <p role="alert">{error}</p>}
+              {loading && <p role="status">Autenticando…</p>}
+              <S.SubmitButton type="submit" disabled={loading}>
+                {loading ? 'Entrando…' : 'Entrar'}
               </S.SubmitButton>
             </S.Form>
           </S.AuthenticationContent>

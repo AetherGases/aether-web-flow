@@ -34,7 +34,7 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
 
       <S.Content>
         <S.Header>
-          <h4 id='id-page'>Painel do administrador</h4>
+          <h4 id='id-page'>{data.role === 'administrator' ? 'Painel do administrador' : 'Painel do analista'}</h4>
           <div>
             <h1>Olá, {data.userName}👋🏻</h1>
 
