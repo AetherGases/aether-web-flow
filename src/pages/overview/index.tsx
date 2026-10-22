@@ -24,6 +24,9 @@ interface OverviewPageProps {
 }
 
 function OverviewPage({ data, onLogout }: OverviewPageProps) {
+  const isAdministrator = data.role === 'administrator'
+  const analysisPath = isAdministrator ? '/data-analysis/select' : '/data-analysis/upload'
+  const statusLabel = { completed: 'Concluída', processing: 'Em processamento', failed: 'Falhou' }
   return (
     <S.Page>
       <Sidebar
@@ -39,12 +42,13 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
             <h1>Olá, {data.userName}👋🏻</h1>
 
             <p>
-              Aqui está um resumo da atividade recente.
+              {isAdministrator ? 'Acompanhe os indicadores e o desempenho das plantas.' : 'Acompanhe suas análises e os alertas relacionados ao seu trabalho.'}
             </p>
           </div>
         </S.Header>
 
         <S.MetricsSection aria-labelledby="metrics-title">
+          <h2 id="metrics-title">Indicadores</h2>
           <S.MetricsGrid>
             {data.metrics.map((metric) => (
               <MetricCard key={metric.id} metric={metric} />
@@ -52,18 +56,18 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
           </S.MetricsGrid>
         </S.MetricsSection>
 
-        <S.FastAcessSection aria-labelledby="fast-access-title"> 
-          <p>Acesso rápido</p>
+        <S.FastAcessSection aria-labelledby="fast-access-title">
+          <h2 id="fast-access-title">Acesso rápido</h2>
           <S.FastAcessGrid>
             <S.FastAcessDiv>
               <S.Icon src={AnaliseIcon} alt="" aria-hidden="true" />
 
               <S.FastAcessContent>
-                <S.FastAcessLink href="/analysis">
+                <S.FastAcessLink to={analysisPath}>
                   Análise de dados
                 </S.FastAcessLink>
 
-                <p>Veja as 24 ocorrências</p>
+                <p>{isAdministrator ? 'Escolha o tipo de análise' : 'Envie um relatório para análise'}</p>
               </S.FastAcessContent>
             </S.FastAcessDiv>
 
@@ -71,7 +75,7 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
               <S.Icon src={CalculadoraIcon} alt="" aria-hidden="true" />
 
               <S.FastAcessContent>
-                <S.FastAcessLink href="/calculator">
+                <S.FastAcessLink to="/calculator">
                   Calculadora
                 </S.FastAcessLink>
 
@@ -83,7 +87,7 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
               <S.Icon src={ChatbotIcon} alt="" aria-hidden="true" />
 
               <S.FastAcessContent>
-                <S.FastAcessLink href="/assistant">
+                <S.FastAcessLink to="/assistant">
                   Assistente Aether
                 </S.FastAcessLink>
 
@@ -94,18 +98,18 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
         </S.FastAcessSection>
 
         <S.DashboardGrid>
-        <S.PerformanceSection aria-labelledby="performance-title">
+        {isAdministrator ? <S.PerformanceSection aria-labelledby="performance-title">
           <S.PerformanceHeader>
             <h2 id="performance-title">
               Desempenho por planta
             </h2>
 
-            <S.AnalysisLink href="/analysis">
+            <S.AnalysisLink to={analysisPath}>
               Ver análise completa
             </S.AnalysisLink>
           </S.PerformanceHeader>
 
-          <S.PerformanceTable>
+          {data.plantPerformance.length === 0 ? <p>Nenhuma planta disponível para comparação.</p> : <S.PerformanceTable>
             <thead>
               <tr>
                 <th scope="col">Planta</th>
@@ -137,8 +141,20 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
                 )
               })}
             </tbody>
-          </S.PerformanceTable>
-        </S.PerformanceSection>
+          </S.PerformanceTable>}
+        </S.PerformanceSection> : <S.PerformanceSection aria-labelledby="recent-analyses-title">
+          <S.PerformanceHeader>
+            <h2 id="recent-analyses-title">Minhas análises recentes</h2>
+            <S.AnalysisLink to={analysisPath}>Nova análise</S.AnalysisLink>
+          </S.PerformanceHeader>
+          {data.recentAnalyses.length === 0 ? <p>Você ainda não possui análises.</p> : <S.RecentList>
+            {data.recentAnalyses.map((analysis) => <li key={analysis.id}>
+              <strong>{analysis.name}</strong>
+              <span>{analysis.date}</span>
+              <span>{statusLabel[analysis.status]}</span>
+            </li>)}
+          </S.RecentList>}
+        </S.PerformanceSection>}
 
         <S.AlertsSection aria-labelledby="alerts-title">
           <S.AlertsHeader>
@@ -146,12 +162,12 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
               Alertas prioritários
             </h2>
 
-            <S.ViewAllLink href="/alerts">
-              Ver todos ›
+            <S.ViewAllLink to={analysisPath}>
+              Ir para análises ›
             </S.ViewAllLink>
           </S.AlertsHeader>
 
-          <S.AlertList>
+          {data.alerts.length === 0 ? <p>Nenhum alerta disponível.</p> : <S.AlertList>
             {data.alerts.map((alert) => (
               <S.AlertItem key={alert.id}>
                 <S.AlertIcon
@@ -171,7 +187,7 @@ function OverviewPage({ data, onLogout }: OverviewPageProps) {
                 </S.SeverityBadge>
               </S.AlertItem>
             ))}
-          </S.AlertList>
+          </S.AlertList>}
         </S.AlertsSection>
         </S.DashboardGrid>
       </S.Content>

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 export const Page = styled.div`
@@ -9,6 +10,7 @@ export const Page = styled.div`
 
 export const Content = styled.main`
   padding: var(--space-8);
+  min-width: 0;
 `
 
 export const Header = styled.header`
@@ -30,6 +32,8 @@ export const MetricsSection = styled.section`
 export const MetricsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  @media (max-width: 1100px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 650px) { grid-template-columns: 1fr; }
   gap: var(--space-4);
   margin-top: var(--space-4);
 `
@@ -37,13 +41,14 @@ export const MetricsGrid = styled.div`
 export const FastAcessSection = styled.section`
   margin-top: var(--space-8);
 
-  > p {
+  > h2 {
     text-align: left;
   }
 `
 export const FastAcessGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
   gap: var(--space-4);
   margin-top: var(--space-4);
 `
@@ -71,7 +76,7 @@ export const FastAcessContent = styled.div`
   }
 `
 
-export const FastAcessLink = styled.a`
+export const FastAcessLink = styled(Link)`
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
@@ -132,7 +137,7 @@ export const PerformanceHeader = styled.header`
   }
 `
 
-export const AnalysisLink = styled.a`
+export const AnalysisLink = styled(Link)`
   padding: var(--space-3) var(--space-4);
 
   color: var(--color-text-primary);
@@ -268,7 +273,7 @@ export const AlertsHeader = styled.header`
   }
 `
 
-export const ViewAllLink = styled.a`
+export const ViewAllLink = styled(Link)`
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   text-decoration: none;
@@ -376,4 +381,18 @@ export const SeverityBadge = styled.span<AlertLevelProps>`
   }};
 
   border-radius: var(--radius-md);
+`
+export const RecentList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-bottom: var(--border-width) solid var(--color-border);
+    text-align: left;
+  }
+  span { color: var(--color-text-secondary); }
 `
