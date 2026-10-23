@@ -13,6 +13,7 @@ const schema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
   FRONTEND_ORIGIN: origin,
   MS_AUTH_URL: origin,
+  MS_INVENTORY_URL: origin.optional(),
   SESSION_SECRET: z.string().trim().min(32),
   SESSION_MAX_AGE_MS: z.coerce.number().int().min(60000).max(86400000).default(28800000),
   UPSTREAM_TIMEOUT_MS: z.coerce.number().int().min(100).max(60000).default(5000),
@@ -21,6 +22,9 @@ const schema = z.object({
 }).superRefine((config, context) => {
   if (config.NODE_ENV === 'production' && (!config.REDIS_URL || !config.FRONTEND_ORIGIN.startsWith('https:') || !config.MS_AUTH_URL.startsWith('https:'))) {
     context.addIssue({ code: 'custom', message: 'Produção exige Redis e HTTPS no frontend/ms-auth' })
+  }
+  if (config.NODE_ENV === 'production' && config.MS_INVENTORY_URL && !config.MS_INVENTORY_URL.startsWith('https:')) {
+    context.addIssue({ code: 'custom', path: ['MS_INVENTORY_URL'], message: 'Produção exige HTTPS no inventory' })
   }
   if (config.REDIS_URL && !['redis:', 'rediss:'].includes(new URL(config.REDIS_URL).protocol)) {
     context.addIssue({ code: 'custom', path: ['REDIS_URL'], message: 'URL Redis inválida' })

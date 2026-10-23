@@ -1,43 +1,10 @@
 import type { OverviewData } from '../types/overview'
 
-export const analystOverviewMock: OverviewData = {
+export const administratorOverviewMock: OverviewData = {
   userName: 'Fernanda',
-  role: 'analyst',
+  role: 'administrator',
 
-  metrics: [
-    {
-      id: 'total-economy',
-      label: 'Economia gerada',
-      value: 'R$ 1,24 mi',
-      currentValue: 1240000,
-      previousValue: 1050000,
-      positiveDirection: 'increase',
-    },
-    {
-      id: 'completed-analyses',
-      label: 'Análises realizadas',
-      value: '312',
-      currentValue: 312,
-      previousValue: 279,
-      positiveDirection: 'increase',
-    },
-    {
-      id: 'active-plants',
-      label: 'Plantas ativas',
-      value: '48',
-      currentValue: 48,
-      previousValue: 44,
-      positiveDirection: 'increase',
-    },
-    {
-      id: 'critical-anomalies',
-      label: 'Anomalias críticas',
-      value: '24',
-      currentValue: 24,
-      previousValue: 20,
-      positiveDirection: 'decrease',
-    },
-  ],
+  metrics: [],
 
   recentAnalyses: [
     {
@@ -93,30 +60,31 @@ export const analystOverviewMock: OverviewData = {
     },
   ],
 
-  alerts: [
-    {
-      id: 'alert-1',
-      title: 'Consumo anômalo detectado na',
-      description: 'Planta 04',
-      level: 'critical',
-    },
-    {
-      id: 'alert-2',
-      title: 'Queda de eficiência na',
-      description: 'Planta 02',
-      level: 'warning',
-    },
-    {
-      id: 'alert-3',
-      title: 'Variação incomum de pressão na',
-      description: 'Planta 07',
-      level: 'info',
-    },
-    {
-      id: 'alert-4',
-      title: 'Manutenção preventiva recomendada na',
-      description: 'Planta 05',
-      level: 'warning',
-    },
-  ],
+  alerts: [],
 }
+// Fixtures de interface, não representam autorização nem respostas de API.
+// Não reutilizar indicadores consolidados da empresa no fluxo de analista.
+export const analystOverviewMock: OverviewData = {
+  userName: 'Fernanda',
+  role: 'analyst',
+  recentAnalyses: [
+    { id: 'my-analysis-1', name: 'Relatório de consumo', date: '05/09/2026', status: 'completed' },
+    { id: 'my-analysis-2', name: 'Relatório de pressão', date: '03/09/2026', status: 'processing' },
+  ],
+  metrics: [],
+  alerts: [],
+  plantPerformance: [],
+}
+// Dados demonstrativos utilizados pelas telas que ainda não foram integradas.
+administratorOverviewMock.metrics = [
+  { id: 'total-economy', label: 'Economia informada', value: 'R$ 1,24 mi', currentValue: 1240000, previousValue: null, positiveDirection: 'increase' },
+  { id: 'completed-analyses', label: 'Análises concluídas', value: '1', currentValue: 1, previousValue: null, positiveDirection: 'increase' },
+  { id: 'available-plants', label: 'Plantas no comparativo', value: '6', currentValue: 6, previousValue: null, positiveDirection: 'increase' },
+  { id: 'critical-anomalies', label: 'Alertas críticos', value: '1', currentValue: 1, previousValue: null, positiveDirection: 'decrease' },
+]
+analystOverviewMock.metrics = [
+  { id: 'completed-analyses', label: 'Análises concluídas', value: '1', currentValue: 1, previousValue: null, positiveDirection: 'increase' },
+  { id: 'processing-analyses', label: 'Em processamento', value: '1', currentValue: 1, previousValue: null, positiveDirection: 'decrease' },
+  { id: 'failed-analyses', label: 'Análises com falha', value: '0', currentValue: 0, previousValue: null, positiveDirection: 'decrease' },
+  { id: 'critical-anomalies', label: 'Alertas críticos', value: '0', currentValue: 0, previousValue: null, positiveDirection: 'decrease' },
+]

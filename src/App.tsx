@@ -9,7 +9,7 @@ import AssistantPage from './pages/assistant'
 import ProfilePage from './pages/profile'
 import ErrorPage from './pages/error'
 import PrivateRoute from './components/PrivateRoute'
-import { analystOverviewMock } from './mocks/overview'
+import { analystOverviewMock, administratorOverviewMock } from './mocks/overview'
 import { analystProfileMock } from './mocks/profile'
 import { useAuth } from './hooks/useAuth'
 import { getHomePath } from './utils/auth'
@@ -21,9 +21,10 @@ function AuthenticatedPage({ page }: AuthenticatedPageProps) {
   const { user, logout, error } = useAuth()
   const navigate = useNavigate()
   if (!user) return <Navigate to="/" replace />
-  const props = { data: { ...analystOverviewMock, userName: user.name, role: user.role }, onLogout: () => { void logout() } }
+  const overviewFixture = user.role === 'administrator' ? administratorOverviewMock : analystOverviewMock
+  const props = { data: { ...overviewFixture, userName: user.name, role: user.role }, onLogout: () => { void logout() } }
   const pages = {
-    overview: <OverviewPage {...props} />,
+    overview: <OverviewPage key={user.id} />,
     analysis: <DataAnalysisPage {...props} />,
     select: <DataAnalysisChoicePage {...props} onSelectPlant={() => navigate('/data-analysis/upload')} />,
     upload: <DataUploadPage {...props} />,

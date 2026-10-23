@@ -55,4 +55,13 @@ Desenvolvimento sem REDIS_URL usa MemoryStore e perde sessões ao reiniciar. Pro
 
 Na raiz: `npm run build`, `npm run lint`, `npm test`, `npm run typecheck:bff` e `npm run test:bff`. Os testes do BFF utilizam um ms-auth HTTP simulado e nunca credenciais reais. Testes de Redis/HTTPS e E2E com os serviços implantados ainda devem ser feitos no ambiente integrado.
 
-As outras telas continuam com dados demonstrativos; apenas a autenticação e a identidade da sessão estão integradas nesta entrega. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção de análise é restrita a administrator; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
+A overview integra inventários pessoais reais; demais telas continuam com dados demonstrativos até suas integrações. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção de análise é restrita a administrator; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
+
+## Overview e inventários
+
+GET /api/v1/overview exige sessão validada e usa MS_INVENTORY_URL no ambiente do BFF. Não configurar esta variável em VITE_*. Ausência retorna seções indisponíveis, sem afetar os endpoints de login. Produção exige HTTPS.
+
+A overview agrega /api/inventories/count, /api/inventories/mine?take=6&skip=0 e /api/inventories/mine/last. Somente o 404 de último inventário vira null. Cada seção retorna ready/data ou error/error. Falha em uma consulta não oculta as demais seções; não há fallback fictício. As contagens são pessoais para ambos os papéis. Não há consolidação financeira, ranking entre plantas ou alertas estatísticos nestes contratos.
+### Indicadores por papel
+
+A overview também usa o filtro status de /api/inventories/mine para os totais pessoais do analista (UNDER_REVIEW, APPROVED, PROCESSING_FAILED), via totalCount. Para administrador consulta /api/inventories/pending com escopo departamental, explicitado no contrato. O papel vem da sessão validada; parâmetros do browser não escolhem esse escopo. Cada indicador retorna seu próprio estado de sucesso/erro. A interface usa relatórios sem renomear APIs ou tabelas.
