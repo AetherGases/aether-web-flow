@@ -27,7 +27,6 @@ export interface PlantPerformance {
   id: string
   name: string
   economy: string
-  economyAmount: number
   reduction: number
 }
 
