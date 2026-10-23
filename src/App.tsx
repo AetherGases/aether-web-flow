@@ -24,7 +24,7 @@ function AuthenticatedPage({ page }: AuthenticatedPageProps) {
   const overviewFixture = user.role === 'administrator' ? administratorOverviewMock : analystOverviewMock
   const props = { data: { ...overviewFixture, userName: user.name, role: user.role }, onLogout: () => { void logout() } }
   const pages = {
-    overview: <OverviewPage {...props} />,
+    overview: <OverviewPage key={user.id} />,
     analysis: <DataAnalysisPage {...props} />,
     select: <DataAnalysisChoicePage {...props} onSelectPlant={() => navigate('/data-analysis/upload')} />,
     upload: <DataUploadPage {...props} />,

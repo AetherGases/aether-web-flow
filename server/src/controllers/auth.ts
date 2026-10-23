@@ -66,7 +66,8 @@ export function createAuthController(config: Config) {
           auth.user = { ...profile, role: auth.user.role }
           request.session.cookie.maxAge = Math.max(1, auth.absoluteExpiresAt - Date.now())
           await new Promise<void>((resolve, reject) => request.session.save((error) => error ? reject(error) : resolve()))
-          response.json({ user: auth.user })
+          if (response.locals.sessionOnly) response.locals.auth = { ...auth, user: { ...auth.user } }
+          else response.json({ user: auth.user })
         } catch (error) {
           if (error instanceof ApiError && [401, 403].includes(error.status)) await destroy(request, response)
           throw error

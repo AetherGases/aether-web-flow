@@ -10,7 +10,6 @@ export const Page = styled.div`
 
 export const Content = styled.main`
   padding: var(--space-8);
-  min-width: 0;
 `
 
 export const Header = styled.header`
@@ -32,8 +31,6 @@ export const MetricsSection = styled.section`
 export const MetricsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  @media (max-width: 1100px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  @media (max-width: 650px) { grid-template-columns: 1fr; }
   gap: var(--space-4);
   margin-top: var(--space-4);
 `
@@ -41,14 +38,13 @@ export const MetricsGrid = styled.div`
 export const FastAcessSection = styled.section`
   margin-top: var(--space-8);
 
-  > h2 {
+  > p {
     text-align: left;
   }
 `
 export const FastAcessGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  @media (max-width: 900px) { grid-template-columns: 1fr; }
   gap: var(--space-4);
   margin-top: var(--space-4);
 `
@@ -126,18 +122,22 @@ export const PerformanceSection = styled.section`
 
 export const PerformanceHeader = styled.header`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 
   h2 {
     color: var(--color-text-primary);
-    font-size: var(--font-size-xl);
+    font-size: 1.125rem;
+    line-height: var(--line-height-tight);
+    text-align: left;
   }
 `
 
 export const AnalysisLink = styled(Link)`
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: var(--space-3) var(--space-4);
 
   color: var(--color-text-primary);
@@ -269,11 +269,13 @@ export const AlertsHeader = styled.header`
 
   h2 {
     color: var(--color-text-primary);
-    font-size: var(--font-size-xl);
+    font-size: 1.125rem;
+    line-height: var(--line-height-tight);
+    text-align: left;
   }
 `
 
-export const ViewAllLink = styled(Link)`
+export const ViewAllLink = styled.a`
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   text-decoration: none;
@@ -382,17 +384,32 @@ export const SeverityBadge = styled.span<AlertLevelProps>`
 
   border-radius: var(--radius-md);
 `
+// Estados adicionados dentro dos blocos existentes, sem alterar o layout da develop.
+export const StatePanel = styled.div`
+  padding-block: var(--space-4);
+  p, strong { color: var(--color-text-secondary); font-size: var(--font-size-sm); text-align: left; }
+  p { margin: var(--space-2) 0; }
+`
+export const RetryButton = styled.button`
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  &:hover:not(:disabled) { border-color: var(--color-brand-green); }
+  &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+  &:disabled { opacity: 0.6; cursor: wait; }
+`
+
 export const RecentList = styled.ul`
-  margin: 0;
-  padding: 0;
   list-style: none;
-  li {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    padding: var(--space-4) 0;
-    border-bottom: var(--border-width) solid var(--color-border);
-    text-align: left;
-  }
-  span { color: var(--color-text-secondary); }
+  padding: 0;
+  margin: 0;
+  li { padding-block: var(--space-3); border-bottom: 1px solid var(--color-border); text-align: left; }
+  strong, span { display: block; font-size: var(--font-size-sm); }
+  span { color: var(--color-text-secondary); margin-top: var(--space-1); }
 `

@@ -3,9 +3,9 @@ import { rateLimit } from 'express-rate-limit'
 import type { Config } from '../config/index.ts'
 import { createAuthController } from '../controllers/auth.ts'
 
-export function authRoutes(config: Config) {
+export function authRoutes(config: Config, controller = createAuthController(config)) {
   const router = Router()
-  const controller = createAuthController(config)
+
   const loginLimit = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 10,

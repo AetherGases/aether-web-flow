@@ -5,7 +5,7 @@ export interface OverviewMetric {
   label: string
   value: string
   currentValue: number
-  previousValue: number
+  previousValue: number | null
   positiveDirection: 'increase' | 'decrease'
 }
 
