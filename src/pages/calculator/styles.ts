@@ -100,8 +100,8 @@ export const RangeInput = styled.input<{ $progress: number }>`
     90deg,
     var(--color-brand-purple) 0%,
     var(--color-brand-purple) ${({ $progress }) => $progress}%,
-    #51266f ${({ $progress }) => $progress}%,
-    #51266f 100%
+    var(--color-range-track) ${({ $progress }) => $progress}%,
+    var(--color-range-track) 100%
   );
   border-radius: var(--radius-pill);
 

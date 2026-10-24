@@ -40,6 +40,17 @@
     var(--color-brand-green) 100%
   );
 
+  /* Superfícies e controles que também respondem ao alto contraste. */
+  --color-range-track: #51266f;
+  --color-assistant-summary: #2a1a41;
+  --color-upload-panel: #332449;
+  --color-upload-icon: rgb(143 88 238 / 10%);
+  --color-upload-icon-border: rgb(126 130 148 / 46%);
+  --color-input-overlay: rgb(13 0 38 / 35%);
+  --color-field-overlay: rgb(13 0 38 / 18%);
+  --color-badge-background: rgb(183 108 244 / 14%);
+  --color-badge-border: rgb(183 108 244 / 35%);
+
   /* Typography */
   --font-family-primary: Inter, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;

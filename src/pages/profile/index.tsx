@@ -1,10 +1,12 @@
 import { type KeyboardEvent, useState } from 'react'
 
 import ProfileField from '../../components/ProfileField'
+import Toast from '../../components/Toast'
 import RoleBadge from '../../components/RoleBadge'
 import Sidebar from '../../components/Sidebar'
 import UserAvatar from '../../components/UserAvatar'
 import { useAuth } from '../../hooks/useAuth'
+import { usePreferences } from '../../hooks/usePreferences'
 import { useProfile } from '../../hooks/useProfile'
 import SectionState from '../../components/SectionState'
 import { validateProfile } from '../../utils/profile'
@@ -12,9 +14,9 @@ import * as S from './styles'
 
 function ProfilePage() {
   const { user, logout, retry } = useAuth()
-  const { data: profile, loading, error, saveError, fieldErrors, saving, saved, sessionExpired, reload, save } = useProfile()
+  const { data: profile, loading, error, notification, dismissNotification, fieldErrors, saving, sessionExpired, reload, save } = useProfile()
   const [lightMode, setLightMode] = useState(false)
-  const [highContrast, setHighContrast] = useState(false)
+  const { highContrast, toggleHighContrast } = usePreferences()
   const [isEditingName, setIsEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
   const [nameError, setNameError] = useState<string | null>(null)
@@ -40,7 +42,7 @@ function ProfilePage() {
   if (!user) return null
 
   return (
-    <S.Page $highContrast={highContrast}>
+    <S.Page>
       <Sidebar
         userName={user.name}
         userRole={user.role}
@@ -51,9 +53,6 @@ function ProfilePage() {
         <S.Title>Meu perfil</S.Title>
 
         {sessionExpired && <p role="alert">Sua sessão expirou. <button type="button" onClick={retry}>Verificar sessão</button></p>}
-        {saveError && <p role="alert">{saveError}</p>}
-        {saved && <p role="status">Perfil atualizado.</p>}
-        {saving && <p role="status">Salvando perfil…</p>}
         {profile ? <S.ProfileGrid>
           <S.PersonalCard>
             <UserAvatar userName={profile.fullName} size="large" />
@@ -171,7 +170,7 @@ function ProfilePage() {
                   aria-checked={highContrast}
                   aria-label="Ativar alto contraste"
                   $active={highContrast}
-                  onClick={() => setHighContrast((currentValue) => !currentValue)}
+                  onClick={toggleHighContrast}
                 >
                   <span />
                 </S.Switch>
@@ -180,6 +179,7 @@ function ProfilePage() {
           </S.InformationCard>
         </S.ProfileGrid> : <SectionState loading={loading} error={!!error} description={error ?? undefined} onRetry={sessionExpired ? retry : reload} />}
       </S.Content>
+      {notification && <Toast type={notification.type} message={notification.message} onDismiss={dismissNotification} />}
     </S.Page>
   )
 }

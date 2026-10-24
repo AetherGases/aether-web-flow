@@ -1,23 +1,6 @@
 import styled from 'styled-components'
 
-interface PageProps {
-  $highContrast: boolean
-}
-
-export const Page = styled.div<PageProps>`
-  ${({ $highContrast }) =>
-    $highContrast &&
-    `
-      --color-background: #000000;
-      --color-surface: #080808;
-      --color-surface-muted: #111111;
-      --color-text-primary: #ffffff;
-      --color-text-secondary: #ffffff;
-      --color-text-muted: #e8e8e8;
-      --color-border: rgba(255, 255, 255, 0.6);
-      --color-border-strong: #ffffff;
-    `}
-
+export const Page = styled.div`
   display: grid;
   min-height: 100dvh;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
@@ -117,7 +100,7 @@ export const NameInput = styled.input`
   padding: var(--space-2) var(--space-3);
   color: var(--color-text-primary);
   text-align: center;
-  background-color: rgb(13 0 38 / 35%);
+  background-color: var(--color-input-overlay);
   border: var(--border-width) solid var(--color-focus);
   border-radius: var(--radius-md);
   outline: none;

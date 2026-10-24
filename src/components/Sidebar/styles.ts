@@ -106,6 +106,9 @@ export const Avatar = styled.span`
 
   background: var(--gradient-brand-diagonal);
   border-radius: 50%;
+  html[data-high-contrast='true'] & {
+    outline: 1px solid var(--color-border-strong);
+  }
 `
 
 export const UserInformation = styled.div`
