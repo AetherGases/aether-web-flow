@@ -1,11 +1,15 @@
 export interface ProfileData {
+  id: number
   fullName: string
   email: string
-  cpf: string
-  phone: string
-  company: string
-  unit: string
-  department: string
-  permissions: string[]
-  language: string
+  cpf: string | null
+  phone: string | null
+}
+export interface ProfileUpdate {
+  name?: string
+  phone?: string
+}
+export interface ProfileErrors {
+  name?: string
+  phone?: string
 }

@@ -10,7 +10,6 @@ import ProfilePage from './pages/profile'
 import ErrorPage from './pages/error'
 import PrivateRoute from './components/PrivateRoute'
 import { analystOverviewMock, administratorOverviewMock } from './mocks/overview'
-import { analystProfileMock } from './mocks/profile'
 import { useAuth } from './hooks/useAuth'
 import { getHomePath } from './utils/auth'
 
@@ -30,7 +29,7 @@ function AuthenticatedPage({ page }: AuthenticatedPageProps) {
     upload: <DataUploadPage {...props} />,
     calculator: <CalculatorPage {...props} />,
     assistant: <AssistantPage {...props} />,
-    profile: <ProfilePage {...props} profile={{ ...analystProfileMock, fullName: user.name, email: user.email }} />,
+    profile: <ProfilePage key={user.id} />,
   }
   return <>
     {error && <div role="alert">{error}</div>}

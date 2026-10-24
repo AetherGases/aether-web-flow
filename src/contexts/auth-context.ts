@@ -7,6 +7,7 @@ export interface AuthContextValue {
   error: string | null
   login: (credentials: LoginCredentials, signal?: AbortSignal) => Promise<void>
   logout: () => Promise<void>
+  updateName: (name: string) => void
   retry: () => void
 }
 

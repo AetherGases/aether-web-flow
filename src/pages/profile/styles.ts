@@ -185,47 +185,26 @@ export const DefinitionList = styled.dl`
   }
 `
 
-export const PermissionList = styled.ul`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-3);
-  list-style: none;
-
-  li {
-    display: grid;
-    place-items: center;
-    min-height: 2.5rem;
-    padding: var(--space-2);
-    color: var(--color-text-primary);
-    font-size: var(--font-size-xs);
-    text-align: center;
-    background: rgb(183 108 244 / 55%);
-    border: var(--border-width) solid rgb(255 255 255 / 35%);
-    border-radius: var(--radius-sm);
-  }
-
-  @media (max-width: 48rem) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+export const SettingsList = styled.div`
+  display: flex;
+  flex-direction: column;
 `
 
-export const SettingsSection = styled.section`
-  margin-top: var(--space-6);
-
-  > h2 {
-    margin-bottom: var(--space-4);
-    font-size: var(--font-size-2xl);
-  }
-`
-
-export const SettingsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+export const SettingsRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
+  min-height: 3.25rem;
+  padding: var(--space-3) 0;
+  border-bottom: var(--border-width) solid var(--color-border);
 
-  @media (max-width: 64rem) {
-    grid-template-columns: 1fr;
-  }
+  &:last-child { border-bottom: 0; }
+`
+
+export const SettingValue = styled.span`
+  color: var(--color-text-secondary);
+  text-align: right;
 `
 
 interface SwitchProps {
@@ -254,3 +233,13 @@ export const Switch = styled.button<SwitchProps>`
   }
 `
 
+
+export const NameLabel = styled.label`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+`

@@ -8,7 +8,9 @@ interface ProfileFieldProps {
   type?: 'text' | 'email' | 'tel'
   editable?: boolean
   maxLength?: number
-  onChange?: (value: string) => void
+  disabled?: boolean
+  error?: string
+  onChange?: (value: string) => void | Promise<boolean>
 }
 
 function ProfileField({
@@ -19,16 +21,18 @@ function ProfileField({
   editable = false,
   maxLength = 100,
   onChange,
+  disabled = false,
+  error,
 }: ProfileFieldProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(value)
 
-  function saveValue() {
+  async function saveValue() {
+    if (disabled) return
     const nextValue = draft.trim()
-    if (!nextValue) return
 
-    onChange?.(nextValue)
-    setIsEditing(false)
+    const saved = await onChange?.(nextValue)
+    if (saved !== false) setIsEditing(false)
   }
 
   function cancelEditing() {
@@ -37,7 +41,7 @@ function ProfileField({
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') saveValue()
+    if (event.key === 'Enter') void saveValue()
     if (event.key === 'Escape') cancelEditing()
   }
 
@@ -48,6 +52,9 @@ function ProfileField({
           <S.Label htmlFor={id}>{label}</S.Label>
           <S.Editor>
             <S.Input
+              aria-invalid={!!error}
+              aria-describedby={error ? `${id}-error` : undefined}
+              disabled={disabled}
               id={id}
               type={type}
               value={draft}
@@ -56,13 +63,14 @@ function ProfileField({
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <S.ConfirmButton type="button" onClick={saveValue}>
+            <S.ConfirmButton type="button" disabled={disabled} onClick={() => { void saveValue() }}>
               Salvar
             </S.ConfirmButton>
-            <S.CancelButton type="button" onClick={cancelEditing}>
+            <S.CancelButton type="button" disabled={disabled} onClick={cancelEditing}>
               Cancelar
             </S.CancelButton>
           </S.Editor>
+          {error && <p id={`${id}-error`} role="alert">{error}</p>}
         </>
       ) : (
         <>
@@ -73,7 +81,8 @@ function ProfileField({
               <S.EditButton
                 type="button"
                 aria-label={`Editar ${label.toLowerCase()}`}
-                onClick={() => setIsEditing(true)}
+                disabled={disabled}
+                onClick={() => { setDraft(value); setIsEditing(true) }}
               >
                 ✎
               </S.EditButton>

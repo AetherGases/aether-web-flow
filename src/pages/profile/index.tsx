@@ -2,73 +2,74 @@ import { type KeyboardEvent, useState } from 'react'
 
 import ProfileField from '../../components/ProfileField'
 import RoleBadge from '../../components/RoleBadge'
-import SettingCard from '../../components/SettingCard'
 import Sidebar from '../../components/Sidebar'
 import UserAvatar from '../../components/UserAvatar'
-import type { OverviewData } from '../../types/overview'
-import type { ProfileData } from '../../types/profile'
+import { useAuth } from '../../hooks/useAuth'
+import { useProfile } from '../../hooks/useProfile'
+import SectionState from '../../components/SectionState'
+import { validateProfile } from '../../utils/profile'
 import * as S from './styles'
 
-interface ProfilePageProps {
-  data: OverviewData
-  profile: ProfileData
-  onLogout: () => void
-}
-
-function ProfilePage({ data, profile: initialProfile, onLogout }: ProfilePageProps) {
-  const [profile, setProfile] = useState(initialProfile)
+function ProfilePage() {
+  const { user, logout, retry } = useAuth()
+  const { data: profile, loading, error, saveError, fieldErrors, saving, saved, sessionExpired, reload, save } = useProfile()
   const [lightMode, setLightMode] = useState(false)
   const [highContrast, setHighContrast] = useState(false)
   const [isEditingName, setIsEditingName] = useState(false)
-  const [nameDraft, setNameDraft] = useState(initialProfile.fullName)
+  const [nameDraft, setNameDraft] = useState('')
+  const [nameError, setNameError] = useState<string | null>(null)
 
-  function updateProfileField(field: 'fullName' | 'phone', value: string) {
-    setProfile((currentProfile) => ({
-      ...currentProfile,
-      [field]: value,
-    }))
-  }
-
-  function saveName() {
-    const nextName = nameDraft.trim()
-    if (!nextName) return
-
-    updateProfileField('fullName', nextName)
-    setIsEditingName(false)
+  async function saveName() {
+    const changes = { name: nameDraft.trim() }
+    const errors = validateProfile(changes)
+    setNameError(errors.name ?? null)
+    if (!errors.name && await save(changes)) setIsEditingName(false)
   }
 
   function cancelNameEditing() {
-    setNameDraft(profile.fullName)
+    setNameDraft(profile?.fullName ?? user?.name ?? '')
+    setNameError(null)
     setIsEditingName(false)
   }
 
   function handleNameKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') saveName()
+    if (event.key === 'Enter') void saveName()
     if (event.key === 'Escape') cancelNameEditing()
   }
+
+  if (!user) return null
 
   return (
     <S.Page $highContrast={highContrast}>
       <Sidebar
-        userName={data.userName}
-        userRole={data.role}
-        onLogout={onLogout}
+        userName={user.name}
+        userRole={user.role}
+        onLogout={() => { void logout() }}
       />
 
       <S.Content>
         <S.Title>Meu perfil</S.Title>
 
-        <S.ProfileGrid>
+        {sessionExpired && <p role="alert">Sua sessão expirou. <button type="button" onClick={retry}>Verificar sessão</button></p>}
+        {saveError && <p role="alert">{saveError}</p>}
+        {saved && <p role="status">Perfil atualizado.</p>}
+        {saving && <p role="status">Salvando perfil…</p>}
+        {profile ? <S.ProfileGrid>
           <S.PersonalCard>
             <UserAvatar userName={profile.fullName} size="large" />
 
             <S.Identity>
               {isEditingName ? (
                 <S.NameEditor>
+                  <S.NameLabel htmlFor="profile-name">Nome completo</S.NameLabel>
                   <S.NameInput
+                    id="profile-name"
                     aria-label="Nome completo"
                     value={nameDraft}
-                    maxLength={80}
+                    maxLength={150}
+                    disabled={saving}
+                    aria-invalid={!!nameError}
+                    aria-describedby={nameError ? "profile-name-error" : undefined}
                     autoFocus
                     onChange={(event) => setNameDraft(event.target.value)}
                     onKeyDown={handleNameKeyDown}
@@ -77,13 +78,15 @@ function ProfilePage({ data, profile: initialProfile, onLogout }: ProfilePagePro
                     type="button"
                     aria-label="Salvar nome"
                     $confirm
-                    onClick={saveName}
+                    disabled={saving}
+                    onClick={() => { void saveName() }}
                   >
                     ✓
                   </S.NameAction>
                   <S.NameAction
                     type="button"
                     aria-label="Cancelar edição do nome"
+                    disabled={saving}
                     onClick={cancelNameEditing}
                   >
                     ×
@@ -95,13 +98,15 @@ function ProfilePage({ data, profile: initialProfile, onLogout }: ProfilePagePro
                   <S.EditNameButton
                     type="button"
                     aria-label="Editar nome"
-                    onClick={() => setIsEditingName(true)}
+                    disabled={saving}
+                    onClick={() => { setNameDraft(profile.fullName); setNameError(null); setIsEditingName(true) }}
                   >
                     ✎
                   </S.EditNameButton>
                 </S.NameRow>
               )}
-              <RoleBadge role={data.role} />
+              {nameError && <p id="profile-name-error" role="alert">{nameError}</p>}
+              <RoleBadge role={user.role} />
             </S.Identity>
 
             <S.Fields>
@@ -113,16 +118,18 @@ function ProfilePage({ data, profile: initialProfile, onLogout }: ProfilePagePro
               <ProfileField
                 id="profile-cpf"
                 label="CPF"
-                value={profile.cpf}
+                value={profile.cpf ?? 'Não informado'}
               />
               <ProfileField
                 id="profile-phone"
                 label="Telefone"
-                value={profile.phone}
+                value={profile.phone ?? 'Não informado'}
                 type="tel"
                 editable
                 maxLength={20}
-                onChange={(value) => updateProfileField('phone', value)}
+                disabled={saving}
+                error={fieldErrors.phone}
+                onChange={(phone) => save({ phone })}
               />
             </S.Fields>
           </S.PersonalCard>
@@ -130,59 +137,48 @@ function ProfilePage({ data, profile: initialProfile, onLogout }: ProfilePagePro
           <S.InformationCard>
             <h2>Organização</h2>
             <S.DefinitionList>
-              <div><dt>Empresa</dt><dd>{profile.company}</dd></div>
-              <div><dt>Unidade</dt><dd>{profile.unit}</dd></div>
-              <div><dt>Departamento</dt><dd>{profile.department}</dd></div>
+              <div><dt>Empresa</dt><dd>Não disponível</dd></div>
+              <div><dt>Unidade</dt><dd>Não disponível</dd></div>
+              <div><dt>Departamento</dt><dd>Não disponível</dd></div>
             </S.DefinitionList>
           </S.InformationCard>
 
-          <S.InformationCard>
-            <h2>Suas permissões</h2>
-            <S.PermissionList aria-label="Permissões do usuário">
-              {profile.permissions.map((permission) => (
-                <li key={permission}>{permission}</li>
-              ))}
-            </S.PermissionList>
+          <S.InformationCard aria-labelledby="settings-title">
+            <h2 id="settings-title">Configurações</h2>
+            <S.SettingsList>
+              <S.SettingsRow>
+                <span>Modo claro</span>
+                <S.Switch
+                  type="button"
+                  role="switch"
+                  aria-checked={lightMode}
+                  aria-label="Ativar modo claro"
+                  $active={lightMode}
+                  onClick={() => setLightMode((currentMode) => !currentMode)}
+                >
+                  <span />
+                </S.Switch>
+              </S.SettingsRow>
+              <S.SettingsRow>
+                <span>Idioma</span>
+                <S.SettingValue>Português (Brasil)</S.SettingValue>
+              </S.SettingsRow>
+              <S.SettingsRow>
+                <span>Alto contraste</span>
+                <S.Switch
+                  type="button"
+                  role="switch"
+                  aria-checked={highContrast}
+                  aria-label="Ativar alto contraste"
+                  $active={highContrast}
+                  onClick={() => setHighContrast((currentValue) => !currentValue)}
+                >
+                  <span />
+                </S.Switch>
+              </S.SettingsRow>
+            </S.SettingsList>
           </S.InformationCard>
-        </S.ProfileGrid>
-
-        <S.SettingsSection aria-labelledby="settings-title">
-          <h2 id="settings-title">Configurações</h2>
-
-          <S.SettingsGrid>
-            <SettingCard label="Modo claro">
-              <S.Switch
-                type="button"
-                role="switch"
-                aria-checked={lightMode}
-                aria-label="Ativar modo claro"
-                $active={lightMode}
-                onClick={() => setLightMode((currentMode) => !currentMode)}
-              >
-                <span />
-              </S.Switch>
-            </SettingCard>
-
-            <SettingCard
-              label="Idioma"
-              value={profile.language}
-              showArrow
-            />
-
-            <SettingCard label="Alto contraste">
-              <S.Switch
-                type="button"
-                role="switch"
-                aria-checked={highContrast}
-                aria-label="Ativar alto contraste"
-                $active={highContrast}
-                onClick={() => setHighContrast((currentValue) => !currentValue)}
-              >
-                <span />
-              </S.Switch>
-            </SettingCard>
-          </S.SettingsGrid>
-        </S.SettingsSection>
+        </S.ProfileGrid> : <SectionState loading={loading} error={!!error} description={error ?? undefined} onRetry={sessionExpired ? retry : reload} />}
       </S.Content>
     </S.Page>
   )
