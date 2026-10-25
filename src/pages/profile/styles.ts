@@ -185,9 +185,51 @@ export const SettingsRow = styled.div`
   &:last-child { border-bottom: 0; }
 `
 
-export const SettingValue = styled.span`
+export const LanguageControl = styled.div`
+  position: relative;
+  flex-shrink: 1;
+  max-width: 70%;
+  min-width: 0;
+`
+
+export const LanguageText = styled.span`
+  display: block;
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-2);
+  white-space: nowrap;
+  visibility: hidden;
+`
+
+export const LanguageSelect = styled.select`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-2);
   color: var(--color-text-secondary);
-  text-align: right;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+
+  &:hover { color: var(--color-text-primary); background: rgb(255 255 255 / 5%); }
+  &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  option { color: var(--color-text-primary); background: var(--color-surface-raised); }
+
+  html[data-high-contrast='true'] & { border: 0; background: transparent; }
+`
+
+export const LanguageArrow = styled.span`
+  position: absolute;
+  top: 50%;
+  right: var(--space-2);
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid var(--color-text-secondary);
+  border-bottom: 2px solid var(--color-text-secondary);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
 `
 
 interface SwitchProps {

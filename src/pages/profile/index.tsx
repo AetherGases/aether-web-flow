@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import { type KeyboardEvent, useState } from 'react'
 
 import ProfileField from '../../components/ProfileField'
@@ -9,14 +10,16 @@ import { useAuth } from '../../hooks/useAuth'
 import { usePreferences } from '../../hooks/usePreferences'
 import { useProfile } from '../../hooks/useProfile'
 import SectionState from '../../components/SectionState'
+import { isLanguage } from '../../types/preferences'
 import { validateProfile } from '../../utils/profile'
 import * as S from './styles'
 
 function ProfilePage() {
+  const { t } = useTranslation()
   const { user, logout, retry } = useAuth()
   const { data: profile, loading, error, notification, dismissNotification, fieldErrors, saving, sessionExpired, reload, save } = useProfile()
   const [lightMode, setLightMode] = useState(false)
-  const { highContrast, toggleHighContrast } = usePreferences()
+  const { highContrast, toggleHighContrast, language, setLanguage } = usePreferences()
   const [isEditingName, setIsEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
   const [nameError, setNameError] = useState<string | null>(null)
@@ -50,9 +53,9 @@ function ProfilePage() {
       />
 
       <S.Content>
-        <S.Title>Meu perfil</S.Title>
+        <S.Title>{t("Meu perfil")}</S.Title>
 
-        {sessionExpired && <p role="alert">Sua sessão expirou. <button type="button" onClick={retry}>Verificar sessão</button></p>}
+        {sessionExpired && <p role="alert">{t("Sua sessão expirou.")}{" "}<button type="button" onClick={retry}>{t("Verificar sessão")}</button></p>}
         {profile ? <S.ProfileGrid>
           <S.PersonalCard>
             <UserAvatar userName={profile.fullName} size="large" />
@@ -60,10 +63,10 @@ function ProfilePage() {
             <S.Identity>
               {isEditingName ? (
                 <S.NameEditor>
-                  <S.NameLabel htmlFor="profile-name">Nome completo</S.NameLabel>
+                  <S.NameLabel htmlFor="profile-name">{t("Nome completo")}</S.NameLabel>
                   <S.NameInput
                     id="profile-name"
-                    aria-label="Nome completo"
+                    aria-label={t("Nome completo")}
                     value={nameDraft}
                     maxLength={150}
                     disabled={saving}
@@ -75,7 +78,7 @@ function ProfilePage() {
                   />
                   <S.NameAction
                     type="button"
-                    aria-label="Salvar nome"
+                    aria-label={t("Salvar nome")}
                     $confirm
                     disabled={saving}
                     onClick={() => { void saveName() }}
@@ -84,7 +87,7 @@ function ProfilePage() {
                   </S.NameAction>
                   <S.NameAction
                     type="button"
-                    aria-label="Cancelar edição do nome"
+                    aria-label={t("Cancelar edição do nome")}
                     disabled={saving}
                     onClick={cancelNameEditing}
                   >
@@ -96,7 +99,7 @@ function ProfilePage() {
                   <h2>{profile.fullName}</h2>
                   <S.EditNameButton
                     type="button"
-                    aria-label="Editar nome"
+                    aria-label={t("Editar nome")}
                     disabled={saving}
                     onClick={() => { setNameDraft(profile.fullName); setNameError(null); setIsEditingName(true) }}
                   >
@@ -104,25 +107,25 @@ function ProfilePage() {
                   </S.EditNameButton>
                 </S.NameRow>
               )}
-              {nameError && <p id="profile-name-error" role="alert">{nameError}</p>}
+              {nameError && <p id="profile-name-error" role="alert">{t(nameError)}</p>}
               <RoleBadge role={user.role} />
             </S.Identity>
 
             <S.Fields>
               <ProfileField
                 id="profile-email"
-                label="E-mail"
+                label={t("E-mail")}
                 value={profile.email}
               />
               <ProfileField
                 id="profile-cpf"
-                label="CPF"
-                value={profile.cpf ?? 'Não informado'}
+                label={t("CPF")}
+                value={profile.cpf ?? t("Não informado")}
               />
               <ProfileField
                 id="profile-phone"
-                label="Telefone"
-                value={profile.phone ?? 'Não informado'}
+                label={t("Telefone")}
+                value={profile.phone ?? t("Não informado")}
                 type="tel"
                 editable
                 maxLength={20}
@@ -134,24 +137,24 @@ function ProfilePage() {
           </S.PersonalCard>
 
           <S.InformationCard>
-            <h2>Organização</h2>
+            <h2>{t("Organização")}</h2>
             <S.DefinitionList>
-              <div><dt>Empresa</dt><dd>Não disponível</dd></div>
-              <div><dt>Unidade</dt><dd>Não disponível</dd></div>
-              <div><dt>Departamento</dt><dd>Não disponível</dd></div>
+              <div><dt>{t("Empresa")}</dt><dd>{t("Não disponível")}</dd></div>
+              <div><dt>{t("Unidade")}</dt><dd>{t("Não disponível")}</dd></div>
+              <div><dt>{t("Departamento")}</dt><dd>{t("Não disponível")}</dd></div>
             </S.DefinitionList>
           </S.InformationCard>
 
           <S.InformationCard aria-labelledby="settings-title">
-            <h2 id="settings-title">Configurações</h2>
+            <h2 id="settings-title">{t("Configurações")}</h2>
             <S.SettingsList>
               <S.SettingsRow>
-                <span>Modo claro</span>
+                <span>{t("Modo claro")}</span>
                 <S.Switch
                   type="button"
                   role="switch"
                   aria-checked={lightMode}
-                  aria-label="Ativar modo claro"
+                  aria-label={t("Ativar modo claro")}
                   $active={lightMode}
                   onClick={() => setLightMode((currentMode) => !currentMode)}
                 >
@@ -159,16 +162,24 @@ function ProfilePage() {
                 </S.Switch>
               </S.SettingsRow>
               <S.SettingsRow>
-                <span>Idioma</span>
-                <S.SettingValue>Português (Brasil)</S.SettingValue>
+                <label htmlFor="profile-language">{t("Idioma")}</label>
+                <S.LanguageControl>
+                  <S.LanguageText aria-hidden="true">{t(language === 'pt-BR' ? 'Português (Brasil)' : language === 'en' ? 'English' : 'Espanhol')}</S.LanguageText>
+                <S.LanguageSelect id="profile-language" value={language} onChange={(event) => { if (isLanguage(event.target.value)) setLanguage(event.target.value) }}>
+                  <option value="pt-BR">{t("Português (Brasil)")}</option>
+                  <option value="en">{t("English")}</option>
+                  <option value="es">{t("Espanhol")}</option>
+                </S.LanguageSelect>
+                <S.LanguageArrow aria-hidden="true" />
+                </S.LanguageControl>
               </S.SettingsRow>
               <S.SettingsRow>
-                <span>Alto contraste</span>
+                <span>{t("Alto contraste")}</span>
                 <S.Switch
                   type="button"
                   role="switch"
                   aria-checked={highContrast}
-                  aria-label="Ativar alto contraste"
+                  aria-label={t("Ativar alto contraste")}
                   $active={highContrast}
                   onClick={toggleHighContrast}
                 >

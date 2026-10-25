@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import { type ChangeEvent, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -14,6 +15,7 @@ interface DataUploadPageProps {
 }
 
 function DataUploadPage({ data, onLogout }: DataUploadPageProps) {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState('')
@@ -30,7 +32,7 @@ function DataUploadPage({ data, onLogout }: DataUploadPageProps) {
     const extension = selectedFile.name.split('.').pop()?.toLowerCase() ?? ''
 
     if (!acceptedExtensions.includes(extension)) {
-      setErrorMessage('Selecione um arquivo CSV, XLS, XLSX ou JSON.')
+      setErrorMessage(t("Selecione um arquivo CSV, XLS, XLSX ou JSON."))
       event.target.value = ''
       return
     }
@@ -49,7 +51,7 @@ function DataUploadPage({ data, onLogout }: DataUploadPageProps) {
       />
 
       <S.Content>
-        <S.Title>Análise - Plantas individuais</S.Title>
+        <S.Title>{t("Análise - Plantas individuais")}</S.Title>
 
         <S.UploadPanel>
           <S.UploadIcon aria-hidden="true">
@@ -57,8 +59,8 @@ function DataUploadPage({ data, onLogout }: DataUploadPageProps) {
           </S.UploadIcon>
 
           <S.UploadText>
-            <strong>Carregue seus dados</strong>
-            <span>Aceita CSV, XLSX ou JSON</span>
+            <strong>{t("Carregue seus dados")}</strong>
+            <span>{t("Aceita CSV, XLSX ou JSON")}</span>
           </S.UploadText>
 
           <S.FileInput
@@ -69,10 +71,9 @@ function DataUploadPage({ data, onLogout }: DataUploadPageProps) {
           />
 
           <S.SelectFileButton type="button" onClick={openFileSelector}>
-            Selecionar arquivo
-          </S.SelectFileButton>
+            {t("Selecionar arquivo")}</S.SelectFileButton>
 
-          {errorMessage && <S.ErrorMessage role="alert">{errorMessage}</S.ErrorMessage>}
+          {errorMessage && <S.ErrorMessage role="alert">{t(errorMessage)}</S.ErrorMessage>}
         </S.UploadPanel>
       </S.Content>
     </S.Page>

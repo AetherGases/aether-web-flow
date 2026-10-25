@@ -1,3 +1,4 @@
+import { useTranslation } from './hooks/useTranslation'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import LoginPage from './pages/login'
 import OverviewPage from './pages/overview'
@@ -17,6 +18,7 @@ type Page = 'overview' | 'analysis' | 'select' | 'upload' | 'calculator' | 'assi
 interface AuthenticatedPageProps { page: Page }
 
 function AuthenticatedPage({ page }: AuthenticatedPageProps) {
+  const { t } = useTranslation()
   const { user, logout, error } = useAuth()
   const navigate = useNavigate()
   if (!user) return <Navigate to="/" replace />
@@ -32,15 +34,16 @@ function AuthenticatedPage({ page }: AuthenticatedPageProps) {
     profile: <ProfilePage key={user.id} />,
   }
   return <>
-    {error && <div role="alert">{error}</div>}
+    {error && <div role="alert">{t(error)}</div>}
     {pages[page]}
   </>
 }
 
 function App() {
+  const { t } = useTranslation()
   const { user, status, error, retry } = useAuth()
-  if (status === 'loading') return <main><p role="status">Recuperando sessão…</p></main>
-  if (status === 'error') return <main><p role="alert">{error}</p><button type="button" onClick={retry}>Tentar novamente</button></main>
+  if (status === 'loading') return <main><p role="status">{t("Recuperando sessão…")}</p></main>
+  if (status === 'error') return <main><p role="alert">{t(error ?? "Não foi possível recuperar sua sessão.")}</p><button type="button" onClick={retry}>{t("Tentar novamente")}</button></main>
 
   return <Routes>
     <Route path="/" element={user ? <Navigate to={getHomePath(user.role)} replace /> : <LoginPage />} />

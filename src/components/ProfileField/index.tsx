@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import { type KeyboardEvent, useState } from 'react'
 import * as S from './styles'
 
@@ -24,6 +25,7 @@ function ProfileField({
   disabled = false,
   error,
 }: ProfileFieldProps) {
+  const { t } = useTranslation()
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(value)
 
@@ -49,7 +51,7 @@ function ProfileField({
     <S.Field>
       {isEditing ? (
         <>
-          <S.Label htmlFor={id}>{label}</S.Label>
+          <S.Label htmlFor={id}>{t(label)}</S.Label>
           <S.Editor>
             <S.Input
               aria-invalid={!!error}
@@ -64,23 +66,21 @@ function ProfileField({
               onKeyDown={handleKeyDown}
             />
             <S.ConfirmButton type="button" disabled={disabled} onClick={() => { void saveValue() }}>
-              Salvar
-            </S.ConfirmButton>
+              {t("Salvar")}</S.ConfirmButton>
             <S.CancelButton type="button" disabled={disabled} onClick={cancelEditing}>
-              Cancelar
-            </S.CancelButton>
+              {t("Cancelar")}</S.CancelButton>
           </S.Editor>
-          {error && <p id={`${id}-error`} role="alert">{error}</p>}
+          {error && <p id={`${id}-error`} role="alert">{t(error)}</p>}
         </>
       ) : (
         <>
-          <S.StaticLabel>{label}</S.StaticLabel>
+          <S.StaticLabel>{t(label)}</S.StaticLabel>
           <S.ValueRow>
             <S.Value>{value}</S.Value>
             {editable && (
               <S.EditButton
                 type="button"
-                aria-label={`Editar ${label.toLowerCase()}`}
+                aria-label={t("Editar {0}", { "0": label.toLowerCase() })}
                 disabled={disabled}
                 onClick={() => { setDraft(value); setIsEditing(true) }}
               >

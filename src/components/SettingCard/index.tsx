@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import type { ReactNode } from 'react'
 import * as S from './styles'
 
@@ -14,9 +15,10 @@ function SettingCard({
   showArrow = false,
   children,
 }: SettingCardProps) {
+  const { t } = useTranslation()
   return (
     <S.Card>
-      <strong>{label}</strong>
+      <strong>{t(label)}</strong>
       {value && (
         <S.Value>
           {value}

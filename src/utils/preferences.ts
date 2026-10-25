@@ -1,20 +1,20 @@
-import type { Preferences } from '../types/preferences.ts'
+import { isLanguage, type Preferences } from '../types/preferences.ts'
 
 export const preferencesKey = 'aether.preferences'
 
 export function parsePreferences(value: string | null): Preferences {
-  const defaults: Preferences = { _versao: 1, highContrast: false }
+  const defaults: Preferences = { _versao: 2, highContrast: false, language: 'pt-BR' }
   if (!value) return defaults
   try {
-    const data = JSON.parse(value) as Partial<Preferences> | null
-    if (!data || data._versao !== 1 || typeof data.highContrast !== 'boolean') return defaults
-    return { _versao: 1, highContrast: data.highContrast }
+    const data = JSON.parse(value) as { _versao?: number; highContrast?: boolean; language?: string } | null
+    if (!data || ![1, 2].includes(data._versao ?? 0) || typeof data.highContrast !== 'boolean') return defaults
+    return { _versao: 2, highContrast: data.highContrast, language: data.language && isLanguage(data.language) ? data.language : 'pt-BR' }
   } catch { return defaults }
 }
 
 export function readPreferences(storage?: Pick<Storage, 'getItem'>): Preferences {
   try { return parsePreferences((storage ?? window.localStorage).getItem(preferencesKey)) }
-  catch { return { _versao: 1, highContrast: false } }
+  catch { return { _versao: 2, highContrast: false, language: 'pt-BR' } }
 }
 
 export function savePreferences(preferences: Preferences, storage?: Pick<Storage, 'setItem'>): void {
