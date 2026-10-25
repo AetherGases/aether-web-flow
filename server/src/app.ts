@@ -1,3 +1,6 @@
+import { createAuthController } from './controllers/auth.ts'
+import { createOverviewService } from './services/overview.ts'
+import type { AuthSession } from './types/auth.ts'
 import { randomUUID } from 'node:crypto'
 import express from 'express'
 import session, { type Store } from 'express-session'
@@ -37,7 +40,16 @@ export function createApp(config: Config, store?: Store) {
     saveUninitialized: false,
     cookie: { httpOnly: true, secure: config.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: config.SESSION_MAX_AGE_MS },
   }))
-  app.use('/api/v1/auth', authRoutes(config))
+  const authController = createAuthController(config)
+  const overview = createOverviewService(config)
+  app.use('/api/v1/auth', authRoutes(config, authController))
+  app.get('/api/v1/overview', async (request, response) => {
+    response.locals.sessionOnly = true
+    await authController.me(request, response)
+    const auth: AuthSession = response.locals.auth
+    const data = await overview(auth.accessToken, response.locals.requestId, auth.user.role)
+    response.json(data)
+  })
   app.use((_request, _response, next) => next(new ApiError(404, 'NOT_FOUND', 'Rota não encontrada.')))
   app.use(errorHandler)
   return app

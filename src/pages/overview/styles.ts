@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 export const Page = styled.div`
@@ -71,7 +72,7 @@ export const FastAcessContent = styled.div`
   }
 `
 
-export const FastAcessLink = styled.a`
+export const FastAcessLink = styled(Link)`
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
@@ -121,18 +122,22 @@ export const PerformanceSection = styled.section`
 
 export const PerformanceHeader = styled.header`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 
   h2 {
     color: var(--color-text-primary);
-    font-size: var(--font-size-xl);
+    font-size: 1.125rem;
+    line-height: var(--line-height-tight);
+    text-align: left;
   }
 `
 
-export const AnalysisLink = styled.a`
+export const AnalysisLink = styled(Link)`
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: var(--space-3) var(--space-4);
 
   color: var(--color-text-primary);
@@ -213,38 +218,6 @@ export const Position = styled.span`
   border-radius: 50%;
 `
 
-export const ReductionValue = styled.span`
-  display: block;
-  margin-bottom: var(--space-2);
-`
-
-export const ProgressTrack = styled.div`
-  width: 100%;
-  height: 0.5rem;
-  overflow: hidden;
-
-  background-color: var(--color-surface-muted);
-  border-radius: var(--radius-pill);
-`
-
-interface ProgressFillProps {
-  $width: number
-}
-
-export const ProgressFill = styled.div<ProgressFillProps>`
-  width: ${({ $width }) => `${$width}%`};
-  height: 100%;
-
-  background-color: var(--color-brand-green);
-  border-radius: inherit;
-`
-
-type AlertLevel = 'info' | 'warning' | 'critical'
-
-interface AlertLevelProps {
-  $level: AlertLevel
-}
-
 export const AlertsSection = styled.section`
   padding: var(--space-8);
 
@@ -264,116 +237,29 @@ export const AlertsHeader = styled.header`
 
   h2 {
     color: var(--color-text-primary);
-    font-size: var(--font-size-xl);
-  }
-`
-
-export const ViewAllLink = styled.a`
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  text-decoration: none;
-
-  &:hover {
-    color: var(--color-brand-green);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 3px;
-    border-radius: var(--radius-sm);
-  }
-`
-
-export const AlertList = styled.ul`
-  margin: 0;
-  padding: 0;
-  list-style: none;
-`
-
-export const AlertItem = styled.li`
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-3);
-
-  min-height: 5rem;
-  padding: var(--space-4) 0;
-
-  border-bottom: var(--border-width) solid var(--color-border);
-
-  &:last-child {
-    border-bottom: none;
-  }
-`
-
-export const AlertIcon = styled.span<AlertLevelProps>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 1.5rem;
-  height: 1.5rem;
-
-  color: ${({ $level }) => {
-    if ($level === 'critical') {
-      return 'var(--color-danger)'
-    }
-
-    if ($level === 'warning') {
-      return '#f6b73c'
-    }
-
-    return 'var(--color-brand-purple)'
-  }};
-
-  font-size: var(--font-size-lg);
-`
-
-export const AlertContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  strong,
-  span {
-    color: var(--color-text-primary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-regular);
+    font-size: 1.125rem;
     line-height: var(--line-height-tight);
     text-align: left;
   }
 `
 
-export const SeverityBadge = styled.span<AlertLevelProps>`
-  min-width: 5rem;
+// Estados adicionados dentro dos blocos existentes, sem alterar o layout da develop.
+export const StatePanel = styled.div`
+  padding-block: var(--space-4);
+  p, strong { color: var(--color-text-secondary); font-size: var(--font-size-sm); text-align: left; }
+  p { margin: var(--space-2) 0; }
+`
+export const RetryButton = styled.button`
+  margin-top: var(--space-2);
   padding: var(--space-2) var(--space-3);
-
-  color: ${({ $level }) => {
-    if ($level === 'critical') {
-      return '#ff8ba1'
-    }
-
-    if ($level === 'warning') {
-      return '#ffd16f'
-    }
-
-    return '#c995ff'
-  }};
-
-  font-size: var(--font-size-xs);
-  text-align: center;
-
-  background-color: ${({ $level }) => {
-    if ($level === 'critical') {
-      return 'rgb(239 71 111 / 20%)'
-    }
-
-    if ($level === 'warning') {
-      return 'rgb(246 183 60 / 20%)'
-    }
-
-    return 'rgb(183 108 244 / 20%)'
-  }};
-
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  &:hover:not(:disabled) { border-color: var(--color-brand-green); }
+  &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+  &:disabled { opacity: 0.6; cursor: wait; }
 `

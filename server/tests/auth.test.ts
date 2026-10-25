@@ -26,10 +26,31 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
   let signalRefresh: (() => void) | undefined
   const refreshStarted = new Promise<void>((resolve) => { signalRefresh = resolve })
   const refreshGate = new Promise<void>((resolve) => { releaseRefresh = resolve })
-  const state = { tokens: initialTokens, refreshTokens: token(), status: 200, profileStatus: 200, refreshStatus: 200, refreshCalls: 0, loginCalls: 0, delay: false, holdRefresh: false }
+  const state = { tokens: initialTokens, refreshTokens: token(), status: 200, profileStatus: 200, refreshStatus: 200, refreshCalls: 0, loginCalls: 0, delay: false, holdRefresh: false, inventoryFailures: {} as Record<string, number>, inventoryEmpty: false, inventoryStatus: 200, inventoryDelay: false, inventoryMalformed: false, inventoryLastMissing: false, inventoryCalls: [] as string[] }
   const upstream = createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json')
-    if (request.url === '/api/auth/login') {
+    if (request.url?.startsWith('/api/inventories/')) {
+      state.inventoryCalls.push(request.url)
+      assert.equal(request.headers.authorization, 'Bearer private-access-token')
+      if (state.inventoryDelay) return
+      const query = new URL(request.url, 'http://test.local')
+      const filter = query.searchParams.get('status')
+      const field = filter === 'UNDER_REVIEW' ? 'awaitingReview' : filter === 'APPROVED' ? 'approved' : filter === 'PROCESSING_FAILED' ? 'processingFailed' : request.url.includes('/pending') ? 'pendingReview' : request.url.includes('/count') ? 'counts' : request.url.includes('/mine/last') ? 'lastSubmitted' : 'history'
+      response.statusCode = state.inventoryFailures[field] ?? state.inventoryStatus
+      const item = { id: 42, name: 'Meu inventário', createdAt: '2026-10-22T09:15:00', status: 'UNDER_REVIEW', type: 'INPUT', internal: 'not-public' }
+      if (response.statusCode !== 200) response.end(JSON.stringify({ internal: 'private-stack-password' }))
+      else if (state.inventoryMalformed) response.end('{}')
+      else if (state.inventoryEmpty) {
+        if (request.url.includes('/mine/last')) { response.statusCode = 404; response.end('{}') }
+        else if (request.url.includes('/count')) response.end(JSON.stringify({ reviewedCount: 0, submittedCount: 0 }))
+        else response.end(JSON.stringify({ inventories: [], totalCount: 0 }))
+      }
+      else if (request.url.includes('/mine/last')) {
+        if (state.inventoryLastMissing) { response.statusCode = 404; response.end('{}') }
+        else response.end(JSON.stringify(item))
+      } else if (request.url.includes('/count')) response.end(JSON.stringify({ reviewedCount: 2, submittedCount: 7 }))
+      else response.end(JSON.stringify({ inventories: [item], totalCount: filter === 'UNDER_REVIEW' ? 2 : filter === 'APPROVED' ? 3 : filter === 'PROCESSING_FAILED' ? 1 : request.url.includes('/pending') ? 4 : 7 }))
+    } else if (request.url === '/api/auth/login') {
       state.loginCalls++
       if (state.delay) return
       response.statusCode = state.status
@@ -49,7 +70,7 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
     } else { response.statusCode = 404; response.end('{}') }
   })
   const upstreamUrl = await listen(upstream)
-  const config = readConfig({ NODE_ENV: 'test', SESSION_SECRET: 'test-only-secret-with-at-least-32-characters', FRONTEND_ORIGIN: origin, MS_AUTH_URL: upstreamUrl, UPSTREAM_TIMEOUT_MS: '1000' })
+  const config = readConfig({ NODE_ENV: 'test', SESSION_SECRET: 'test-only-secret-with-at-least-32-characters', FRONTEND_ORIGIN: origin, MS_AUTH_URL: upstreamUrl, MS_INVENTORY_URL: upstreamUrl, UPSTREAM_TIMEOUT_MS: '1000' })
   if (production) Object.assign(config, { NODE_ENV: 'production', TRUST_PROXY_HOPS: 1 })
   const store = new session.MemoryStore()
   const appServer = createServer(createApp(config, store))
@@ -70,7 +91,7 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
     assert(cookie)
     return { response, cookie }
   }
-  return { state, base, post, login, store, logoutStarted, refreshStarted, releaseRefresh: () => releaseRefresh?.(), stopUpstream: async () => { upstream.closeAllConnections(); await new Promise<void>((resolve) => upstream.close(() => resolve())) } }
+  return { config, state, base, post, login, store, logoutStarted, refreshStarted, releaseRefresh: () => releaseRefresh?.(), stopUpstream: async () => { upstream.closeAllConnections(); await new Promise<void>((resolve) => upstream.close(() => resolve())) } }
 }
 
 test('login dos dois papéis, sessão recuperada e tokens somente no servidor', async (t) => {
@@ -238,4 +259,126 @@ test('cookie de produção possui Secure, HttpOnly, SameSite e prefixo Host', as
   const body = await response.json()
   assert.deepEqual(Object.keys(body), ['user'])
   assert.deepEqual(Object.keys(body.user).sort(), ['email', 'id', 'name', 'role'])
+})
+test('overview exige sessão antes de consultar inventários', async (t) => {
+  const h = await harness(t)
+  for (const cookie of ['', 'aether.sid=forged']) assert.equal((await fetch(`${h.base}/api/v1/overview`, { headers: { Cookie: cookie } })).status, 401)
+  assert.equal(h.state.inventoryCalls.length, 0)
+})
+
+test('overview dos dois papéis mantém escopo pessoal, contratos e tokens privados', async (t) => {
+  for (const role of ['analyst', 'administrator']) await t.test(role, async (subtest) => {
+    const h = await harness(subtest, token(role))
+    const { cookie } = await h.login()
+    const response = await fetch(`${h.base}/api/v1/overview?userId=999`, { headers: { Cookie: cookie } })
+    assert.equal(response.status, 200)
+    const text = await response.text()
+    assert(!/private-|not-public|accessToken|refreshToken/.test(text))
+    const body = JSON.parse(text)
+    assert.equal(body.scope, 'personal')
+    assert.deepEqual(body.counts, { status: 'ready', data: { reviewedCount: 2, submittedCount: 7 } })
+    assert.equal(body.history.data.inventories[0].status, 'UNDER_REVIEW')
+    assert.equal(body.lastSubmitted.data.id, 42)
+    assert.equal(body.history.data.totalCount, 7)
+    const expected = ['/api/inventories/count', '/api/inventories/mine/last', '/api/inventories/mine?take=6&skip=0']
+    if (role === 'analyst') {
+      expected.push(...['UNDER_REVIEW', 'APPROVED', 'PROCESSING_FAILED'].map((status) => `/api/inventories/mine?status=${status}&take=1&skip=0`))
+      assert.deepEqual(body.indicators.awaitingReview, { status: 'ready', data: 2 })
+      assert.deepEqual(body.indicators.approved, { status: 'ready', data: 3 })
+      assert.deepEqual(body.indicators.processingFailed, { status: 'ready', data: 1 })
+      assert.equal(body.indicators.pendingReview, null)
+    } else {
+      expected.push('/api/inventories/pending?take=1&skip=0')
+      assert.deepEqual(body.indicators.pendingReview, { status: 'ready', data: { count: 4, scope: 'department' } })
+      assert.equal(body.indicators.awaitingReview, null)
+    }
+    assert.deepEqual([...h.state.inventoryCalls].sort(), expected.sort())
+  })
+})
+
+test('falha isolada não esconde dados das outras seções', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  for (const failed of ['counts', 'history', 'lastSubmitted']) {
+    h.state.inventoryFailures = { [failed]: 403 }
+    const response = await fetch(`${h.base}/api/v1/overview`, { headers: { Cookie: cookie } })
+    assert.equal(response.status, 200)
+    const body = await response.json()
+    for (const name of ['counts', 'history', 'lastSubmitted']) assert.equal(body[name].status, name === failed ? 'error' : 'ready')
+    assert.equal(body[failed].error.code, 'INVENTORY_ACCESS_DENIED')
+    assert(!('data' in body[failed]))
+  }
+})
+
+test('falha total mantém erros por seção sem inventar zeros e sem encerrar sessão', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  for (const status of [400, 401, 403, 404, 500]) {
+    h.state.inventoryStatus = status
+    const response = await fetch(`${h.base}/api/v1/overview`, { headers: { Cookie: cookie } })
+    assert.equal(response.status, 200)
+    const text = await response.text()
+    assert(!/private-stack|Credenciais inválidas|sessão expirada/.test(text))
+    const body = JSON.parse(text)
+    for (const name of ['counts', 'history', 'lastSubmitted']) assert.equal(body[name].status, status === 404 && name === 'lastSubmitted' ? 'ready' : 'error')
+    assert.equal((await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })).status, 200)
+  }
+})
+
+test('histórico vazio e último inexistente são sucesso vazio, não erro', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  h.state.inventoryEmpty = true
+  const response = await fetch(`${h.base}/api/v1/overview`, { headers: { Cookie: cookie } })
+  const body = await response.json()
+  assert.deepEqual(body.counts, { status: 'ready', data: { reviewedCount: 0, submittedCount: 0 } })
+  assert.deepEqual(body.history, { status: 'ready', data: { inventories: [], totalCount: 0 } })
+  assert.deepEqual(body.lastSubmitted, { status: 'ready', data: null })
+})
+
+test('contrato inválido e timeout tornam as seções indisponíveis', async (t) => {
+  const h = await harness(t, token('analyst', Date.now() + 10000))
+  const { cookie } = await h.login()
+  h.state.inventoryMalformed = true
+  const malformed = await fetch(`${h.base}/api/v1/overview`, { headers: { Cookie: cookie } })
+  assert.equal((await malformed.json()).history.error.code, 'INVENTORY_CONTRACT_INVALID')
+  assert.equal(h.state.refreshCalls, 1)
+  h.state.inventoryMalformed = false
+  h.state.inventoryDelay = true
+  const timedOut = await fetch(`${h.base}/api/v1/overview`, { headers: { Cookie: cookie } })
+  const body = await timedOut.json()
+  for (const name of ['counts', 'history', 'lastSubmitted']) assert.equal(body[name].error.code, 'INVENTORY_TIMEOUT')
+})
+
+test('configuração ausente gera seções indisponíveis sem chamadas ao inventory', async (t) => {
+  const h = await harness(t)
+  delete h.config.MS_INVENTORY_URL
+  const { cookie } = await h.login()
+  const response = await fetch(`${h.base}/api/v1/overview`, { headers: { Cookie: cookie } })
+  const body = await response.json()
+  assert.equal(response.status, 200)
+  assert.equal(body.counts.error.code, 'INVENTORY_NOT_CONFIGURED')
+  assert.equal(h.state.inventoryCalls.length, 0)
+})
+
+test('sessão recusada pelo ms-auth continua retornando 401 global sem dados', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  h.state.profileStatus = 401
+  const response = await fetch(`${h.base}/api/v1/overview`, { headers: { Cookie: cookie } })
+  assert.equal(response.status, 401)
+  assert.equal(h.state.inventoryCalls.length, 0)
+})
+test('falha em um indicador por status não contamina os demais nem consulta revisão administrativa', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  h.state.inventoryFailures = { approved: 403 }
+  const response = await fetch(`${h.base}/api/v1/overview?role=administrator`, { headers: { Cookie: cookie } })
+  const body = await response.json()
+  assert.equal(response.status, 200)
+  assert.equal(body.indicators.approved.status, 'error')
+  assert.equal(body.indicators.awaitingReview.data, 2)
+  assert.equal(body.indicators.processingFailed.data, 1)
+  assert.equal(body.history.status, 'ready')
+  assert(!h.state.inventoryCalls.some((path) => path.includes('/pending')))
 })
