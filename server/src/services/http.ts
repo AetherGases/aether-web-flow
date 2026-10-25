@@ -1,0 +1,68 @@
+import { ApiError } from '../middleware/errors.ts'
+
+export interface ServiceOptions {
+  method: 'GET' | 'POST' | 'PUT'
+  requestId: string
+  token?: string
+  body?: unknown
+}
+
+export function createHttpClient(origin: string, timeoutMs: number) {
+  const base = new URL(origin)
+  return async function request(path: string, options: ServiceOptions): Promise<unknown> {
+    const url = new URL(path, base)
+    if (!path.startsWith('/') || path.startsWith('//') || path.includes('\\') || url.origin !== base.origin) {
+      throw new Error('Caminho de serviço inválido')
+    }
+    const signal = AbortSignal.timeout(timeoutMs)
+    try {
+      const response = await fetch(url, {
+        method: options.method,
+        signal,
+        redirect: 'error',
+        headers: {
+          Accept: 'application/json',
+          'X-Request-Id': options.requestId,
+          ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+          ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        },
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      })
+      if (!response.ok) {
+        await response.body?.cancel()
+        if ([400, 401].includes(response.status)) throw new ApiError(401, 'AUTH_REJECTED', 'Credenciais inválidas ou sessão expirada.')
+        if (response.status === 403) throw new ApiError(403, 'FORBIDDEN', 'Acesso não permitido.')
+        throw new ApiError(502, 'AUTH_UNAVAILABLE', 'O serviço de autenticação não conseguiu concluir a operação.')
+      }
+      const mediaType = response.headers.get('content-type') ?? ''
+      if (!/^application\/(?:[\w.-]+\+)?json(?:;|$)/i.test(mediaType)) {
+        await response.body?.cancel()
+        throw new ApiError(502, 'AUTH_CONTRACT_INVALID', 'O serviço de autenticação retornou uma resposta incompatível.')
+      }
+      const reader = response.body?.getReader()
+      if (!reader) throw new ApiError(502, 'AUTH_CONTRACT_INVALID', 'Resposta de autenticação vazia.')
+      const chunks: Uint8Array[] = []
+      let size = 0
+      try {
+        while (true) {
+          const chunk = await reader.read()
+          if (chunk.done) break
+          size += chunk.value.byteLength
+          if (size > 65536) {
+            await reader.cancel()
+            throw new ApiError(502, 'AUTH_CONTRACT_INVALID', 'Resposta de autenticação excede o limite.')
+          }
+          chunks.push(chunk.value)
+        }
+        return JSON.parse(Buffer.concat(chunks).toString('utf8')) as unknown
+      } finally {
+        reader.releaseLock()
+      }
+    } catch (error) {
+      if (error instanceof ApiError) throw error
+      if (signal.aborted) throw new ApiError(504, 'AUTH_TIMEOUT', 'O serviço de autenticação demorou para responder. Tente novamente.')
+      if (error instanceof SyntaxError) throw new ApiError(502, 'AUTH_CONTRACT_INVALID', 'Resposta de autenticação inválida.')
+      throw new ApiError(502, 'AUTH_UNAVAILABLE', 'Serviço de autenticação temporariamente indisponível.')
+    }
+  }
+}
