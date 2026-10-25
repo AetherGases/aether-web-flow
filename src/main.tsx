@@ -10,7 +10,7 @@ import AuthProvider from './contexts/AuthProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <AuthProvider><App /></AuthProvider>
     </BrowserRouter>
   </StrictMode>,
