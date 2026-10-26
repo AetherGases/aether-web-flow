@@ -42,6 +42,9 @@ function ProfilePage() {
     if (event.key === 'Escape') cancelNameEditing()
   }
 
+  const unitAddress = profile?.unit?.address
+  const unitLocation = unitAddress ? `${unitAddress.neighborhood} — ${unitAddress.city}/${unitAddress.state}` : t("Não disponível")
+
   if (!user) return null
 
   return (
@@ -139,8 +142,8 @@ function ProfilePage() {
           <S.InformationCard>
             <h2>{t("Organização")}</h2>
             <S.DefinitionList>
-              <div><dt>{t("Empresa")}</dt><dd>{t("Não disponível")}</dd></div>
-              <div><dt>{t("Unidade")}</dt><dd>{t("Não disponível")}</dd></div>
+              <div><dt>{t("Empresa")}</dt><dd>{profile.enterprise?.name ?? t("Não disponível")}</dd></div>
+              <div><dt>{t("Unidade")}</dt><dd>{unitLocation}</dd></div>
               <div><dt>{t("Departamento")}</dt><dd>{t("Não disponível")}</dd></div>
             </S.DefinitionList>
           </S.InformationCard>

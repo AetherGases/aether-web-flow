@@ -80,7 +80,11 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
       }
       response.end(JSON.stringify(state.profileMalformed ? {} : {
         id: 1, name: state.profileName, email: credentials.email, cpf: 'not-public', phone: state.profilePhone,
-        ...(request.method === 'PATCH' ? {} : { permissions: [{ id: 1, name: 'inventory:analysis', description: 'Consultar relatórios' }] }),
+        ...(request.method === 'PATCH' ? {} : {
+          permissions: [{ id: 1, name: 'inventory:analysis', description: 'Consultar relatórios' }],
+          enterprise: { id: 1, name: 'Aurora Alimentos Sustentáveis S.A.', address: { street: 'private-address' } },
+          unit: { id: 1, cnpj: '11000000000111', address: { neighborhood: 'Centro', city: 'Curitiba', state: 'PR', street: 'private-address' } },
+        }),
         passwordHash: 'private-stack-password',
       }))
     } else { response.statusCode = 404; response.end('{}') }
@@ -399,7 +403,7 @@ test('falha em um indicador por status não contamina os demais nem consulta rev
   assert(!h.state.inventoryCalls.some((path) => path.includes('/pending')))
 })
 
-test('perfil exige sessão e entrega somente dados pessoais sem expor permissões', async (t) => {
+test('perfil exige sessão e entrega dados pessoais e organização sem expor permissões', async (t) => {
   const h = await harness(t)
   assert.equal((await fetch(`${h.base}/api/v1/profile`)).status, 401)
   const { cookie } = await h.login()
@@ -408,6 +412,8 @@ test('perfil exige sessão e entrega somente dados pessoais sem expor permissõe
   const data = await response.json()
   assert.equal(data.fullName, h.state.profileName)
   assert.equal(data.phone, h.state.profilePhone)
+  assert.deepEqual(data.enterprise, { id: 1, name: 'Aurora Alimentos Sustentáveis S.A.' })
+  assert.deepEqual(data.unit, { id: 1, address: { neighborhood: 'Centro', city: 'Curitiba', state: 'PR' } })
   assert(!('permissions' in data))
   assert(!JSON.stringify(data).includes('private-'))
   assert(!('name' in data || 'passwordHash' in data || 'company' in data))
@@ -424,6 +430,7 @@ test('perfil salva apenas nome/telefone e recuperação da sessão reflete nome 
   const data = await response.json()
   assert.equal(data.fullName, 'Novo Nome')
   assert.equal(data.phone, '(11) 98888-7777')
+  assert(!('enterprise' in data || 'unit' in data))
   assert(!('permissions' in data))
   const me = await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })
   assert.equal((await me.json()).user.name, 'Novo Nome')

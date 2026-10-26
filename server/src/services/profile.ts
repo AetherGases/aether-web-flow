@@ -7,6 +7,17 @@ const personal = z.object({
   id: z.number().int().positive(), name: z.string().min(1), email: z.string().email(),
   cpf: z.string().nullable(), phone: z.string().nullable(),
 })
+const profile = personal.extend({
+  enterprise: z.object({
+    id: z.number().int().positive(), name: z.string().min(1),
+  }).nullish().transform((value) => value ?? null),
+  unit: z.object({
+    id: z.number().int().positive(),
+    address: z.object({
+      neighborhood: z.string().min(1), city: z.string().min(1), state: z.string().min(1),
+    }).nullish().transform((value) => value ?? null),
+  }).nullish().transform((value) => value ?? null),
+})
 export const updateProfileSchema = z.object({
   name: z.string().trim().min(3).max(150).regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/).optional(),
   phone: z.string().trim().regex(/^(\(\d{2}\)|\d{2})\s?\d{4,5}-?\d{4}$/).optional(),
@@ -16,7 +27,7 @@ export function createProfileService(config: Config) {
   const request = createHttpClient(config.MS_AUTH_URL, config.UPSTREAM_TIMEOUT_MS, 'PROFILE')
   return {
     async get(token: string, requestId: string) {
-      const parsed = personal.safeParse(await request('/api/profile', { method: 'GET', token, requestId }))
+      const parsed = profile.safeParse(await request('/api/profile', { method: 'GET', token, requestId }))
       if (!parsed.success) throw new ApiError(502, 'PROFILE_CONTRACT_INVALID', 'O serviço retornou um perfil incompatível.')
       const { name, ...data } = parsed.data
       return { ...data, fullName: name }
