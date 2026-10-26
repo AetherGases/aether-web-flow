@@ -29,7 +29,7 @@ function AuthenticatedPage({ page }: AuthenticatedPageProps) {
     analysis: <DataAnalysisPage {...props} />,
     select: <DataAnalysisChoicePage {...props} onSelectPlant={() => navigate('/data-analysis/upload')} />,
     upload: <DataUploadPage {...props} />,
-    calculator: <CalculatorPage {...props} />,
+    calculator: <CalculatorPage key={user.id} />,
     assistant: <AssistantPage {...props} />,
     profile: <ProfilePage key={user.id} />,
   }

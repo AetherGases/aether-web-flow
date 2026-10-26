@@ -55,7 +55,7 @@ Desenvolvimento sem REDIS_URL usa MemoryStore e perde sessões ao reiniciar. Pro
 
 Na raiz: `npm run build`, `npm run lint`, `npm test`, `npm run typecheck:bff` e `npm run test:bff`. Os testes do BFF utilizam um ms-auth HTTP simulado e nunca credenciais reais. Testes de Redis/HTTPS e E2E com os serviços implantados ainda devem ser feitos no ambiente integrado.
 
-A overview integra inventários pessoais reais e o perfil consulta e atualiza dados no ms-auth; as demais telas continuam com dados demonstrativos até suas integrações. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção de análise é restrita a administrator; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
+A overview integra inventários pessoais reais e o perfil consulta e atualiza dados no ms-auth; a calculadora usa o microsserviço quando configurado; as demais telas continuam com dados demonstrativos até suas integrações. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção de análise é restrita a administrator; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
 
 ## Overview e inventários
 
@@ -72,4 +72,14 @@ A overview também usa o filtro status de /api/inventories/mine para os totais p
 
 `PATCH /api/v1/profile` aceita somente `name` e/ou `phone`, exige origem válida e encaminha a atualização para o ms-auth. Nome deve ter de 3 a 150 caracteres, com letras e espaços; telefone deve conter DDD e seguir os formatos aceitos pelo serviço. Campos administrativos, senha, imagem, email e identificador não podem ser enviados por essa rota. A resposta contém os dados pessoais confirmados, sem permissões; a interface atualiza os dados confirmados. Erros 400/422 do serviço de atualização retornam validação 422 sem invalidar a sessão.
 
-O card Organização permanece sem dados até existir contrato para empresa, unidade e departamento. Configurações ocupa o card abaixo de Organização, ao lado dos dados pessoais no desktop e empilhado em telas menores. Idioma, modo claro e contraste mantêm o comportamento local anterior e serão tratados separadamente. A tela não utiliza mais o mock de perfil. Após salvar, o nome confirmado é refletido na sidebar; a próxima verificação de sessão também recupera o nome atualizado do ms-auth.
+O card Organização permanece sem dados até existir contrato para empresa, unidade e departamento. Configurações ocupa o card abaixo de Organização, ao lado dos dados pessoais no desktop e empilhado em telas menores. Idioma e alto contraste são globais e persistem no navegador. O modo claro será implementado separadamente. A tela não utiliza mais o mock de perfil. Após salvar, o nome confirmado é refletido na sidebar; a próxima verificação de sessão também recupera o nome atualizado do ms-auth.
+
+## Calculadora
+
+`POST /api/v1/calculator/cost-reduction/forecast` exige sessão e origem válida. Encaminha somente `monthlyCost`, `reductionPercentage` e `periodMonths` para `POST /api/calculator/cost-reduction/forecast`, no serviço configurado por `MS_CALCULATOR_URL`. Configure somente a origem (por exemplo, `https://aethergases.org`), sem `/api` ou caminho, no ambiente do BFF. Não use VITE_* e não exponha tokens ao navegador. Produção exige HTTPS. A ausência da configuração retorna 503 sem afetar o login.
+
+O microsserviço deve verificar a permissão **calculator:roi** no token encaminhado; a role da interface não substitui essa autorização. Nenhuma permissão ou dado do banco é alterado por esta integração. Custos aceitam zero e até duas casas decimais, redução inteira de 0 a 50 e períodos de 3, 6, 12 ou 24 meses. Valores monetários devem ser representáveis com centavos seguros em JavaScript. O BFF valida entradas, formato e correspondência da resposta à simulação, sem executar fórmulas financeiras. Campos extras do serviço são descartados.
+
+A tela preserva os cards e gráfico, aguarda 350 ms após alterações e cancela consultas anteriores. Não mostra resultados antigos para novos valores, nem usa cálculos locais ou mock em caso de falha. Exportar PDF fica habilitado somente com resultado atual confirmado. Idioma e alto contraste seguem as preferências globais.
+
+400/422 do serviço tornam-se validação 422; 403 mantém a sessão e informa falta de permissão; 401 informa falha de autenticação; respostas incompatíveis ou falhas do serviço retornam 502; timeout retorna 504. Os testes HTTP utilizam um serviço simulado. A validação real depende da implementação do endpoint e da configuração de calculator:roi no back-end. Esta etapa não salva histórico nem gera PDF no servidor.

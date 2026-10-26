@@ -26,10 +26,24 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
   let signalRefresh: (() => void) | undefined
   const refreshStarted = new Promise<void>((resolve) => { signalRefresh = resolve })
   const refreshGate = new Promise<void>((resolve) => { releaseRefresh = resolve })
-  const state = { tokens: initialTokens, refreshTokens: token(), status: 200, profileStatus: 200, refreshStatus: 200, refreshCalls: 0, loginCalls: 0, delay: false, holdRefresh: false, inventoryFailures: {} as Record<string, number>, inventoryEmpty: false, inventoryStatus: 200, inventoryDelay: false, inventoryMalformed: false, inventoryLastMissing: false, inventoryCalls: [] as string[], profileName: 'Usuário de teste', profilePhone: '(11) 99999-9999', profileWrites: 0, profileWriteStatus: 200, profileMalformed: false, profileDelay: false }
+  const calculatorInput = { monthlyCost: 100000, reductionPercentage: 15, periodMonths: 3 }
+  const calculatorResponse = { ...calculatorInput, currency: 'BRL', monthlySavings: 15000, newMonthlyCost: 85000, totalSavings: 45000, projection: [{ month: 1, accumulatedSavings: 15000 }, { month: 2, accumulatedSavings: 30000 }, { month: 3, accumulatedSavings: 45000 }] }
+  const state = { calculatorResponse, calculatorStatus: 200, calculatorDelay: false, calculatorMalformed: false, calculatorHtml: false, calculatorCalls: 0, calculatorBodies: [] as object[], tokens: initialTokens, refreshTokens: token(), status: 200, profileStatus: 200, refreshStatus: 200, refreshCalls: 0, loginCalls: 0, delay: false, holdRefresh: false, inventoryFailures: {} as Record<string, number>, inventoryEmpty: false, inventoryStatus: 200, inventoryDelay: false, inventoryMalformed: false, inventoryLastMissing: false, inventoryCalls: [] as string[], profileName: 'Usuário de teste', profilePhone: '(11) 99999-9999', profileWrites: 0, profileWriteStatus: 200, profileMalformed: false, profileDelay: false }
   const upstream = createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json')
-    if (request.url?.startsWith('/api/inventories/')) {
+    if (request.url === '/api/calculator/cost-reduction/forecast') {
+      state.calculatorCalls++
+      assert.equal(request.method, 'POST')
+      assert.equal(request.headers.authorization, 'Bearer private-access-token')
+      assert(request.headers['x-request-id'])
+      let body = ''
+      for await (const chunk of request) body += chunk
+      state.calculatorBodies.push(JSON.parse(body))
+      if (state.calculatorDelay) return
+      response.statusCode = state.calculatorStatus
+      if (state.calculatorHtml) { response.setHeader('Content-Type', 'text/html'); response.end('<html>private-stack</html>') }
+      else response.end(JSON.stringify(state.calculatorStatus !== 200 ? { internal: 'private-stack-password' } : state.calculatorMalformed ? {} : { ...state.calculatorResponse, internal: 'private-stack-password' }))
+    } else if (request.url?.startsWith('/api/inventories/')) {
       state.inventoryCalls.push(request.url)
       assert.equal(request.headers.authorization, 'Bearer private-access-token')
       if (state.inventoryDelay) return
@@ -86,7 +100,7 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
     } else { response.statusCode = 404; response.end('{}') }
   })
   const upstreamUrl = await listen(upstream)
-  const config = readConfig({ NODE_ENV: 'test', SESSION_SECRET: 'test-only-secret-with-at-least-32-characters', FRONTEND_ORIGIN: origin, MS_AUTH_URL: upstreamUrl, MS_INVENTORY_URL: upstreamUrl, UPSTREAM_TIMEOUT_MS: '1000' })
+  const config = readConfig({ NODE_ENV: 'test', SESSION_SECRET: 'test-only-secret-with-at-least-32-characters', FRONTEND_ORIGIN: origin, MS_AUTH_URL: upstreamUrl, MS_INVENTORY_URL: upstreamUrl, MS_CALCULATOR_URL: upstreamUrl, UPSTREAM_TIMEOUT_MS: '1000' })
   if (production) Object.assign(config, { NODE_ENV: 'production', TRUST_PROXY_HOPS: 1 })
   const store = new session.MemoryStore()
   const appServer = createServer(createApp(config, store))
@@ -462,4 +476,113 @@ test('perfil malformado ou lento não retorna informações fictícias', async (
   h.state.profileMalformed = false
   h.state.profileDelay = true
   assert.equal((await fetch(`${h.base}/api/v1/profile`, { headers: { Cookie: cookie } })).status, 504)
+})
+
+
+const forecastInput = { monthlyCost: 100000, reductionPercentage: 15, periodMonths: 3 }
+async function postForecast(base: string, cookie = '', body: object = forecastInput, requestOrigin = origin) {
+  return fetch(`${base}/api/v1/calculator/cost-reduction/forecast`, {
+    method: 'POST', headers: { Cookie: cookie, Origin: requestOrigin, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  })
+}
+
+test('calculadora exige sessão e origem válida antes de consultar o serviço', async (t) => {
+  const h = await harness(t)
+  assert.equal((await postForecast(h.base)).status, 401)
+  const { cookie } = await h.login()
+  assert.equal((await postForecast(h.base, cookie, forecastInput, 'https://outside.example')).status, 403)
+  const noJson = await fetch(`${h.base}/api/v1/calculator/cost-reduction/forecast`, { method: 'POST', headers: { Cookie: cookie, Origin: origin }, body: 'not-json' })
+  assert.equal(noJson.status, 415)
+  assert.equal(h.state.calculatorCalls, 0)
+})
+
+test('calculadora encaminha token e entradas para a rota combinada, sem expor campos internos', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  const response = await postForecast(h.base, cookie)
+  assert.equal(response.status, 200)
+  assert.equal(response.headers.get('cache-control'), 'no-store')
+  const body = await response.json()
+  assert.deepEqual(body, h.state.calculatorResponse)
+  assert.deepEqual(h.state.calculatorBodies, [forecastInput])
+  assert(!JSON.stringify(body).includes('private-'))
+  h.state.calculatorResponse = { monthlyCost: 123.45, reductionPercentage: 15, periodMonths: 3, currency: 'BRL', monthlySavings: 18.52, newMonthlyCost: 104.93, totalSavings: 55.56, projection: [{ month: 1, accumulatedSavings: 18.52 }, { month: 2, accumulatedSavings: 37.04 }, { month: 3, accumulatedSavings: 55.56 }] }
+  const cents = await postForecast(h.base, cookie, { ...forecastInput, monthlyCost: 123.45 })
+  assert.equal(cents.status, 200)
+  assert.deepEqual(await cents.json(), h.state.calculatorResponse)
+  h.state.calculatorResponse = { ...h.state.calculatorResponse, monthlyCost: 0, reductionPercentage: 0, monthlySavings: 0, newMonthlyCost: 0, totalSavings: 0, projection: [{ month: 1, accumulatedSavings: 0 }, { month: 2, accumulatedSavings: 0 }, { month: 3, accumulatedSavings: 0 }] }
+  assert.equal((await postForecast(h.base, cookie, { monthlyCost: 0, reductionPercentage: 0, periodMonths: 3 })).status, 200)
+})
+
+test('calculadora rejeita campos extras, valores inválidos e tipos incorretos sem chamar serviço', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  for (const input of [{}, { ...forecastInput, monthlyCost: -1 }, { ...forecastInput, monthlyCost: '100' }, { ...forecastInput, monthlyCost: null }, { ...forecastInput, monthlyCost: 1.001 }, { ...forecastInput, reductionPercentage: 51 }, { ...forecastInput, reductionPercentage: 15.5 }, { ...forecastInput, periodMonths: 5 }, { ...forecastInput, role: 'administrator' }]) {
+    assert.equal((await postForecast(h.base, cookie, input)).status, 400)
+  }
+  assert.equal(h.state.calculatorCalls, 0)
+})
+
+test('permissão calculator:roi é decidida no serviço e administrator não ignora uma recusa', async (t) => {
+  for (const role of ['analyst', 'administrator']) {
+    await t.test(role, async (subtest) => {
+      const h = await harness(subtest, token(role))
+      const { cookie } = await h.login()
+      h.state.calculatorStatus = 403
+      const response = await postForecast(h.base, cookie)
+      assert.equal(response.status, 403)
+      assert.equal((await response.json()).error.code, 'CALCULATOR_FORBIDDEN')
+      assert.equal((await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })).status, 200)
+    })
+  }
+})
+
+test('validação, autenticação e falhas do serviço preservam HTTP sem vazar detalhes', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  for (const [upstream, expected, code] of [[400, 422, 'CALCULATOR_VALIDATION_ERROR'], [422, 422, 'CALCULATOR_VALIDATION_ERROR'], [401, 401, 'AUTH_REJECTED'], [500, 502, 'CALCULATOR_UNAVAILABLE']] as const) {
+    h.state.calculatorStatus = upstream
+    const response = await postForecast(h.base, cookie)
+    assert.equal(response.status, expected)
+    const text = await response.text()
+    assert.equal(JSON.parse(text).error.code, code)
+    assert(!text.includes('private-'))
+  }
+})
+
+test('resposta incompatível, HTML e projeção incompleta não viram resultado válido', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  h.state.calculatorMalformed = true
+  assert.equal((await postForecast(h.base, cookie)).status, 502)
+  h.state.calculatorMalformed = false
+  h.state.calculatorHtml = true
+  assert.equal((await postForecast(h.base, cookie)).status, 502)
+  h.state.calculatorHtml = false
+  h.state.calculatorResponse.monthlyCost = 999
+  assert.equal((await postForecast(h.base, cookie)).status, 502)
+  h.state.calculatorResponse.monthlyCost = 100000
+  h.state.calculatorResponse.projection.pop()
+  assert.equal((await postForecast(h.base, cookie)).status, 502)
+})
+
+test('calculadora lenta ou não configurada retorna erro, sem impedir login', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  delete h.config.MS_CALCULATOR_URL
+  const missing = await postForecast(h.base, cookie)
+  assert.equal(missing.status, 503)
+  assert.equal((await missing.json()).error.code, 'CALCULATOR_NOT_CONFIGURED')
+  assert.equal(h.state.calculatorCalls, 0)
+  h.config.MS_CALCULATOR_URL = h.config.MS_AUTH_URL
+  h.state.calculatorDelay = true
+  const slow = await postForecast(h.base, cookie)
+  assert.equal(slow.status, 504)
+  assert.equal((await slow.json()).error.code, 'CALCULATOR_TIMEOUT')
+})
+
+test('configuração da calculadora exige uma origem válida e HTTPS em produção', () => {
+  const env = { SESSION_SECRET: 'x'.repeat(32), FRONTEND_ORIGIN: origin, MS_AUTH_URL: 'http://localhost:3000' }
+  assert.throws(() => readConfig({ ...env, MS_CALCULATOR_URL: 'https://aethergases.org/api/calculator' }))
+  assert.throws(() => readConfig({ ...env, NODE_ENV: 'production', FRONTEND_ORIGIN: 'https://web.example', MS_AUTH_URL: 'https://auth.example', REDIS_URL: 'redis://localhost:6379', MS_CALCULATOR_URL: 'http://localhost:3004' }))
 })
