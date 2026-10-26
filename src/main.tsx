@@ -12,8 +12,12 @@ import AuthProvider from './contexts/AuthProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <PreferencesProvider><AuthProvider><App /></AuthProvider></PreferencesProvider>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+      <PreferencesProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </PreferencesProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 )
