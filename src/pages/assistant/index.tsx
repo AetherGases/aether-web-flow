@@ -1,172 +1,82 @@
 import { useTranslation } from '../../hooks/useTranslation'
-import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react'
-
+import { type FormEvent, useEffect, useMemo, useRef } from 'react'
+import { useAssistant } from '../../hooks/useAssistant'
+import { useAuth } from '../../hooks/useAuth'
+import { assistantMessageLimit } from '../../services/assistant'
 import assistantAvatarBackground from '../../assets/icons/chatbot/assistant-avatar-background.svg'
 import assistantIcon from '../../assets/icons/chatbot/assistant-icon.svg'
-import potentialSavingsChart from '../../assets/icons/chatbot/potential-savings-chart.svg'
 import sendIcon from '../../assets/icons/chatbot/send-icon.svg'
 import Sidebar from '../../components/Sidebar'
-import type { OverviewData } from '../../types/overview'
+import SectionState from '../../components/SectionState'
 import * as S from './styles'
 
-const suggestions = [
-  'Por que o consumo da Planta 04 aumentou?',
-  'Compare as plantas com maior custo',
-  'Analise minha última planta',
-]
+const suggestions = ['Como posso reduzir as emissões da empresa?', 'Explique os escopos de emissões', 'Como interpretar meu relatório?']
 
-interface ChatMessage {
-  id: number
-  author: 'user' | 'assistant'
-  text: string
-}
-
-interface AssistantPageProps {
-  data: OverviewData
-  onLogout: () => void
-}
-
-function findMetric(data: OverviewData, id: string) {
-  return data.metrics.find((metric) => metric.id === id)
-}
-
-function createLocalResponse() {
-  return 'Esta é uma resposta de teste do Assistente Aether. A integração com a IA será realizada posteriormente.'
-}
-
-function AssistantPage({ data, onLogout }: AssistantPageProps) {
+function AssistantPage() {
   const { t } = useTranslation()
-  const [draft, setDraft] = useState('')
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const { user, logout, retry } = useAuth()
+  const chat = useAssistant()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const nextMessageIdRef = useRef(1)
-
-  const anomalies = findMetric(data, 'critical-anomalies')?.value ?? '0'
-  const economy = findMetric(data, 'total-economy')?.value ?? 'R$ 0'
-  const firstName = data.userName.trim().split(/\s+/)[0]
-
   const greeting = useMemo(() => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'Bom dia'
-    if (hour < 18) return 'Boa tarde'
-    return 'Boa noite'
+    return hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
   }, [])
-
   useEffect(() => {
-    if (messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-      })
-    }
-  }, [messages])
+    if (chat.messages.length) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [chat.messages])
+  if (!user) return null
+  const busy = chat.sending || chat.loading
+  function handleSubmit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); void chat.send(chat.draft) }
 
-  function sendMessage(text: string) {
-    const trimmedMessage = text.trim()
-    if (!trimmedMessage) return
-
-    const userMessageId = nextMessageIdRef.current
-    const assistantMessageId = userMessageId + 1
-    nextMessageIdRef.current += 2
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      { id: userMessageId, author: 'user', text: trimmedMessage },
-      {
-        id: assistantMessageId,
-        author: 'assistant',
-        text: createLocalResponse(),
-      },
-    ])
-    setDraft('')
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    sendMessage(draft)
-  }
-
-  return (
-    <S.Page>
-      <Sidebar 
-        userName={data.userName} 
-        userRole={data.role} 
-        onLogout={onLogout} 
-      />
-
-      <S.Content>
-        <S.Header>
-          <h4 id='id-page'>{t("Assistente IA")}</h4>
-          <div>
-            < h1>{t("Assistente Aether")}</h1>
-          </div>
-        </S.Header>
-
-        <S.SummaryCard>
-          <S.AssistantAvatar aria-hidden="true">
-            <img src={assistantAvatarBackground} alt="" />
-            <img src={assistantIcon} alt="" />
-          </S.AssistantAvatar>
-
-          <S.SummaryText>
-            <strong>{t(greeting)}, {firstName}{t(". Há uma oportunidade importante.")}</strong>
-            <p>{t("Encontrei")}{" "}{anomalies} {t("anomalias nas plantas analisadas, com economia potencial estimada em")}{" "}{economy}.</p>
-            <S.ReviewButton type="button">{t("Revisar anomalias")}</S.ReviewButton>
-          </S.SummaryText>
-
-          <S.EconomyCard>
-            <span>{t("Economia potencial encontrada")}</span>
-            <strong>{economy}</strong>
-            <img src={potentialSavingsChart} alt={t("Tendência crescente da economia potencial")} />
-          </S.EconomyCard>
-        </S.SummaryCard>
-
-        <S.Messages aria-live="polite" aria-label={t("Conversa com o Assistente Aether")}>
-          {messages.map((message) => (
-            <S.Message key={message.id} $author={message.author}>
-              {message.author === 'assistant' && (
-                <S.MessageAvatar aria-hidden="true">
-                  <img src={assistantIcon} alt="" />
-                </S.MessageAvatar>
-              )}
-              <p>{message.author === 'assistant' ? t(message.text) : message.text}</p>
-            </S.Message>
-          ))}
-          <div ref={messagesEndRef} />
-        </S.Messages>
-
-        <S.ComposerArea>
-          <h2>{t("Sugestões para você")}</h2>
-          <S.Suggestions>
-            {suggestions.map((suggestion) => (
-              <button key={suggestion} type="button" onClick={() => sendMessage(t(suggestion))}>
-                {t(suggestion)}
-              </button>
-            ))}
-          </S.Suggestions>
-
-          <S.Composer onSubmit={handleSubmit}>
-            <label htmlFor="assistant-message">{t("Digite sua pergunta para o Assistente Aether")}</label>
-            <textarea
-              id="assistant-message"
-              rows={1}
-              value={draft}
-              placeholder={t("Digite sua pergunta...")}
-              onChange={(event) => setDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                  event.preventDefault()
-                  sendMessage(draft)
-                }
-              }}
-            />
-            <button type="submit" aria-label={t("Enviar mensagem")} disabled={!draft.trim()}>
-              <img src={sendIcon} alt="" aria-hidden="true" />
-            </button>
-          </S.Composer>
-        </S.ComposerArea>
-      </S.Content>
-    </S.Page>
-  )
+  return <S.Page>
+    <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
+    <S.Content>
+      <S.Header><h4 id="id-page">{t("Assistente IA")}</h4><h1>{t("Assistente Aether")}</h1></S.Header>
+      <S.SummaryCard>
+        <S.AssistantAvatar aria-hidden="true"><img src={assistantAvatarBackground} alt="" /><img src={assistantIcon} alt="" /></S.AssistantAvatar>
+        <S.SummaryText>
+          <strong>{t(greeting)}, {user.name.trim().split(/\s+/)[0]}!</strong>
+          <p>{t("Como posso ajudar com suas análises hoje?")}</p>
+        </S.SummaryText>
+        <S.ReviewButton type="button" disabled={busy} onClick={() => { void chat.openConversation(null) }}>{t("Nova conversa")}</S.ReviewButton>
+      </S.SummaryCard>
+      <S.ConversationControls>
+        <label htmlFor="assistant-conversation">{t("Suas conversas")}</label>
+        <select id="assistant-conversation" value={chat.conversationId ?? ''} disabled={chat.sending || chat.loading}
+          onChange={(event) => { void chat.openConversation(event.target.value || null) }}>
+          <option value="">{t("Nova conversa")}</option>
+          {chat.conversations.map((conversation) => <option key={conversation.id} value={conversation.id}>{conversation.name}</option>)}
+        </select>
+        <button type="button" disabled={busy} onClick={chat.reload}>{t("Atualizar histórico")}</button>
+      </S.ConversationControls>
+      {chat.error && <SectionState error description={chat.error} onRetry={chat.sessionExpired ? retry : chat.reload} />}
+      <S.Messages role="log" aria-live="polite" aria-relevant="additions" aria-busy={busy} aria-label={t("Conversa com o Assistente Aether")}>
+        {chat.loading && <p role="status">{t("Carregando conversas…")}</p>}
+        {!chat.loading && !chat.messages.length && !chat.error && <p>{t("Envie uma mensagem para começar ou selecione uma conversa.")}</p>}
+        {chat.messages.map((message) => <S.Message key={message.id} $author={message.author}>
+          {message.author === 'assistant' && <S.MessageAvatar aria-hidden="true"><img src={assistantIcon} alt="" /></S.MessageAvatar>}
+          <p>{message.text}</p>
+        </S.Message>)}
+        {chat.sending && <p role="status">{t("O assistente está preparando uma resposta…")}</p>}
+        <div ref={messagesEndRef} />
+      </S.Messages>
+      <S.ComposerArea>
+        <h2>{t("Sugestões para você")}</h2>
+        <S.Suggestions>{suggestions.map((suggestion) => <button key={suggestion} type="button" disabled={busy}
+          onClick={() => { void chat.send(t(suggestion)) }}>{t(suggestion)}</button>)}</S.Suggestions>
+        <S.Composer onSubmit={handleSubmit}>
+          <label htmlFor="assistant-message">{t("Digite sua pergunta para o Assistente Aether")}</label>
+          <textarea id="assistant-message" rows={1} value={chat.draft} maxLength={assistantMessageLimit} disabled={chat.sending}
+            placeholder={t("Digite sua pergunta...")} onChange={(event) => chat.setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+                event.preventDefault(); void chat.send(chat.draft)
+              }
+            }} />
+          <button type="submit" aria-label={t("Enviar mensagem")} disabled={busy || !chat.draft.trim()}><img src={sendIcon} alt="" aria-hidden="true" /></button>
+        </S.Composer>
+      </S.ComposerArea>
+    </S.Content>
+  </S.Page>
 }
-
 export default AssistantPage

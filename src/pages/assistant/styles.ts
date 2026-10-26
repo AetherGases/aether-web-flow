@@ -31,23 +31,9 @@ export const Header = styled.header`
     margin-bottom: var(--space-12);
 `
 
-export const Eyebrow = styled.p`
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--color-success);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-
-  img {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-`
-
 export const SummaryCard = styled.section`
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(16rem, 0.2fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-8);
   padding: var(--space-3) var(--space-6);
@@ -55,7 +41,7 @@ export const SummaryCard = styled.section`
   border: var(--border-width) solid var(--color-text-primary);
   border-radius: 3rem;
   max-width: 72rem;
-  max-height: 15rem;
+  min-height: 8rem;
 
   @media (max-width: 62rem) {
     grid-template-columns: auto 1fr;
@@ -103,7 +89,9 @@ export const SummaryText = styled.div`
 `
 
 export const ReviewButton = styled.button`
-  min-width: 13rem;
+  min-width: 10rem;
+  @media (max-width: 62rem) { grid-column: 1 / -1; justify-self: end; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
   padding: var(--space-2) var(--space-5);
   color: var(--color-text-inverse);
   font-weight: var(--font-weight-medium);
@@ -111,38 +99,6 @@ export const ReviewButton = styled.button`
   background: var(--gradient-brand);
   border: 0;
   border-radius: var(--radius-md);
-`
-
-export const EconomyCard = styled.article`
-  display: flex;
-  flex-direction: column;
-  min-height: 9.4rem;
-  padding: var(--space-4) var(--space-6);
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-lg);
-
-  span {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-  }
-
-  strong {
-    margin: var(--space-1) 0 var(--space-3);
-    color: var(--color-success);
-    font-size: var(--font-size-xl);
-  }
-
-  img {
-    width: 100%;
-    max-width: 14rem;
-    height: 3rem;
-    margin-top: auto;
-  }
-
-  @media (max-width: 62rem) {
-    grid-column: 1 / -1;
-    width: 100%;
-  }
 `
 
 export const Messages = styled.section`
@@ -164,12 +120,16 @@ export const Message = styled.article<{ $author: 'user' | 'assistant' }>`
   max-width: min(75%, 44rem);
 
   p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    min-width: 0;
     padding: var(--space-3) var(--space-4);
     color: var(--color-text-primary);
     background: ${({ $author }) => $author === 'user' ? 'var(--color-brand-purple)' : 'var(--color-surface)'};
     border: var(--border-width) solid var(--color-border);
     border-radius: ${({ $author }) => $author === 'user' ? 'var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg)' : 'var(--radius-sm) var(--radius-lg) var(--radius-lg) var(--radius-lg)'};
   }
+  html[data-high-contrast='true'] & p { background: var(--color-surface); }
 `
 
 export const MessageAvatar = styled.span`
@@ -214,7 +174,7 @@ export const Suggestions = styled.div`
     border-radius: var(--radius-md);
   }
 
-  button:hover {
+  button:hover:not(:disabled) {
     background-color: var(--color-surface);
     border-color: var(--color-brand-purple);
   }
@@ -257,6 +217,8 @@ export const Composer = styled.form`
     outline: 0;
   }
 
+  &:focus-within { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+
   textarea::placeholder {
     color: var(--color-text-muted);
   }
@@ -284,4 +246,26 @@ export const Composer = styled.form`
     width: 2rem;
     height: 2rem;
   }
+`
+
+export const ConversationControls = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  label { font-size: var(--font-size-sm); }
+  select, button {
+    max-width: 100%;
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    font: inherit;
+    font-size: var(--font-size-sm);
+  }
+  select { flex: 1; min-width: 10rem; }
+  button { cursor: pointer; }
+  :disabled { opacity: 0.55; cursor: not-allowed; }
 `

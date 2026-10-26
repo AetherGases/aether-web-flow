@@ -8,7 +8,7 @@ export interface ServiceOptions {
   body?: unknown
 }
 
-export function createHttpClient(origin: string, timeoutMs: number, service: 'AUTH' | 'INVENTORY' | 'PROFILE' | 'CALCULATOR' = 'AUTH') {
+export function createHttpClient(origin: string, timeoutMs: number, service: 'AUTH' | 'INVENTORY' | 'PROFILE' | 'CALCULATOR' | 'AI' = 'AUTH', maxResponseBytes = 65536) {
   const base = new URL(origin)
   return async function request(path: string, options: ServiceOptions): Promise<unknown> {
     const url = new URL(path, base)
@@ -35,6 +35,9 @@ export function createHttpClient(origin: string, timeoutMs: number, service: 'AU
       }
       if (!response.ok) {
         await response.body?.cancel()
+        if (service === 'AI' && response.status === 400) throw new ApiError(400, 'AI_VALIDATION_ERROR', 'Não foi possível enviar a mensagem para esta conversa. Atualize o histórico.')
+        if (service === 'AI' && response.status === 422) throw new ApiError(422, 'AI_ANSWER_REJECTED', 'O assistente não conseguiu responder a essa pergunta. Tente reformular a mensagem.')
+        if (service === 'AI' && response.status === 403) throw new ApiError(403, 'AI_FORBIDDEN', 'Sua conta não tem acesso a esta conversa.')
         if (service === 'CALCULATOR' && [400, 422].includes(response.status)) throw new ApiError(422, 'CALCULATOR_VALIDATION_ERROR', 'Confira os valores informados para a simulação.')
         if (service === 'CALCULATOR' && response.status === 403) throw new ApiError(403, 'CALCULATOR_FORBIDDEN', 'Sua conta não tem permissão para usar esta calculadora.')
         if (service === 'PROFILE' && [400, 422].includes(response.status)) throw new ApiError(422, 'PROFILE_VALIDATION_ERROR', 'Confira o nome e o telefone informados.')
@@ -48,7 +51,7 @@ export function createHttpClient(origin: string, timeoutMs: number, service: 'AU
         throw new ApiError(502, `${service}_CONTRACT_INVALID`, 'O serviço solicitado retornou uma resposta incompatível.')
       }
       const reader = response.body?.getReader()
-      if (!reader) throw new ApiError(502, `${service}_CONTRACT_INVALID`, 'Resposta de autenticação vazia.')
+      if (!reader) throw new ApiError(502, `${service}_CONTRACT_INVALID`, 'O serviço solicitado retornou uma resposta vazia.')
       const chunks: Uint8Array[] = []
       let size = 0
       try {
@@ -56,9 +59,9 @@ export function createHttpClient(origin: string, timeoutMs: number, service: 'AU
           const chunk = await reader.read()
           if (chunk.done) break
           size += chunk.value.byteLength
-          if (size > 65536) {
+          if (size > maxResponseBytes) {
             await reader.cancel()
-            throw new ApiError(502, `${service}_CONTRACT_INVALID`, 'Resposta de autenticação excede o limite.')
+            throw new ApiError(502, `${service}_CONTRACT_INVALID`, 'A resposta do serviço solicitado excede o limite permitido.')
           }
           chunks.push(chunk.value)
         }
@@ -68,8 +71,9 @@ export function createHttpClient(origin: string, timeoutMs: number, service: 'AU
       }
     } catch (error) {
       if (error instanceof ApiError) throw error
+      if (service === 'AI' && signal.aborted) throw new ApiError(504, 'AI_TIMEOUT', 'Não foi possível confirmar o envio. Atualize o histórico antes de enviar novamente.')
       if (signal.aborted) throw new ApiError(504, `${service}_TIMEOUT`, 'O serviço solicitado demorou para responder. Tente novamente.')
-      if (error instanceof SyntaxError) throw new ApiError(502, `${service}_CONTRACT_INVALID`, 'Resposta de autenticação inválida.')
+      if (error instanceof SyntaxError) throw new ApiError(502, `${service}_CONTRACT_INVALID`, 'O serviço solicitado retornou uma resposta inválida.')
       throw new ApiError(502, `${service}_UNAVAILABLE`, 'Serviço solicitado temporariamente indisponível.')
     }
   }

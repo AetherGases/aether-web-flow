@@ -30,7 +30,7 @@ function AuthenticatedPage({ page }: AuthenticatedPageProps) {
     select: <DataAnalysisChoicePage {...props} onSelectPlant={() => navigate('/data-analysis/upload')} />,
     upload: <DataUploadPage {...props} />,
     calculator: <CalculatorPage key={user.id} />,
-    assistant: <AssistantPage {...props} />,
+    assistant: <AssistantPage key={user.id} />,
     profile: <ProfilePage key={user.id} />,
   }
   return <>
