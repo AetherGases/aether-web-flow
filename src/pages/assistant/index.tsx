@@ -9,7 +9,7 @@ import Sidebar from '../../components/Sidebar'
 import SectionState from '../../components/SectionState'
 import * as S from './styles'
 
-const suggestions = ['Como posso reduzir as emissões da empresa?', 'Explique os escopos de emissões', 'Como interpretar meu relatório?']
+const suggestions = ['O que é um inventário de gases de efeito estufa?', 'Qual a diferença entre os escopos 1, 2 e 3?', 'O que são gases verdes?']
 
 function AssistantPage() {
   const { t } = useTranslation()
