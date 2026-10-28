@@ -8,7 +8,7 @@ export interface ServiceOptions {
   body?: unknown
 }
 
-export function createHttpClient(origin: string, timeoutMs: number, service: 'AUTH' | 'INVENTORY' | 'PROFILE' = 'AUTH') {
+export function createHttpClient(origin: string, timeoutMs: number, service: 'AUTH' | 'INVENTORY' | 'PROFILE' | 'CALCULATOR' = 'AUTH') {
   const base = new URL(origin)
   return async function request(path: string, options: ServiceOptions): Promise<unknown> {
     const url = new URL(path, base)
@@ -35,6 +35,8 @@ export function createHttpClient(origin: string, timeoutMs: number, service: 'AU
       }
       if (!response.ok) {
         await response.body?.cancel()
+        if (service === 'CALCULATOR' && [400, 422].includes(response.status)) throw new ApiError(422, 'CALCULATOR_VALIDATION_ERROR', 'Confira os valores informados para a simulação.')
+        if (service === 'CALCULATOR' && response.status === 403) throw new ApiError(403, 'CALCULATOR_FORBIDDEN', 'Sua conta não tem permissão para usar esta calculadora.')
         if (service === 'PROFILE' && [400, 422].includes(response.status)) throw new ApiError(422, 'PROFILE_VALIDATION_ERROR', 'Confira o nome e o telefone informados.')
         if (response.status === 401 || (service === 'AUTH' && response.status === 400)) throw new ApiError(401, 'AUTH_REJECTED', 'Credenciais inválidas ou sessão expirada.')
         if (response.status === 403) throw new ApiError(403, 'FORBIDDEN', 'Acesso não permitido.')

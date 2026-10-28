@@ -1,3 +1,4 @@
+import { createCalculatorService, forecastInputSchema } from './services/calculator.ts'
 import { createProfileService, updateProfileSchema } from './services/profile.ts'
 import { createAuthController } from './controllers/auth.ts'
 import { createOverviewService } from './services/overview.ts'
@@ -72,6 +73,15 @@ export function createApp(config: Config, store?: Store) {
       if (data.id !== auth.user.id || data.email !== auth.user.email) throw new ApiError(502, 'PROFILE_IDENTITY_INVALID', 'O serviço retornou um perfil incompatível.')
       response.json(data)
     })
+  const forecast = createCalculatorService(config)
+  app.post('/api/v1/calculator/cost-reduction/forecast', async (request, response) => {
+    response.locals.sessionOnly = true
+    await authController.me(request, response)
+    const input = forecastInputSchema.safeParse(request.body)
+    if (!input.success) throw new ApiError(400, 'CALCULATOR_VALIDATION_ERROR', 'Confira os valores informados para a simulação.')
+    const auth: AuthSession = response.locals.auth
+    response.json(await forecast(input.data, auth.accessToken, response.locals.requestId))
+  })
   app.use((_request, _response, next) => next(new ApiError(404, 'NOT_FOUND', 'Rota não encontrada.')))
   app.use(errorHandler)
   return app

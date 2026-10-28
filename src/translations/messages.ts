@@ -1,5 +1,13 @@
 // As chaves são os textos em português; cada entrada contém inglês e espanhol.
 export const messages: Record<string, readonly [english: string, spanish: string]> = {
+  "Calculando simulação…": ["Calculating forecast…", "Calculando simulación…"],
+  "Informe um custo mensal válido, com até duas casas decimais.": ["Enter a valid monthly cost with up to two decimal places.", "Introduce un costo mensual válido con hasta dos decimales."],
+  "Informe uma redução inteira entre 0 e 50%.": ["Enter a whole reduction percentage between 0 and 50%.", "Introduce un porcentaje entero de reducción entre 0 y 50%."],
+  "Selecione um período de 3, 6, 12 ou 24 meses.": ["Select a period of 3, 6, 12 or 24 months.", "Selecciona un período de 3, 6, 12 o 24 meses."],
+  "A calculadora retornou uma resposta incompatível. Tente novamente.": ["The calculator returned an incompatible response. Try again.", "La calculadora devolvió una respuesta incompatible. Inténtalo de nuevo."],
+  "A calculadora está temporariamente indisponível.": ["The calculator is temporarily unavailable.", "La calculadora no está disponible temporalmente."],
+  "Confira os valores informados para a simulação.": ["Check the values entered for the forecast.", "Revisa los valores introducidos para la simulación."],
+  "Sua conta não tem permissão para usar esta calculadora.": ["Your account does not have permission to use this calculator.", "Tu cuenta no tiene permiso para usar esta calculadora."],
   "Visão geral": ["Overview", "Resumen"],
   "Análise de dados": ["Data analysis", "Análisis de datos"],
   "Calculadora": ["Calculator", "Calculadora"],

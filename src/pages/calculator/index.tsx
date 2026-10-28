@@ -1,156 +1,96 @@
 import { useTranslation } from '../../hooks/useTranslation'
-import { useMemo, useState } from 'react'
-
+import { useCalculator } from '../../hooks/useCalculator'
+import { useAuth } from '../../hooks/useAuth'
 import Sidebar from '../../components/Sidebar'
-import type { OverviewData } from '../../types/overview'
+import SectionState from '../../components/SectionState'
+import { calculatorPeriods } from '../../utils/calculator'
 import * as S from './styles'
 
-const periods = [3, 6, 12, 24]
-
-interface CalculatorPageProps {
-  data: OverviewData
-  onLogout: () => void
-}
-
-function CalculatorPage({ data, onLogout }: CalculatorPageProps) {
+function CalculatorPage() {
   const { t, locale } = useTranslation()
-  const currencyFormatter = new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: 'BRL',
-    maximumFractionDigits: 0,
-  })
-  const [monthlyCost, setMonthlyCost] = useState(100000)
-  const [reduction, setReduction] = useState(15)
-  const [period, setPeriod] = useState(12)
-
-  const monthlySavings = monthlyCost * (reduction / 100)
-  const totalSavings = monthlySavings * period
-  const newMonthlyCost = monthlyCost - monthlySavings
-
-  const projection = useMemo(
-    () => Array.from({ length: period }, (_, index) => monthlySavings * (index + 1)),
-    [monthlySavings, period],
-  )
-  const projectionScale = Math.max(200000, ...projection)
-
-  function handleMonthlyCostChange(value: string) {
-    const parsedValue = Number(value)
-    setMonthlyCost(Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : 0)
-  }
+  const { user, logout, retry } = useAuth()
+  const { inputs, setInputs, data, validationError, error, loading, sessionExpired, retry: retryForecast } = useCalculator()
+  if (!user) return null
+  const currencyFormatter = new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL' })
+  const projectionScale = Math.max(1, ...(data?.projection.map((item) => item.accumulatedSavings) ?? []))
+  const money = (value?: number) => value === undefined ? '—' : currencyFormatter.format(value)
 
   return (
     <S.Page>
-      <Sidebar
-        userName={data.userName}
-        userRole={data.role}
-        onLogout={onLogout}
-      />
-
+      <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
       <S.Content>
         <S.Header>
-                  <h4 id='id-page'>{t("Calculadora")}</h4>
-                  <div>
-                    < h1>{t("Calculadora de redução de custos")}</h1>
-                    <p>{t("Simule cenários e visualize o impacto no seu orçamento.")}</p>
-                  </div>
-                </S.Header>
-
+          <h4 id="id-page">{t("Calculadora")}</h4>
+          <div>
+            <h1>{t("Calculadora de redução de custos")}</h1>
+            <p>{t("Simule cenários e visualize o impacto no seu orçamento.")}</p>
+          </div>
+        </S.Header>
         <S.CalculatorGrid>
-          <S.FormCard>
+          <S.FormCard onSubmit={(event) => { event.preventDefault(); retryForecast() }}>
             <S.Field>
               <label htmlFor="monthly-cost">{t("Custo mensal atual")}</label>
-              <S.NumberInput
-                id="monthly-cost"
-                type="number"
-                min="0"
-                step="1000"
-                value={monthlyCost}
-                onChange={(event) => handleMonthlyCostChange(event.target.value)}
-              />
+              <S.NumberInput id="monthly-cost" type="number" min="0" step="0.01" value={inputs.monthlyCost}
+                aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'calculator-validation' : undefined}
+                onChange={(event) => setInputs((current) => ({ ...current, monthlyCost: event.target.value }))} />
+              {validationError && <p id="calculator-validation" role="alert">{t(validationError)}</p>}
             </S.Field>
-
             <S.Field>
               <S.RangeHeader>
                 <label htmlFor="reduction">{t("Redução estimada")}</label>
-                <output htmlFor="reduction">{reduction}%</output>
+                <output htmlFor="reduction">{inputs.reductionPercentage}%</output>
               </S.RangeHeader>
-              <S.RangeInput
-                id="reduction"
-                type="range"
-                min="0"
-                max="50"
-                step="1"
-                value={reduction}
-                $progress={reduction * 2}
-                onChange={(event) => setReduction(Number(event.target.value))}
-              />
+              <S.RangeInput id="reduction" type="range" min="0" max="50" step="1" value={inputs.reductionPercentage}
+                $progress={inputs.reductionPercentage * 2}
+                onChange={(event) => setInputs((current) => ({ ...current, reductionPercentage: Number(event.target.value) }))} />
             </S.Field>
-
             <S.Field>
               <span>{t("Período (meses)")}</span>
-              <S.PeriodOptions aria-label={t("Selecione o período da projeção")}>
-                {periods.map((option) => (
-                  <S.PeriodButton
-                    key={option}
-                    type="button"
-                    $active={period === option}
-                    aria-pressed={period === option}
-                    onClick={() => setPeriod(option)}
-                  >
+              <S.PeriodOptions role="group" aria-label={t("Selecione o período da projeção")}>
+                {calculatorPeriods.map((option) => (
+                  <S.PeriodButton key={option} type="button" $active={inputs.periodMonths === option}
+                    aria-pressed={inputs.periodMonths === option}
+                    onClick={() => setInputs((current) => ({ ...current, periodMonths: option }))}>
                     {option}m
                   </S.PeriodButton>
                 ))}
               </S.PeriodOptions>
             </S.Field>
-
-            <S.ExportButton type="button" onClick={() => window.print()}>
-              {t("Exportar PDF")}</S.ExportButton>
+            <S.ExportButton type="button" disabled={!data || loading} onClick={() => window.print()}>
+              {t("Exportar PDF")}
+            </S.ExportButton>
           </S.FormCard>
-
-          <S.Results aria-live="polite">
+          <S.Results aria-live="polite" aria-busy={loading}>
+            {loading && <p role="status">{t("Calculando simulação…")}</p>}
+            {error && <SectionState error description={error} onRetry={sessionExpired ? retry : retryForecast} />}
             <S.TotalSavingsCard>
               <span>{t("Economia total no período")}</span>
-              <strong>{currencyFormatter.format(totalSavings)}</strong>
+              <strong>{money(data?.totalSavings)}</strong>
             </S.TotalSavingsCard>
-
             <S.SummaryGrid>
-              <S.SummaryCard>
-                <span>{t("Economia mensal")}</span>
-                <strong>{currencyFormatter.format(monthlySavings)}</strong>
-              </S.SummaryCard>
-
-              <S.SummaryCard>
-                <span>{t("Novo custo mensal")}</span>
-                <strong>{currencyFormatter.format(newMonthlyCost)}</strong>
-              </S.SummaryCard>
+              <S.SummaryCard><span>{t("Economia mensal")}</span><strong>{money(data?.monthlySavings)}</strong></S.SummaryCard>
+              <S.SummaryCard><span>{t("Novo custo mensal")}</span><strong>{money(data?.newMonthlyCost)}</strong></S.SummaryCard>
             </S.SummaryGrid>
-
             <S.ProjectionCard>
               <S.ProjectionHeader>
                 <div>
                   <h2>{t("Projeção mensal")}</h2>
-                  <p>{t("Economia acumulada em")}{" "}{period} {t("meses")}</p>
+                  <p>{t("Economia acumulada em")}{" "}{inputs.periodMonths} {t("meses")}</p>
                 </div>
-                <strong>{currencyFormatter.format(totalSavings)}</strong>
+                <strong>{money(data?.totalSavings)}</strong>
               </S.ProjectionHeader>
-
-              <S.Bars aria-label={t("Projeção de economia para {0} meses", { "0": period })}>
-                {projection.map((value, index) => (
-                  <S.BarColumn key={`${period}-${index}`}>
+              {data && <S.Bars aria-label={t("Projeção de economia para {0} meses", { "0": data.periodMonths })}>
+                {data.projection.map(({ month, accumulatedSavings }) => (
+                  <S.BarColumn key={month}>
                     <S.BarTrack>
-                      <S.Bar
-                        style={{
-                          height: `${Math.max(8, (value / projectionScale) * 100)}%`,
-                        }}
-                        data-tooltip={currencyFormatter.format(value)}
-                        aria-label={t("Mês {0}: {1}", { "0": index + 1, "1": currencyFormatter.format(value) })}
-                        tabIndex={0}
-                      />
+                      <S.Bar style={{ height: `${(accumulatedSavings / projectionScale) * 100}%` }}
+                        data-tooltip={money(accumulatedSavings)}
+                        aria-label={t("Mês {0}: {1}", { "0": month, "1": money(accumulatedSavings) })} tabIndex={0} />
                     </S.BarTrack>
-                    <S.BarLabel>{index + 1}m</S.BarLabel>
+                    <S.BarLabel>{month}m</S.BarLabel>
                   </S.BarColumn>
                 ))}
-              </S.Bars>
+              </S.Bars>}
             </S.ProjectionCard>
           </S.Results>
         </S.CalculatorGrid>

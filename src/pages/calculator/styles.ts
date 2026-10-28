@@ -153,7 +153,8 @@ export const ExportButton = styled.button`
   border: 0;
   border-radius: var(--radius-md);
 
-  &:hover { filter: brightness(1.08); }
+  &:hover:not(:disabled) { filter: brightness(1.08); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
 `
 
 export const Results = styled.section`
