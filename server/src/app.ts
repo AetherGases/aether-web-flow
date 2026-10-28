@@ -9,6 +9,7 @@ import session, { type Store } from 'express-session'
 import helmet from 'helmet'
 import type { Config } from './config/index.ts'
 import { ApiError, errorHandler } from './middleware/errors.ts'
+import { assistantRoutes } from './routes/assistant.ts'
 import { authRoutes } from './routes/auth.ts'
 
 export function createApp(config: Config, store?: Store) {
@@ -33,6 +34,7 @@ export function createApp(config: Config, store?: Store) {
     }
     next()
   })
+  app.use('/api/v1/assistant', express.json({ limit: '64kb' }))
   app.use(express.json({ limit: '8kb' }))
   app.use(session({
     name: config.NODE_ENV === 'production' ? '__Host-aether.sid' : 'aether.sid',
@@ -45,6 +47,7 @@ export function createApp(config: Config, store?: Store) {
   const authController = createAuthController(config)
   const overview = createOverviewService(config)
   app.use('/api/v1/auth', authRoutes(config, authController))
+  app.use('/api/v1/assistant', assistantRoutes(config, authController))
   app.get('/api/v1/overview', async (request, response) => {
     response.locals.sessionOnly = true
     await authController.me(request, response)

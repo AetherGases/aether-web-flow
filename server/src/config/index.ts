@@ -15,6 +15,9 @@ const schema = z.object({
   MS_AUTH_URL: origin,
   MS_INVENTORY_URL: origin.optional(),
   MS_CALCULATOR_URL: origin.optional(),
+  MS_AI_URL: origin.optional(),
+  MS_AI_PATH_PREFIX: z.string().max(128).regex(/^(?:\/[a-zA-Z0-9_-]+)*$/).default(''),
+  AI_TIMEOUT_MS: z.coerce.number().int().min(100).max(180000).default(60000),
   SESSION_SECRET: z.string().trim().min(32),
   SESSION_MAX_AGE_MS: z.coerce.number().int().min(60000).max(86400000).default(28800000),
   UPSTREAM_TIMEOUT_MS: z.coerce.number().int().min(100).max(60000).default(5000),
@@ -29,6 +32,9 @@ const schema = z.object({
   }
   if (config.NODE_ENV === 'production' && config.MS_CALCULATOR_URL && !config.MS_CALCULATOR_URL.startsWith('https:')) {
     context.addIssue({ code: 'custom', path: ['MS_CALCULATOR_URL'], message: 'Produção exige HTTPS na calculadora' })
+  }
+  if (config.NODE_ENV === 'production' && config.MS_AI_URL && !config.MS_AI_URL.startsWith('https:')) {
+    context.addIssue({ code: 'custom', path: ['MS_AI_URL'], message: 'Produção exige HTTPS no assistente' })
   }
   if (config.REDIS_URL && !['redis:', 'rediss:'].includes(new URL(config.REDIS_URL).protocol)) {
     context.addIssue({ code: 'custom', path: ['REDIS_URL'], message: 'URL Redis inválida' })
