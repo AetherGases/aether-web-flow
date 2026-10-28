@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import aetherLogo from '../../assets/logos/logo-aether.svg'
 import * as S from './styles'
 import OverviewLogo from '../../assets/icons/overview.svg'
@@ -22,15 +23,16 @@ function Sidebar({
   userRole,
   onLogout,
 }: SidebarProps) {
+  const { t } = useTranslation()
   const { pathname } = useLocation()
   const userInitial = userName.charAt(0).toUpperCase()
 
   const roleLabel =
     userRole === 'administrator'
-      ? 'Administrador'
-      : 'Analista'
+      ? t("Administrador")
+      : t("Analista")
   return (
-    <S.Container aria-label="Navegação principal">
+    <S.Container aria-label={t("Navegação principal")}>
       <S.Logo src={aetherLogo} alt="Aether" />
 
       <S.Navigation>
@@ -41,8 +43,7 @@ function Sidebar({
               aria-current={pathname === '/overview' ? 'page' : undefined}
             >
               <S.Icon src={OverviewLogo} alt="" aria-hidden="true" />
-              Visão geral
-            </S.NavigationLink>
+              {t("Visão geral")}</S.NavigationLink>
           </li>
 
           <li>
@@ -51,8 +52,7 @@ function Sidebar({
               aria-current={pathname.startsWith('/data-analysis') ? 'page' : undefined}
             >
               <S.Icon src={AnaliseLogo} alt="" aria-hidden="true" />
-              Análise de dados
-            </S.NavigationLink>
+              {t("Análise de dados")}</S.NavigationLink>
           </li>
 
           <li>
@@ -61,8 +61,7 @@ function Sidebar({
               aria-current={pathname === '/calculator' ? 'page' : undefined}
             >
               <S.Icon src={CalculadoraLogo} alt="" aria-hidden="true" />
-              Calculadora
-            </S.NavigationLink>
+              {t("Calculadora")}</S.NavigationLink>
           </li>
 
           <li>
@@ -71,8 +70,7 @@ function Sidebar({
               aria-current={pathname === '/assistant' ? 'page' : undefined}
             >
               <S.Icon src={ChatbotLogo} alt="" aria-hidden="true" />
-              Assistente Aether
-            </S.NavigationLink>
+              {t("Assistente Aether")}</S.NavigationLink>
           </li>
 
           <li>
@@ -81,8 +79,7 @@ function Sidebar({
               aria-current={pathname === '/profile' ? 'page' : undefined}
             >
               <S.Icon src={perfil} alt="" aria-hidden="true" />
-              Perfil
-            </S.NavigationLink>
+              {t("Perfil")}</S.NavigationLink>
           </li>
         </S.NavigationList>
       </S.Navigation>
@@ -99,9 +96,9 @@ function Sidebar({
         <S.LogoutButton
           type="button"
           onClick={onLogout}
-          aria-label="Sair da conta"
+          aria-label={t("Sair da conta")}
         >
-          <S.Icon src={sair} alt="sair da conta" aria-hidden="true" />
+          <S.Icon src={sair} alt={t("sair da conta")} aria-hidden="true" />
         </S.LogoutButton>
       </S.UserFooter>
     </S.Container>

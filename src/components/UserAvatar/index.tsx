@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import * as S from './styles'
 
 interface UserAvatarProps {
@@ -11,11 +12,12 @@ function UserAvatar({
   imageUrl,
   size = 'medium',
 }: UserAvatarProps) {
+  const { t } = useTranslation()
   const initial = userName.trim().charAt(0).toUpperCase()
 
   return (
-    <S.Avatar $size={size} aria-label={`Avatar de ${userName}`}>
-      {imageUrl ? <img src={imageUrl} alt={`Foto de ${userName}`} /> : initial}
+    <S.Avatar $size={size} aria-label={t("Avatar de {0}", { "0": userName })}>
+      {imageUrl ? <img src={imageUrl} alt={t("Foto de {0}", { "0": userName })} /> : initial}
     </S.Avatar>
   )
 }

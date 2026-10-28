@@ -30,7 +30,7 @@ export const UploadPanel = styled.section`
   min-height: 20.5rem;
   padding: var(--space-8);
   margin-top: var(--space-12);
-  background-color: #332449;
+  background-color: var(--color-upload-panel);
   border: var(--border-width) solid var(--color-border-strong);
   border-radius: var(--radius-lg);
 
@@ -46,8 +46,8 @@ export const UploadIcon = styled.div`
   width: 4.7rem;
   height: 4.25rem;
   margin-bottom: var(--space-4);
-  background-color: rgb(143 88 238 / 10%);
-  border: var(--border-width) solid rgb(126 130 148 / 46%);
+  background-color: var(--color-upload-icon);
+  border: var(--border-width) solid var(--color-upload-icon-border);
   border-radius: var(--radius-md);
 `
 

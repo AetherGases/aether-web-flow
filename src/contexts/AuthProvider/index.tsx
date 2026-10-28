@@ -58,7 +58,10 @@ function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  return <AuthContext.Provider value={{ ...state, login, logout, retry: () => {
+  return <AuthContext.Provider value={{ ...state, login, logout, updateName: (name) => {
+    ++revision.current
+    setState((current) => current.user ? { ...current, user: { ...current.user, name } } : current)
+  }, retry: () => {
     setState({ user: null, status: 'loading', error: null })
     setAttempt((value) => value + 1)
   } }}>{children}</AuthContext.Provider>

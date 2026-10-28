@@ -96,6 +96,9 @@ export const Icon = styled.img`
 
   background: var(--gradient-brand-diagonal);
   border-radius: var(--radius-md);
+  html[data-high-contrast='true'] & {
+    outline: 1px solid var(--color-border-strong);
+  }
 `
 
 export const DashboardGrid = styled.div`

@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 
 import assistantAvatarBackground from '../../assets/icons/chatbot/assistant-avatar-background.svg'
@@ -34,6 +35,7 @@ function createLocalResponse() {
 }
 
 function AssistantPage({ data, onLogout }: AssistantPageProps) {
+  const { t } = useTranslation()
   const [draft, setDraft] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -93,9 +95,9 @@ function AssistantPage({ data, onLogout }: AssistantPageProps) {
 
       <S.Content>
         <S.Header>
-          <h4 id='id-page'>Assistente IA</h4>
+          <h4 id='id-page'>{t("Assistente IA")}</h4>
           <div>
-            < h1>Assistente Aether</h1>
+            < h1>{t("Assistente Aether")}</h1>
           </div>
         </S.Header>
 
@@ -106,19 +108,19 @@ function AssistantPage({ data, onLogout }: AssistantPageProps) {
           </S.AssistantAvatar>
 
           <S.SummaryText>
-            <strong>{greeting}, {firstName}. Há uma oportunidade importante.</strong>
-            <p>Encontrei {anomalies} anomalias nas plantas analisadas, com economia potencial estimada em {economy}.</p>
-            <S.ReviewButton type="button">Revisar anomalias</S.ReviewButton>
+            <strong>{t(greeting)}, {firstName}{t(". Há uma oportunidade importante.")}</strong>
+            <p>{t("Encontrei")}{" "}{anomalies} {t("anomalias nas plantas analisadas, com economia potencial estimada em")}{" "}{economy}.</p>
+            <S.ReviewButton type="button">{t("Revisar anomalias")}</S.ReviewButton>
           </S.SummaryText>
 
           <S.EconomyCard>
-            <span>Economia potencial encontrada</span>
+            <span>{t("Economia potencial encontrada")}</span>
             <strong>{economy}</strong>
-            <img src={potentialSavingsChart} alt="Tendência crescente da economia potencial" />
+            <img src={potentialSavingsChart} alt={t("Tendência crescente da economia potencial")} />
           </S.EconomyCard>
         </S.SummaryCard>
 
-        <S.Messages aria-live="polite" aria-label="Conversa com o Assistente Aether">
+        <S.Messages aria-live="polite" aria-label={t("Conversa com o Assistente Aether")}>
           {messages.map((message) => (
             <S.Message key={message.id} $author={message.author}>
               {message.author === 'assistant' && (
@@ -126,29 +128,29 @@ function AssistantPage({ data, onLogout }: AssistantPageProps) {
                   <img src={assistantIcon} alt="" />
                 </S.MessageAvatar>
               )}
-              <p>{message.text}</p>
+              <p>{message.author === 'assistant' ? t(message.text) : message.text}</p>
             </S.Message>
           ))}
           <div ref={messagesEndRef} />
         </S.Messages>
 
         <S.ComposerArea>
-          <h2>Sugestões para você</h2>
+          <h2>{t("Sugestões para você")}</h2>
           <S.Suggestions>
             {suggestions.map((suggestion) => (
-              <button key={suggestion} type="button" onClick={() => sendMessage(suggestion)}>
-                {suggestion}
+              <button key={suggestion} type="button" onClick={() => sendMessage(t(suggestion))}>
+                {t(suggestion)}
               </button>
             ))}
           </S.Suggestions>
 
           <S.Composer onSubmit={handleSubmit}>
-            <label htmlFor="assistant-message">Digite sua pergunta para o Assistente Aether</label>
+            <label htmlFor="assistant-message">{t("Digite sua pergunta para o Assistente Aether")}</label>
             <textarea
               id="assistant-message"
               rows={1}
               value={draft}
-              placeholder="Digite sua pergunta..."
+              placeholder={t("Digite sua pergunta...")}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
@@ -157,7 +159,7 @@ function AssistantPage({ data, onLogout }: AssistantPageProps) {
                 }
               }}
             />
-            <button type="submit" aria-label="Enviar mensagem" disabled={!draft.trim()}>
+            <button type="submit" aria-label={t("Enviar mensagem")} disabled={!draft.trim()}>
               <img src={sendIcon} alt="" aria-hidden="true" />
             </button>
           </S.Composer>

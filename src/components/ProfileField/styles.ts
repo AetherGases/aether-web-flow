@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export const Field = styled.div`
   min-width: 0;
   padding: var(--space-2) var(--space-3);
-  background-color: rgb(13 0 38 / 18%);
+  background-color: var(--color-field-overlay);
   border: var(--border-width) solid var(--color-border-strong);
   border-radius: var(--radius-md);
 `
@@ -62,7 +62,7 @@ export const Input = styled.input`
   width: 100%;
   padding: var(--space-2) var(--space-3);
   color: var(--color-text-primary);
-  background-color: rgb(13 0 38 / 35%);
+  background-color: var(--color-input-overlay);
   border: var(--border-width) solid var(--color-focus);
   border-radius: var(--radius-md);
   outline: none;

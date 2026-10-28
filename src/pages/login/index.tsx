@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import aetherLogo from '../../assets/logos/logo.svg'
 import analistaIcon from '../../assets/icons/analista-icon.svg'
 import adminIcon from '../../assets/icons/admin-icon.svg'
@@ -5,6 +6,7 @@ import * as S from './styles'
 import { useLogin } from '../../hooks/useLogin'
 
 function LoginPage() {
+  const { t } = useTranslation()
   const { form, setForm, loading, errors, error, handleSubmit } = useLogin()
     return (
       <S.Page>
@@ -42,24 +44,20 @@ function LoginPage() {
   
           <S.PresentationContent>
             <h2 id="presentation-title">
-              Inteligência para decisões que reduzem custos
-            </h2>
+              {t("Inteligência para decisões que reduzem custos")}</h2>
   
             <p>
-              Analistas ganham clareza. Administradores ganham controle.
-              Toda a operação unificada.
-            </p>
+              {t("Analistas ganham clareza. Administradores ganham controle. Toda a operação unificada.")}</p>
           </S.PresentationContent>
         </S.Presentation>
   
         <S.Authentication aria-labelledby="login-title">
           <S.AuthenticationContent>
             <S.Header>
-              <h1 id="login-title">Entre na sua conta</h1>
+              <h1 id="login-title">{t("Entre na sua conta")}</h1>
   
               <p>
-                Bem-vindo de volta! Acesse a plataforma com suas credenciais.
-              </p>
+                {t("Bem-vindo de volta! Acesse a plataforma com suas credenciais.")}</p>
             </S.Header>
   
             <section
@@ -71,10 +69,10 @@ function LoginPage() {
                   <S.ProfileCard>
                     <img
                         src={analistaIcon}
-                        alt="Analista"
+                        alt={t("Analista")}
                     />
-                    <h3>Analista</h3>
-                    <p>Dados e análises</p>
+                    <h3>{t("Analista")}</h3>
+                    <p>{t("Dados e análises")}</p>
                   </S.ProfileCard>
                 </li>
   
@@ -82,10 +80,10 @@ function LoginPage() {
                   <S.ProfileCard>
                   <img
                         src={adminIcon}
-                        alt="Admin"
+                        alt={t("Admin")}
                     />
-                    <h3>Administrador</h3>
-                    <p>Gestão da plataforma</p>
+                    <h3>{t("Administrador")}</h3>
+                    <p>{t("Gestão da plataforma")}</p>
                   </S.ProfileCard>
                 </li>
               </S.ProfileList>
@@ -93,14 +91,14 @@ function LoginPage() {
   
             <S.Form onSubmit={handleSubmit} noValidate aria-busy={loading}>
               <S.Field>
-                <S.Label htmlFor="email">E-mail</S.Label>
+                <S.Label htmlFor="email">{t("E-mail")}</S.Label>
   
                 <S.Input
                   id="email"
                   name="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="voce@empresa.com"
+                  placeholder={t("voce@empresa.com")}
                   required
                   maxLength={255}
                   value={form.email}
@@ -109,11 +107,11 @@ function LoginPage() {
                   aria-describedby={errors.email ? 'email-error' : undefined}
                   onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
                 />
-                {errors.email && <p id="email-error" role="alert">{errors.email}</p>}
+                {errors.email && <p id="email-error" role="alert">{t(errors.email)}</p>}
               </S.Field>
   
               <S.Field>
-                <S.Label htmlFor="password">Senha</S.Label>
+                <S.Label htmlFor="password">{t("Senha")}</S.Label>
   
                 <S.Input
                   id="password"
@@ -129,13 +127,13 @@ function LoginPage() {
                   aria-describedby={errors.password ? 'password-error' : undefined}
                   onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
                 />
-                {errors.password && <p id="password-error" role="alert">{errors.password}</p>}
+                {errors.password && <p id="password-error" role="alert">{t(errors.password)}</p>}
               </S.Field>
   
-              {error && <p role="alert">{error}</p>}
-              {loading && <p role="status">Autenticando…</p>}
+              {error && <p role="alert">{t(error)}</p>}
+              {loading && <p role="status">{t("Autenticando…")}</p>}
               <S.SubmitButton type="submit" disabled={loading}>
-                {loading ? 'Entrando…' : 'Entrar'}
+                {loading ? t("Entrando…") : t("Entrar")}
               </S.SubmitButton>
             </S.Form>
           </S.AuthenticationContent>

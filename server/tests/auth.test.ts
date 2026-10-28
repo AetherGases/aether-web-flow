@@ -26,7 +26,7 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
   let signalRefresh: (() => void) | undefined
   const refreshStarted = new Promise<void>((resolve) => { signalRefresh = resolve })
   const refreshGate = new Promise<void>((resolve) => { releaseRefresh = resolve })
-  const state = { tokens: initialTokens, refreshTokens: token(), status: 200, profileStatus: 200, refreshStatus: 200, refreshCalls: 0, loginCalls: 0, delay: false, holdRefresh: false, inventoryFailures: {} as Record<string, number>, inventoryEmpty: false, inventoryStatus: 200, inventoryDelay: false, inventoryMalformed: false, inventoryLastMissing: false, inventoryCalls: [] as string[] }
+  const state = { tokens: initialTokens, refreshTokens: token(), status: 200, profileStatus: 200, refreshStatus: 200, refreshCalls: 0, loginCalls: 0, delay: false, holdRefresh: false, inventoryFailures: {} as Record<string, number>, inventoryEmpty: false, inventoryStatus: 200, inventoryDelay: false, inventoryMalformed: false, inventoryLastMissing: false, inventoryCalls: [] as string[], profileName: 'Usuário de teste', profilePhone: '(11) 99999-9999', profileWrites: 0, profileWriteStatus: 200, profileMalformed: false, profileDelay: false }
   const upstream = createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json')
     if (request.url?.startsWith('/api/inventories/')) {
@@ -65,8 +65,28 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
       response.end(JSON.stringify(state.refreshTokens))
     } else if (request.url === '/api/profile') {
       assert.equal(request.headers.authorization, 'Bearer private-access-token')
-      response.statusCode = state.profileStatus
-      response.end(JSON.stringify({ id: 1, name: 'Usuário de teste', email: credentials.email, cpf: 'not-public' }))
+      if (state.profileDelay) return
+      response.statusCode = request.method === 'PATCH' ? state.profileWriteStatus : state.profileStatus
+      if (request.method === 'PATCH') {
+        state.profileWrites++
+        let body = ''
+        for await (const chunk of request) body += chunk
+        const changes = JSON.parse(body)
+        assert(!('id' in changes || 'role' in changes || 'permissions' in changes || 'email' in changes))
+        if (response.statusCode === 200) {
+          state.profileName = changes.name ?? state.profileName
+          state.profilePhone = changes.phone ?? state.profilePhone
+        }
+      }
+      response.end(JSON.stringify(state.profileMalformed ? {} : {
+        id: 1, name: state.profileName, email: credentials.email, cpf: 'not-public', phone: state.profilePhone,
+        ...(request.method === 'PATCH' ? {} : {
+          permissions: [{ id: 1, name: 'inventory:analysis', description: 'Consultar relatórios' }],
+          enterprise: { id: 1, name: 'Aurora Alimentos Sustentáveis S.A.', address: { street: 'private-address' } },
+          unit: { id: 1, cnpj: '11000000000111', address: { neighborhood: 'Centro', city: 'Curitiba', state: 'PR', street: 'private-address' } },
+        }),
+        passwordHash: 'private-stack-password',
+      }))
     } else { response.statusCode = 404; response.end('{}') }
   })
   const upstreamUrl = await listen(upstream)
@@ -381,4 +401,72 @@ test('falha em um indicador por status não contamina os demais nem consulta rev
   assert.equal(body.indicators.processingFailed.data, 1)
   assert.equal(body.history.status, 'ready')
   assert(!h.state.inventoryCalls.some((path) => path.includes('/pending')))
+})
+
+test('perfil exige sessão e entrega dados pessoais e organização sem expor permissões', async (t) => {
+  const h = await harness(t)
+  assert.equal((await fetch(`${h.base}/api/v1/profile`)).status, 401)
+  const { cookie } = await h.login()
+  const response = await fetch(`${h.base}/api/v1/profile`, { headers: { Cookie: cookie } })
+  assert.equal(response.status, 200)
+  const data = await response.json()
+  assert.equal(data.fullName, h.state.profileName)
+  assert.equal(data.phone, h.state.profilePhone)
+  assert.deepEqual(data.enterprise, { id: 1, name: 'Aurora Alimentos Sustentáveis S.A.' })
+  assert.deepEqual(data.unit, { id: 1, address: { neighborhood: 'Centro', city: 'Curitiba', state: 'PR' } })
+  assert(!('permissions' in data))
+  assert(!JSON.stringify(data).includes('private-'))
+  assert(!('name' in data || 'passwordHash' in data || 'company' in data))
+})
+
+test('perfil salva apenas nome/telefone e recuperação da sessão reflete nome confirmado', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  const response = await fetch(`${h.base}/api/v1/profile`, {
+    method: 'PATCH', headers: { Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Novo Nome', phone: '(11) 98888-7777' }),
+  })
+  assert.equal(response.status, 200)
+  const data = await response.json()
+  assert.equal(data.fullName, 'Novo Nome')
+  assert.equal(data.phone, '(11) 98888-7777')
+  assert(!('enterprise' in data || 'unit' in data))
+  assert(!('permissions' in data))
+  const me = await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })
+  assert.equal((await me.json()).user.name, 'Novo Nome')
+})
+
+test('perfil rejeita campos administrativos, dados inválidos e origem externa antes da escrita', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  for (const body of [{}, { name: 'A' }, { phone: '123' }, { email: 'other@example.com' }, { role: 'administrator' }, { name: 'Novo Nome', id: 2 }, { newPassword: 'Senha123' }]) {
+    const response = await fetch(`${h.base}/api/v1/profile`, { method: 'PATCH', headers: { Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    assert.equal(response.status, 400)
+  }
+  const denied = await fetch(`${h.base}/api/v1/profile`, { method: 'PATCH', headers: { Cookie: cookie, Origin: 'https://outside.example', 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Novo Nome' }) })
+  assert.equal(denied.status, 403)
+  assert.equal(h.state.profileWrites, 0)
+})
+
+test('validação do ms-auth ao salvar perfil não vira sessão expirada e permite tentar novamente', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  h.state.profileWriteStatus = 400
+  const response = await fetch(`${h.base}/api/v1/profile`, { method: 'PATCH', headers: { Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Novo Nome' }) })
+  assert.equal(response.status, 422)
+  assert.equal((await response.json()).error.code, 'PROFILE_VALIDATION_ERROR')
+  h.state.profileWriteStatus = 200
+  const me = await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })
+  assert.equal(me.status, 200)
+  assert.equal((await me.json()).user.name, 'Usuário de teste')
+})
+
+test('perfil malformado ou lento não retorna informações fictícias', async (t) => {
+  const h = await harness(t)
+  const { cookie } = await h.login()
+  h.state.profileMalformed = true
+  assert.equal((await fetch(`${h.base}/api/v1/profile`, { headers: { Cookie: cookie } })).status, 502)
+  h.state.profileMalformed = false
+  h.state.profileDelay = true
+  assert.equal((await fetch(`${h.base}/api/v1/profile`, { headers: { Cookie: cookie } })).status, 504)
 })

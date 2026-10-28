@@ -7,7 +7,7 @@ export const Badge = styled.span`
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-  background-color: rgb(183 108 244 / 14%);
-  border: var(--border-width) solid rgb(183 108 244 / 35%);
+  background-color: var(--color-badge-background);
+  border: var(--border-width) solid var(--color-badge-border);
   border-radius: var(--radius-pill);
 `

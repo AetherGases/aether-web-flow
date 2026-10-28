@@ -1,3 +1,4 @@
+import { createProfileService, updateProfileSchema } from './services/profile.ts'
 import { createAuthController } from './controllers/auth.ts'
 import { createOverviewService } from './services/overview.ts'
 import type { AuthSession } from './types/auth.ts'
@@ -50,6 +51,27 @@ export function createApp(config: Config, store?: Store) {
     const data = await overview(auth.accessToken, response.locals.requestId, auth.user.role)
     response.json(data)
   })
+  const profile = createProfileService(config)
+  app.route('/api/v1/profile')
+    .all(async (request, response, next) => {
+      response.locals.sessionOnly = true
+      await authController.me(request, response)
+      next()
+    })
+    .get(async (_request, response) => {
+      const auth: AuthSession = response.locals.auth
+      const data = await profile.get(auth.accessToken, response.locals.requestId)
+      if (data.id !== auth.user.id || data.email !== auth.user.email) throw new ApiError(502, 'PROFILE_IDENTITY_INVALID', 'O serviço retornou um perfil incompatível.')
+      response.json(data)
+    })
+    .patch(async (request, response) => {
+      const changes = updateProfileSchema.safeParse(request.body)
+      if (!changes.success) throw new ApiError(400, 'VALIDATION_ERROR', 'Informe um nome válido de 3 a 150 caracteres ou um telefone com DDD.')
+      const auth: AuthSession = response.locals.auth
+      const data = await profile.update(auth.accessToken, response.locals.requestId, changes.data)
+      if (data.id !== auth.user.id || data.email !== auth.user.email) throw new ApiError(502, 'PROFILE_IDENTITY_INVALID', 'O serviço retornou um perfil incompatível.')
+      response.json(data)
+    })
   app.use((_request, _response, next) => next(new ApiError(404, 'NOT_FOUND', 'Rota não encontrada.')))
   app.use(errorHandler)
   return app

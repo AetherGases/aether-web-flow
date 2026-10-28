@@ -51,7 +51,7 @@ export const SummaryCard = styled.section`
   align-items: center;
   gap: var(--space-8);
   padding: var(--space-3) var(--space-6);
-  background-color: #2a1a41;
+  background-color: var(--color-assistant-summary);
   border: var(--border-width) solid var(--color-text-primary);
   border-radius: 3rem;
   max-width: 72rem;

@@ -1,3 +1,4 @@
+import { useTranslation } from '../../hooks/useTranslation'
 import Sidebar from '../../components/Sidebar'
 import type { OverviewData } from '../../types/overview'
 import * as S from './styles'
@@ -17,6 +18,7 @@ function DataAnalysisChoicePage({
   onSelectPlant,
   onSelectCompany,
 }: DataAnalysisChoicePageProps) {
+  const { t } = useTranslation()
   return (
     <S.Page>
       <Sidebar
@@ -26,16 +28,16 @@ function DataAnalysisChoicePage({
       />
 
       <S.Content>
-        <S.Title>Selecione o tipo de análise</S.Title>
+        <S.Title>{t("Selecione o tipo de análise")}</S.Title>
 
-        <S.Options aria-label="Tipos de análise">
+        <S.Options aria-label={t("Tipos de análise")}>
           <S.OptionButton type="button" onClick={onSelectPlant}>
             <S.OptionIconBox>
               <S.OptionIcon src={PlantaIcon} alt="" aria-hidden="true" />
             </S.OptionIconBox>
             <S.OptionText>
-              <strong>Plantas individuais</strong>
-              <span>Analise uma unidade por vez</span>
+              <strong>{t("Plantas individuais")}</strong>
+              <span>{t("Analise uma unidade por vez")}</span>
             </S.OptionText>
           </S.OptionButton>
 
@@ -44,8 +46,8 @@ function DataAnalysisChoicePage({
               <S.OptionIcon src={EmpresaIcon} alt="" aria-hidden="true" />
             </S.OptionIconBox>
             <S.OptionText>
-              <strong>Empresa completa</strong>
-              <span>Visão consolidada de todas as plantas</span>
+              <strong>{t("Empresa completa")}</strong>
+              <span>{t("Visão consolidada de todas as plantas")}</span>
             </S.OptionText>
           </S.OptionButton>
         </S.Options>

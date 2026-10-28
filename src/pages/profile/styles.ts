@@ -1,23 +1,6 @@
 import styled from 'styled-components'
 
-interface PageProps {
-  $highContrast: boolean
-}
-
-export const Page = styled.div<PageProps>`
-  ${({ $highContrast }) =>
-    $highContrast &&
-    `
-      --color-background: #000000;
-      --color-surface: #080808;
-      --color-surface-muted: #111111;
-      --color-text-primary: #ffffff;
-      --color-text-secondary: #ffffff;
-      --color-text-muted: #e8e8e8;
-      --color-border: rgba(255, 255, 255, 0.6);
-      --color-border-strong: #ffffff;
-    `}
-
+export const Page = styled.div`
   display: grid;
   min-height: 100dvh;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
@@ -117,7 +100,7 @@ export const NameInput = styled.input`
   padding: var(--space-2) var(--space-3);
   color: var(--color-text-primary);
   text-align: center;
-  background-color: rgb(13 0 38 / 35%);
+  background-color: var(--color-input-overlay);
   border: var(--border-width) solid var(--color-focus);
   border-radius: var(--radius-md);
   outline: none;
@@ -185,47 +168,68 @@ export const DefinitionList = styled.dl`
   }
 `
 
-export const PermissionList = styled.ul`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-3);
-  list-style: none;
-
-  li {
-    display: grid;
-    place-items: center;
-    min-height: 2.5rem;
-    padding: var(--space-2);
-    color: var(--color-text-primary);
-    font-size: var(--font-size-xs);
-    text-align: center;
-    background: rgb(183 108 244 / 55%);
-    border: var(--border-width) solid rgb(255 255 255 / 35%);
-    border-radius: var(--radius-sm);
-  }
-
-  @media (max-width: 48rem) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+export const SettingsList = styled.div`
+  display: flex;
+  flex-direction: column;
 `
 
-export const SettingsSection = styled.section`
-  margin-top: var(--space-6);
-
-  > h2 {
-    margin-bottom: var(--space-4);
-    font-size: var(--font-size-2xl);
-  }
-`
-
-export const SettingsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+export const SettingsRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
+  min-height: 3.25rem;
+  padding: var(--space-3) 0;
+  border-bottom: var(--border-width) solid var(--color-border);
 
-  @media (max-width: 64rem) {
-    grid-template-columns: 1fr;
-  }
+  &:last-child { border-bottom: 0; }
+`
+
+export const LanguageControl = styled.div`
+  position: relative;
+  flex-shrink: 1;
+  max-width: 70%;
+  min-width: 0;
+`
+
+export const LanguageText = styled.span`
+  display: block;
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-2);
+  white-space: nowrap;
+  visibility: hidden;
+`
+
+export const LanguageSelect = styled.select`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-2);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+
+  &:hover { color: var(--color-text-primary); background: rgb(255 255 255 / 5%); }
+  &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  option { color: var(--color-text-primary); background: var(--color-surface-raised); }
+
+  html[data-high-contrast='true'] & { border: 0; background: transparent; }
+`
+
+export const LanguageArrow = styled.span`
+  position: absolute;
+  top: 50%;
+  right: var(--space-2);
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid var(--color-text-secondary);
+  border-bottom: 2px solid var(--color-text-secondary);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
 `
 
 interface SwitchProps {
@@ -254,3 +258,13 @@ export const Switch = styled.button<SwitchProps>`
   }
 `
 
+
+export const NameLabel = styled.label`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+`
