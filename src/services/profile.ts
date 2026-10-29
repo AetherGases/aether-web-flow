@@ -10,6 +10,9 @@ function parsePersonal(data: ProfilePersonal): ProfilePersonal {
 }
 export function parseProfile(data: ProfileData): ProfileData {
   const personal = parsePersonal(data)
+  const department = data.department ?? null
+  if (department !== null && (!Number.isSafeInteger(department.id) || department.id <= 0 ||
+      typeof department.name !== 'string' || !department.name.trim())) throw new Error('Departamento inválido.')
   const enterprise = data.enterprise ?? null
   const unit = data.unit ?? null
   if (enterprise !== null && (!Number.isSafeInteger(enterprise.id) || enterprise.id <= 0 ||
@@ -20,6 +23,7 @@ export function parseProfile(data: ProfileData): ProfileData {
     typeof value !== 'string' || !value.trim())) throw new Error('Endereço da unidade inválido.')
   return {
     ...personal,
+    department: department ? { id: department.id, name: department.name } : null,
     enterprise: enterprise ? { id: enterprise.id, name: enterprise.name } : null,
     unit: unit ? { id: unit.id, address: address ? { neighborhood: address.neighborhood, city: address.city, state: address.state } : null } : null,
   }

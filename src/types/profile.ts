@@ -6,6 +6,7 @@ export interface ProfilePersonal {
   phone: string | null
 }
 export interface ProfileData extends ProfilePersonal {
+  department: { id: number; name: string } | null
   enterprise: { id: number; name: string } | null
   unit: { id: number; address: { neighborhood: string; city: string; state: string } | null } | null
 }
