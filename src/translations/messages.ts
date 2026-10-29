@@ -1,5 +1,13 @@
 // As chaves são os textos em português; cada entrada contém inglês e espanhol.
 export const messages: Record<string, readonly [english: string, spanish: string]> = {
+  "Gerado em": ["Generated on", "Generado el"],
+  "Relatório da simulação": ["Simulation report", "Informe de simulación"],
+  "Simulação de": ["Simulation by", "Simulación de"],
+  "Parâmetros da simulação": ["Simulation parameters", "Parámetros de la simulación"],
+  "Resultados da simulação": ["Simulation results", "Resultados de la simulación"],
+  "Mês": ["Month", "Mes"],
+  "Economia acumulada": ["Cumulative savings", "Ahorro acumulado"],
+  "Projeção estimada com base nos valores informados. Não representa garantia de economia.": ["Estimated forecast based on the values provided. It does not guarantee savings.", "Proyección estimada basada en los valores indicados. No garantiza el ahorro."],
   "Sua conta não tem permissão para usar o assistente.": ["Your account does not have permission to use the assistant.", "Tu cuenta no tiene permiso para usar el asistente."],
   "Como posso ajudar com suas análises hoje?": ["How can I help with your analyses today?", "¿Cómo puedo ayudarte con tus análisis hoy?"],
   "Nova conversa": ["New conversation", "Nueva conversación"],

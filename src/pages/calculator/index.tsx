@@ -1,17 +1,22 @@
+import { useState } from 'react'
+import { flushSync } from 'react-dom'
 import { useTranslation } from '../../hooks/useTranslation'
 import { useCalculator } from '../../hooks/useCalculator'
 import { useAuth } from '../../hooks/useAuth'
+import CalculatorReport from '../../components/CalculatorReport'
 import Sidebar from '../../components/Sidebar'
 import SectionState from '../../components/SectionState'
 import { calculatorPeriods } from '../../utils/calculator'
 import * as S from './styles'
 
 function CalculatorPage() {
+  const [exportedAt, setExportedAt] = useState<Date | null>(null)
   const { t, locale } = useTranslation()
   const { user, logout, retry } = useAuth()
   const { inputs, setInputs, data, validationError, error, loading, sessionExpired, retry: retryForecast } = useCalculator()
   if (!user) return null
   const currencyFormatter = new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL' })
+  const labelInterval = Math.ceil((data?.periodMonths ?? inputs.periodMonths) / 6)
   const projectionScale = Math.max(1, ...(data?.projection.map((item) => item.accumulatedSavings) ?? []))
   const money = (value?: number) => value === undefined ? '—' : currencyFormatter.format(value)
 
@@ -56,7 +61,10 @@ function CalculatorPage() {
                 ))}
               </S.PeriodOptions>
             </S.Field>
-            <S.ExportButton type="button" disabled={!data || loading} onClick={() => window.print()}>
+            <S.ExportButton type="button" disabled={!data || loading} onClick={() => {
+              flushSync(() => setExportedAt(new Date()))
+              window.print()
+            }}>
               {t("Exportar PDF")}
             </S.ExportButton>
           </S.FormCard>
@@ -84,10 +92,10 @@ function CalculatorPage() {
                   <S.BarColumn key={month}>
                     <S.BarTrack>
                       <S.Bar style={{ height: `${(accumulatedSavings / projectionScale) * 100}%` }}
-                        data-tooltip={money(accumulatedSavings)}
+                        data-tooltip={t("Mês {0}: {1}", { "0": month, "1": money(accumulatedSavings) })}
                         aria-label={t("Mês {0}: {1}", { "0": month, "1": money(accumulatedSavings) })} tabIndex={0} />
                     </S.BarTrack>
-                    <S.BarLabel>{month}m</S.BarLabel>
+                    <S.BarLabel aria-hidden="true">{month === 1 || month % labelInterval === 0 ? `${month}m` : ''}</S.BarLabel>
                   </S.BarColumn>
                 ))}
               </S.Bars>}
@@ -95,6 +103,7 @@ function CalculatorPage() {
           </S.Results>
         </S.CalculatorGrid>
       </S.Content>
+      {data && !loading && <CalculatorReport forecast={data} userName={user.name} exportedAt={exportedAt} />}
     </S.Page>
   )
 }
