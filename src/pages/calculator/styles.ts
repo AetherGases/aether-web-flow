@@ -11,6 +11,13 @@ export const Page = styled.div`
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100vh;
   background-color: var(--color-background);
+
+  @media print {
+    display: block;
+    min-height: 0;
+    background: #fff;
+    > :not([data-calculator-report]) { display: none; }
+  }
 `
 
 export const Content = styled.main`
@@ -205,6 +212,7 @@ export const ProjectionCard = styled.article`
 
 export const ProjectionHeader = styled.header`
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
@@ -216,7 +224,7 @@ export const ProjectionHeader = styled.header`
 
 export const Bars = styled.div`
   display: flex;
-  gap: clamp(0.1rem, 0.7vw, 0.75rem);
+  gap: clamp(2px, 0.35vw, 6px);
   height: 10.5rem;
   margin-top: var(--space-5);
   overflow: visible;
@@ -225,9 +233,9 @@ export const Bars = styled.div`
 export const BarColumn = styled.div`
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  flex: 1;
+  flex: 1 1 0;
   gap: var(--space-2);
-  min-width: 0.4rem;
+  min-width: 0;
 `
 
 export const BarTrack = styled.div`
@@ -241,10 +249,10 @@ export const Bar = styled.span`
   position: relative;
   display: block;
   width: 100%;
-  min-width: 0.4rem;
+  min-width: 0;
   cursor: help;
   background: linear-gradient(180deg, var(--color-brand-purple), var(--color-brand-blue), var(--color-brand-green));
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border-radius: 4px 4px 0 0;
   transition: height var(--duration-normal) var(--easing-standard);
 
   &::after {
@@ -276,6 +284,10 @@ export const Bar = styled.span`
 `
 
 export const BarLabel = styled.span`
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  min-height: 1em;
   color: var(--color-text-muted);
   font-size: 0.62rem;
   text-align: center;
