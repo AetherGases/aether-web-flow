@@ -96,6 +96,7 @@ async function harness(t: TestContext, initialTokens = token(), production = fal
         id: 1, name: state.profileName, email: credentials.email, cpf: 'not-public', phone: state.profilePhone,
         ...(request.method === 'PATCH' ? {} : {
           permissions: [{ id: 1, name: 'inventory:analysis', description: 'Consultar relatórios' }],
+          department: { id: 2, name: 'Administrativo', description: 'private-description' },
           enterprise: { id: 1, name: 'Aurora Alimentos Sustentáveis S.A.', address: { street: 'private-address' } },
           unit: { id: 1, cnpj: '11000000000111', address: { neighborhood: 'Centro', city: 'Curitiba', state: 'PR', street: 'private-address' } },
         }),
@@ -444,7 +445,7 @@ test('perfil salva apenas nome/telefone e recuperação da sessão reflete nome 
   const data = await response.json()
   assert.equal(data.fullName, 'Novo Nome')
   assert.equal(data.phone, '(11) 98888-7777')
-  assert(!('enterprise' in data || 'unit' in data))
+  assert(!('enterprise' in data || 'unit' in data || 'department' in data))
   assert(!('permissions' in data))
   const me = await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })
   assert.equal((await me.json()).user.name, 'Novo Nome')

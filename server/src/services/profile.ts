@@ -8,6 +8,9 @@ const personal = z.object({
   cpf: z.string().nullable(), phone: z.string().nullable(),
 })
 const profile = personal.extend({
+  department: z.object({
+    id: z.number().int().positive(), name: z.string().trim().min(1),
+  }).nullish().transform((value) => value ?? null),
   enterprise: z.object({
     id: z.number().int().positive(), name: z.string().min(1),
   }).nullish().transform((value) => value ?? null),

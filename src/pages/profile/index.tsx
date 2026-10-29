@@ -144,7 +144,7 @@ function ProfilePage() {
             <S.DefinitionList>
               <div><dt>{t("Empresa")}</dt><dd>{profile.enterprise?.name ?? t("Não disponível")}</dd></div>
               <div><dt>{t("Unidade")}</dt><dd>{unitLocation}</dd></div>
-              <div><dt>{t("Departamento")}</dt><dd>{t("Não disponível")}</dd></div>
+              <div><dt>{t("Departamento")}</dt><dd>{profile.department?.name ?? t("Não disponível")}</dd></div>
             </S.DefinitionList>
           </S.InformationCard>
 
