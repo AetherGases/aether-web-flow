@@ -24,3 +24,10 @@ export interface InventoryOverview {
   history: OverviewSection<{ inventories: InventorySummary[]; totalCount: number }>
   lastSubmitted: OverviewSection<InventorySummary | null>
 }
+export interface OrganizationOverview {
+  scope: 'department'
+  reports: OverviewSection<{ inventories: InventorySummary[]; totalCount: number }>
+  underReview: OverviewSection<number>
+  approved: OverviewSection<number>
+  rejected: OverviewSection<number>
+}

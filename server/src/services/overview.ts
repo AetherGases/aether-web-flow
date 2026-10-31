@@ -49,3 +49,22 @@ export function createOverviewService(config: Config) {
     return { scope: 'personal' as const, counts: countsResult, history: historyResult, lastSubmitted: lastResult, indicators: { awaitingReview, approved, processingFailed, pendingReview } }
   }
 }
+
+export function createOrganizationOverviewService(config: Config) {
+  return async (accessToken: string, requestId: string) => {
+    if (!config.MS_INVENTORY_URL) {
+      const unavailable = { status: 'error' as const, error: { code: 'INVENTORY_NOT_CONFIGURED', message: 'Esta consulta ainda não está disponível.' } }
+      return { scope: 'department' as const, reports: unavailable, underReview: unavailable, approved: unavailable, rejected: unavailable }
+    }
+    const request = createHttpClient(config.MS_INVENTORY_URL, config.UPSTREAM_TIMEOUT_MS, 'INVENTORY')
+    const options = { method: 'GET' as const, token: accessToken, requestId }
+    const total = z.object({ totalCount: z.number().int().nonnegative().safe() }).transform(value => value.totalCount)
+    const [reports, underReview, approved, rejected] = await Promise.all([
+      section(() => request('/api/inventories/reviewed?take=6&skip=0', options), history),
+      section(() => request('/api/inventories/reviewed?status=UNDER_REVIEW&take=1&skip=0', options), total),
+      section(() => request('/api/inventories/reviewed?status=APPROVED&take=1&skip=0', options), total),
+      section(() => request('/api/inventories/reviewed?status=REJECTED&take=1&skip=0', options), total),
+    ])
+    return { scope: 'department' as const, reports, underReview, approved, rejected }
+  }
+}

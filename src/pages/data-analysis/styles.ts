@@ -1,3 +1,4 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
 
 const panel = `
@@ -17,6 +18,8 @@ export const Content = styled.main`
   min-width: 0;
   padding: var(--space-6);
   text-align: left;
+
+  ${pageContent}
 `
 
 export const Header = styled.header`
@@ -30,13 +33,13 @@ export const Header = styled.header`
 `
 
 export const TitleArea = styled.div`
-  h1 { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-2); font-size: var(--font-size-2xl); }
+  h1 { ${pageTitle} }
+  h1 { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-2); ${pageTitle} }
   h1 span { color: var(--color-success); font-size: var(--font-size-xl); }
 `
 
 export const Breadcrumb = styled.p`
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  ${pageEyebrow}
 `
 
 export const Filters = styled.div`
@@ -126,7 +129,7 @@ export const MetricContent = styled.div`
 export const Variation = styled.small<{ $status: 'positive' | 'negative' }>`
   color: ${({ $status }) => $status === 'positive' ? 'var(--color-success)' : 'var(--color-danger)'};
   font-size: 0.68rem;
-  white-space: nowrap;
+  white-space: normal;
 `
 
 export const DashboardGrid = styled.div`
@@ -144,6 +147,7 @@ export const LeftColumn = styled.div`
 `
 
 export const RightColumn = styled.aside`
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -156,6 +160,7 @@ export const ChartCard = styled.section`
 `
 
 export const CardHeader = styled.header`
+  flex-wrap: wrap;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -209,6 +214,8 @@ export const CostCard = styled.section`
 `
 
 export const CostContent = styled.div`
+  flex-wrap: wrap;
+  @media (max-width: 40rem) { gap: var(--space-4); padding-top: var(--space-4); }
   display: flex;
   align-items: center;
   justify-content: center;
@@ -312,4 +319,13 @@ export const SecondaryButton = styled.button`
   background: transparent;
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
+`
+
+export const DemoNotice = styled.p`
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-secondary);
+  border-left: 3px solid var(--color-brand-purple);
+  background: var(--color-surface);
+  font-size: var(--font-size-sm);
 `

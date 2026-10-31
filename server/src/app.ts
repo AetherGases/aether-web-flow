@@ -1,7 +1,7 @@
 import { createCalculatorService, forecastInputSchema } from './services/calculator.ts'
 import { createProfileService, updateProfileSchema } from './services/profile.ts'
 import { createAuthController } from './controllers/auth.ts'
-import { createOverviewService } from './services/overview.ts'
+import { createOverviewService, createOrganizationOverviewService } from './services/overview.ts'
 import type { AuthSession } from './types/auth.ts'
 import { randomUUID } from 'node:crypto'
 import express from 'express'
@@ -55,6 +55,14 @@ export function createApp(config: Config, store?: Store) {
     const data = await overview(auth.accessToken, response.locals.requestId, auth.user.role)
     response.json(data)
   })
+  const organizationOverview = createOrganizationOverviewService(config)
+  app.get('/api/v1/overview/organization', async (request, response) => {
+    response.locals.sessionOnly = true
+    await authController.me(request, response)
+    const auth: AuthSession = response.locals.auth
+    if (auth.user.role !== 'administrator') throw new ApiError(403, 'FORBIDDEN', 'Acesso não permitido.')
+    response.json(await organizationOverview(auth.accessToken, response.locals.requestId))
+  })
   const profile = createProfileService(config)
   app.route('/api/v1/profile')
     .all(async (request, response, next) => {
@@ -80,9 +88,10 @@ export function createApp(config: Config, store?: Store) {
   app.post('/api/v1/calculator/cost-reduction/forecast', async (request, response) => {
     response.locals.sessionOnly = true
     await authController.me(request, response)
+    const auth: AuthSession = response.locals.auth
+    if (auth.user.role !== 'analyst') throw new ApiError(403, 'CALCULATOR_FORBIDDEN', 'Sua conta não tem permissão para usar esta calculadora.')
     const input = forecastInputSchema.safeParse(request.body)
     if (!input.success) throw new ApiError(400, 'CALCULATOR_VALIDATION_ERROR', 'Confira os valores informados para a simulação.')
-    const auth: AuthSession = response.locals.auth
     response.json(await forecast(input.data, auth.accessToken, response.locals.requestId))
   })
   app.use((_request, _response, next) => next(new ApiError(404, 'NOT_FOUND', 'Rota não encontrada.')))

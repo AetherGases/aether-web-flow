@@ -56,6 +56,7 @@ function ProfilePage() {
       />
 
       <S.Content>
+        <S.Eyebrow>{t("Perfil")}</S.Eyebrow>
         <S.Title>{t("Meu perfil")}</S.Title>
 
         {sessionExpired && <p role="alert">{t("Sua sessão expirou.")}{" "}<button type="button" onClick={retry}>{t("Verificar sessão")}</button></p>}

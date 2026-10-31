@@ -1,3 +1,4 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
 
 export const Page = styled.div`
@@ -23,6 +24,8 @@ export const Content = styled.main`
 
   @media (max-width: 62rem) { padding-inline: var(--space-4); }
   @media (max-height: 40rem) { padding-top: var(--space-3); }
+
+  ${pageContent}
 `
 
 export const Header = styled.header`
@@ -31,6 +34,9 @@ export const Header = styled.header`
   h4 { color: var(--color-brand-green); font-size: var(--font-size-sm); margin: 0 0 var(--space-1); }
   h1 { font-size: clamp(1.5rem, 3vw, 2.5rem); text-align: left; }
   @media (max-height: 40rem) { h4 { display: none; } margin-bottom: var(--space-2); }
+
+  h1 { ${pageTitle} }
+  h4 { ${pageEyebrow} }
 `
 
 export const ConversationControls = styled.nav`

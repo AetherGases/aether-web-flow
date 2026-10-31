@@ -1,3 +1,4 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
 
 const card = `
@@ -26,6 +27,8 @@ export const Content = styled.main`
   margin: 0 auto;
   padding: var(--space-8);
   text-align: left;
+
+  ${pageContent}
 `
 
 export const Header = styled.header`
@@ -39,6 +42,9 @@ export const Header = styled.header`
     margin-bottom: var(--space-1);
   }
     margin-bottom: var(--space-12);
+
+  h1 { ${pageTitle} }
+  h4 { ${pageEyebrow} }
 `
 
 export const CalculatorGrid = styled.div`

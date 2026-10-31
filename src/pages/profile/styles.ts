@@ -1,3 +1,4 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
 
 export const Page = styled.div`
@@ -8,7 +9,7 @@ export const Page = styled.div`
 `
 
 export const Content = styled.main`
-  width: min(100%, 72rem);
+  width: 100%;
   min-width: 0;
   padding: clamp(var(--space-6), 5vh, var(--space-12)) var(--space-8);
   text-align: left;
@@ -16,11 +17,15 @@ export const Content = styled.main`
   @media (max-width: 48rem) {
     padding: var(--space-6);
   }
+
+  ${pageContent}
 `
 
 export const Title = styled.h1`
   margin-bottom: var(--space-6);
   font-size: var(--font-size-3xl);
+
+  ${pageTitle}
 `
 
 export const ProfileGrid = styled.div`
@@ -127,6 +132,9 @@ export const NameAction = styled.button<NameActionProps>`
 `
 
 export const Fields = styled.div`
+  min-width: 0;
+  width: 100%;
+  overflow-wrap: anywhere;
   display: grid;
   gap: var(--space-3);
   width: 100%;
@@ -153,6 +161,8 @@ export const DefinitionList = styled.dl`
     border-bottom: var(--border-width) solid var(--color-border);
   }
 
+  @media (max-width: 40rem) { div { grid-template-columns: 1fr; gap: var(--space-1); } }
+
   div:last-child {
     border-bottom: 0;
   }
@@ -162,6 +172,7 @@ export const DefinitionList = styled.dl`
   }
 
   dd {
+    overflow-wrap: anywhere;
     margin: 0;
     color: var(--color-text-primary);
     font-weight: var(--font-weight-semibold);
@@ -174,6 +185,7 @@ export const SettingsList = styled.div`
 `
 
 export const SettingsRow = styled.div`
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -268,3 +280,5 @@ export const NameLabel = styled.label`
   clip-path: inset(50%);
   white-space: nowrap;
 `
+
+export const Eyebrow = styled.p`${pageEyebrow}`

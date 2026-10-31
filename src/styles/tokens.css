@@ -24,6 +24,7 @@
 
   /* Feedback */
   --color-success: #48e29b;
+  --color-warning: #f4cf7a;
   --color-danger: #ef476f;
 
   /* Gradients */
@@ -101,3 +102,5 @@
   --duration-normal: 250ms;
   --easing-standard: ease;
 }
+
+@media (max-width: 48rem) { :root { --sidebar-width: 4.5rem; } }

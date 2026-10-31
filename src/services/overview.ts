@@ -1,5 +1,5 @@
 import { HttpError, request } from './http.ts'
-import { inventoryStatusLabels, type InventoryOverview, type InventorySummary, type OverviewSection } from '../types/inventory.ts'
+import { inventoryStatusLabels, type InventoryOverview, type OrganizationOverview, type InventorySummary, type OverviewSection } from '../types/inventory.ts'
 
 function count(value: number): number {
   if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) throw new Error('Contagem de relatórios inválida.')
@@ -58,6 +58,29 @@ export function parseOverview(data: InventoryOverview): InventoryOverview {
 export async function getOverview(signal?: AbortSignal): Promise<InventoryOverview> {
   try {
     return parseOverview(await request('/overview', { signal }) as InventoryOverview)
+  } catch (error) {
+    if (error instanceof HttpError || (error instanceof DOMException && error.name === 'AbortError')) throw error
+    throw new HttpError(502, 'INVALID_OVERVIEW_RESPONSE', 'O servidor retornou informações de relatórios incompatíveis.')
+  }
+}
+
+export function parseOrganizationOverview(data: OrganizationOverview): OrganizationOverview {
+  if (!data || data.scope !== 'department') throw new Error('Visão geral incompatível com a aplicação.')
+  return {
+    scope: 'department',
+    reports: section(data.reports, (value) => {
+      if (!value || !Array.isArray(value.inventories) || value.inventories.length > 6) throw new Error('Histórico inválido.')
+      return { inventories: value.inventories.map(inventory), totalCount: count(value.totalCount) }
+    }),
+    underReview: section(data.underReview, count),
+    approved: section(data.approved, count),
+    rejected: section(data.rejected, count),
+  }
+}
+
+export async function getOrganizationOverview(signal?: AbortSignal): Promise<OrganizationOverview> {
+  try {
+    return parseOrganizationOverview(await request('/overview/organization', { signal }) as OrganizationOverview)
   } catch (error) {
     if (error instanceof HttpError || (error instanceof DOMException && error.name === 'AbortError')) throw error
     throw new HttpError(502, 'INVALID_OVERVIEW_RESPONSE', 'O servidor retornou informações de relatórios incompatíveis.')

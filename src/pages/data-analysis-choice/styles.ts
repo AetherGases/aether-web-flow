@@ -1,4 +1,6 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 export const Page = styled.div`
   display: grid;
@@ -15,6 +17,8 @@ export const Content = styled.main`
   @media (max-width: 48rem) {
     padding: var(--space-6);
   }
+
+  ${pageContent}
 `
 
 export const Title = styled.h1`
@@ -23,6 +27,8 @@ export const Title = styled.h1`
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
+
+  ${pageTitle}
 `
 
 export const Options = styled.div`
@@ -42,7 +48,7 @@ export const Options = styled.div`
   }
 `
 
-export const OptionButton = styled.button`
+export const OptionCard = styled.article`
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -55,24 +61,7 @@ export const OptionButton = styled.button`
   border: var(--border-width) solid var(--color-border-strong);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  transition: border-color var(--duration-fast) var(--easing-standard),
-    box-shadow var(--duration-fast) var(--easing-standard),
-    transform var(--duration-fast) var(--easing-standard);
 
-  &:hover {
-    border-color: var(--color-brand-green);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 3px;
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
 `
 
 export const OptionIconBox = styled.span`
@@ -112,4 +101,35 @@ export const OptionText = styled.span`
     font-size: var(--font-size-md);
     line-height: var(--line-height-normal);
   }
+`
+
+
+export const Eyebrow = styled.p`
+  color: var(--color-brand-green);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-2);
+
+  ${pageEyebrow}
+`
+
+export const Description = styled.p`
+  max-width: 42rem;
+  margin-top: var(--space-3);
+  text-align: left;
+`
+
+export const Availability = styled.span`
+  margin-top: var(--space-5);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+`
+
+
+export const AnalysisLink = styled(Link)`
+  text-decoration: none;
+  &:hover { border-color: var(--color-brand-green); }
+  &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
 `

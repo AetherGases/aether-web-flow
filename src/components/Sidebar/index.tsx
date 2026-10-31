@@ -3,6 +3,7 @@ import aetherLogo from '../../assets/logos/logo-aether.svg'
 import * as S from './styles'
 import OverviewLogo from '../../assets/icons/overview.svg'
 import AnaliseLogo from '../../assets/icons/analise-dados.svg'
+import GestaoLogo from '../../assets/icons/empresa.svg'
 import CalculadoraLogo from '../../assets/icons/calculator.svg'
 import ChatbotLogo from '../../assets/icons/chatbot.svg'
 import type { UserRole } from '../../types/overview'
@@ -25,6 +26,7 @@ function Sidebar({
 }: SidebarProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
+  const isAdministrator = userRole === 'administrator'
   const userInitial = userName.charAt(0).toUpperCase()
 
   const roleLabel =
@@ -43,7 +45,7 @@ function Sidebar({
               aria-current={pathname === '/overview' ? 'page' : undefined}
             >
               <S.Icon src={OverviewLogo} alt="" aria-hidden="true" />
-              {t("Visão geral")}</S.NavigationLink>
+              <S.Label>{t("Visão geral")}</S.Label></S.NavigationLink>
           </li>
 
           <li>
@@ -52,16 +54,16 @@ function Sidebar({
               aria-current={pathname.startsWith('/data-analysis') ? 'page' : undefined}
             >
               <S.Icon src={AnaliseLogo} alt="" aria-hidden="true" />
-              {t("Análise de dados")}</S.NavigationLink>
+              <S.AnalysisLabel>{isAdministrator ? t("Análises da organização") : t("Análise de dados")}</S.AnalysisLabel></S.NavigationLink>
           </li>
 
           <li>
             <S.NavigationLink
-              to="/calculator"
-              aria-current={pathname === '/calculator' ? 'page' : undefined}
+              to={isAdministrator ? '/administration' : '/calculator'}
+              aria-current={pathname === (isAdministrator ? '/administration' : '/calculator') ? 'page' : undefined}
             >
-              <S.Icon src={CalculadoraLogo} alt="" aria-hidden="true" />
-              {t("Calculadora")}</S.NavigationLink>
+              <S.Icon src={isAdministrator ? GestaoLogo : CalculadoraLogo} alt="" aria-hidden="true" />
+              <S.Label>{isAdministrator ? t("Gestão administrativa") : t("Calculadora")}</S.Label></S.NavigationLink>
           </li>
 
           <li>
@@ -70,7 +72,7 @@ function Sidebar({
               aria-current={pathname === '/assistant' ? 'page' : undefined}
             >
               <S.Icon src={ChatbotLogo} alt="" aria-hidden="true" />
-              {t("Assistente Aether")}</S.NavigationLink>
+              <S.Label>{t("Assistente Aether")}</S.Label></S.NavigationLink>
           </li>
 
           <li>
@@ -79,7 +81,7 @@ function Sidebar({
               aria-current={pathname === '/profile' ? 'page' : undefined}
             >
               <S.Icon src={perfil} alt="" aria-hidden="true" />
-              {t("Perfil")}</S.NavigationLink>
+              <S.Label>{t("Perfil")}</S.Label></S.NavigationLink>
           </li>
         </S.NavigationList>
       </S.Navigation>

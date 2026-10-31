@@ -1,15 +1,19 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 export const Page = styled.div`
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100vh;
   background: var(--color-background);
 `
 
 export const Content = styled.main`
+  min-width: 0;
   padding: var(--space-8);
+
+  ${pageContent}
 `
 
 export const Header = styled.header`
@@ -22,6 +26,9 @@ export const Header = styled.header`
     font-size: var(--font-size-sm);
     margin-bottom: var(--space-1);
   }
+
+  h1 { ${pageTitle} }
+  h4 { ${pageEyebrow} }
 `
 
 export const MetricsSection = styled.section`
@@ -33,6 +40,8 @@ export const MetricsGrid = styled.div`
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-4);
   margin-top: var(--space-4);
+  @media (max-width: 75rem) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 45rem) { grid-template-columns: 1fr; }
 `
 
 export const FastAcessSection = styled.section`
@@ -44,7 +53,7 @@ export const FastAcessSection = styled.section`
 `
 export const FastAcessGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
   gap: var(--space-4);
   margin-top: var(--space-4);
 `
@@ -60,6 +69,8 @@ export const FastAcessDiv = styled.article`
 `
 
 export const FastAcessContent = styled.div`
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -103,27 +114,27 @@ export const Icon = styled.img`
 
 export const DashboardGrid = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   align-items: stretch;
   gap: var(--space-4);
   margin-top: var(--space-8);
   width: 100%;
-  max-width: 68rem;
-  margin-inline: auto;
 
-  @media (max-width: 900px) {
+  @media (max-width: 75rem) {
     grid-template-columns: 1fr;
   }
 `
 
 export const PerformanceSection = styled.section`
-  padding: var(--space-8);
+  min-width: 0;
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-xl);
 `
 
 export const PerformanceHeader = styled.header`
+  flex-wrap: wrap;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -166,6 +177,8 @@ export const AnalysisLink = styled(Link)`
 `
 
 export const PerformanceTable = styled.table`
+  th, td { overflow-wrap: anywhere; font-size: var(--font-size-sm); }
+  @media (max-width: 40rem) { th, td { padding: var(--space-2) var(--space-1); } }
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
@@ -202,6 +215,9 @@ export const PerformanceTable = styled.table`
 `
 
 export const PlantIdentification = styled.div`
+  min-width: 0;
+  span:last-child { min-width: 0; overflow-wrap: anywhere; }
+  @media (max-width: 40rem) { flex-wrap: wrap; }
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -222,7 +238,8 @@ export const Position = styled.span`
 `
 
 export const AlertsSection = styled.section`
-  padding: var(--space-8);
+  min-width: 0;
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
 
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);

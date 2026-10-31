@@ -3,9 +3,9 @@ import { test } from 'node:test'
 import { getHomePath } from '../src/utils/auth.ts'
 import { validateLogin } from '../src/utils/validation.ts'
 
-test('papéis autenticados possuem entradas distintas', () => {
+test('papéis autenticados entram pela visão geral com o painel definido pela sessão', () => {
   assert.equal(getHomePath('analyst'), '/overview')
-  assert.equal(getHomePath('administrator'), '/data-analysis/select')
+  assert.equal(getHomePath('administrator'), '/overview')
 })
 
 test('validação impede campos vazios, email inválido e senha acima do limite', () => {
