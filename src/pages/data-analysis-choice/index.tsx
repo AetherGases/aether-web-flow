@@ -17,12 +17,12 @@ export default function DataAnalysisChoicePage() {
       <S.Title>{t('Análises da organização')}</S.Title>
       <S.Description>{t('Escolha o escopo e selecione o relatório para análise.')}</S.Description>
       <S.Options aria-label={t('Tipos de análise')}>
-        <S.OptionCard as={S.AnalysisLink} to="/data-analysis/upload?scope=plant">
+        <S.OptionCard as={S.AnalysisLink} to="/data-analysis/upload/plant">
           <S.OptionIconBox><S.OptionIcon data-theme-icon src={PlantaIcon} alt="" aria-hidden="true" /></S.OptionIconBox>
           <S.OptionText><strong>{t('Plantas individuais')}</strong><span>{t('Analise uma unidade por vez')}</span></S.OptionText>
           <S.Availability>{t('Selecionar relatório')}</S.Availability>
         </S.OptionCard>
-        <S.OptionCard as={S.AnalysisLink} to="/data-analysis/upload?scope=company">
+        <S.OptionCard as={S.AnalysisLink} to="/data-analysis/upload/company">
           <S.OptionIconBox><S.OptionIcon data-theme-icon src={EmpresaIcon} alt="" aria-hidden="true" /></S.OptionIconBox>
           <S.OptionText><strong>{t('Empresa completa')}</strong><span>{t('Visão consolidada de todas as plantas')}</span></S.OptionText>
           <S.Availability>{t('Selecionar relatório')}</S.Availability>

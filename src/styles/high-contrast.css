@@ -10,6 +10,7 @@ html[data-high-contrast='true'] {
   --color-text-secondary: #ffffff;
   --color-text-muted: #eeeeee;
   --color-text-inverse: #000000;
+  --color-on-brand: #ffffff;
   --color-border: #ffffff;
   --color-border-strong: #ffffff;
   --color-focus: #ffff00;

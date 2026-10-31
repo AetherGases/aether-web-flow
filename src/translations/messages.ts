@@ -1,5 +1,6 @@
 // As chaves são os textos em português; cada entrada contém inglês e espanhol.
 export const messages: Record<string, readonly [english: string, spanish: string]> = {
+  "Perfis de acesso": ["Access profiles", "Perfiles de acceso"],
   "Carregando perfil...": ["Loading profile...", "Cargando perfil..."],
   "Voltar à escolha de análise": ["Back to analysis selection", "Volver a elegir el análisis"],
   "Aceita apenas Excel (.xlsx)": ["Accepts Excel only (.xlsx)", "Solo acepta Excel (.xlsx)"],

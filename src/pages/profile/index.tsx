@@ -1,5 +1,5 @@
 import { useTranslation } from '../../hooks/useTranslation'
-import { type KeyboardEvent, useState } from 'react'
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 
 import ProfileField from '../../components/ProfileField'
 import Toast from '../../components/Toast'
@@ -14,26 +14,37 @@ import { isLanguage } from '../../types/preferences'
 import { validateProfile } from '../../utils/profile'
 import * as S from './styles'
 
+interface NameEditorState { editing: boolean; draft: string; error: string | null }
+
 function ProfilePage() {
   const { t } = useTranslation()
   const { user, logout, retry } = useAuth()
   const { data: profile, loading, error, notification, dismissNotification, fieldErrors, saving, sessionExpired, reload, save } = useProfile()
   const { lightMode, toggleLightMode, highContrast, toggleHighContrast, language, setLanguage } = usePreferences()
-  const [isEditingName, setIsEditingName] = useState(false)
-  const [nameDraft, setNameDraft] = useState('')
-  const [nameError, setNameError] = useState<string | null>(null)
+  const [nameEditor, setNameEditor] = useState<NameEditorState>({ editing: false, draft: '', error: null })
+  const { editing: isEditingName, draft: nameDraft, error: nameError } = nameEditor
+  const nameButtonRef = useRef<HTMLButtonElement>(null)
+  const restoreNameFocus = useRef(false)
+  useEffect(() => {
+    if (!isEditingName && restoreNameFocus.current) {
+      nameButtonRef.current?.focus()
+      restoreNameFocus.current = false
+    }
+  }, [isEditingName])
 
   async function saveName() {
     const changes = { name: nameDraft.trim() }
     const errors = validateProfile(changes)
-    setNameError(errors.name ?? null)
-    if (!errors.name && await save(changes)) setIsEditingName(false)
+    setNameEditor((current) => ({ ...current, error: errors.name ?? null }))
+    if (!errors.name && await save(changes)) {
+      restoreNameFocus.current = true
+      setNameEditor((current) => ({ ...current, editing: false }))
+    }
   }
 
   function cancelNameEditing() {
-    setNameDraft(profile?.fullName ?? user?.name ?? '')
-    setNameError(null)
-    setIsEditingName(false)
+    restoreNameFocus.current = true
+    setNameEditor({ editing: false, draft: profile?.fullName ?? user?.name ?? '', error: null })
   }
 
   function handleNameKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -76,7 +87,7 @@ function ProfilePage() {
                     aria-invalid={!!nameError}
                     aria-describedby={nameError ? "profile-name-error" : undefined}
                     autoFocus
-                    onChange={(event) => setNameDraft(event.target.value)}
+                    onChange={(event) => setNameEditor((current) => ({ ...current, draft: event.target.value }))}
                     onKeyDown={handleNameKeyDown}
                   />
                   <S.NameAction
@@ -101,10 +112,11 @@ function ProfilePage() {
                 <S.NameRow>
                   <h2>{profile.fullName}</h2>
                   <S.EditNameButton
+                    ref={nameButtonRef}
                     type="button"
                     aria-label={t("Editar nome")}
                     disabled={saving}
-                    onClick={() => { setNameDraft(profile.fullName); setNameError(null); setIsEditingName(true) }}
+                    onClick={() => { setNameEditor({ editing: true, draft: profile.fullName, error: null }) }}
                   >
                     ✎
                   </S.EditNameButton>

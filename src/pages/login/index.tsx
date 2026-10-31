@@ -61,7 +61,7 @@ function LoginPage() {
             </S.Header>
   
             <section
-              aria-labelledby="profiles-title"
+              aria-label={t("Perfis de acesso")}
             >
   
               <S.ProfileList>

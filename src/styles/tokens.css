@@ -14,8 +14,9 @@
   /* Text */
   --color-text-primary: #ffffff;
   --color-text-secondary: #c3bfd0;
-  --color-text-muted: #8f899f;
+  --color-text-muted: #b8b1c7;
   --color-text-inverse: #130523;
+  --color-on-brand: #130523;
 
   /* Borders */
   --color-border: #514768;
@@ -25,7 +26,7 @@
   /* Feedback */
   --color-success: #48e29b;
   --color-warning: #f4cf7a;
-  --color-danger: #ef476f;
+  --color-danger: #ff8fa7;
 
   /* Gradients */
   --gradient-brand: linear-gradient(

@@ -16,7 +16,7 @@ function OverviewPage() {
   const { user, logout, retry: recoverSession } = useAuth()
   const { data, loading, sessionExpired, reload } = useOverview()
   if (!user) return null
-  const analysisPath = '/data-analysis/upload'
+  const analysisPath = '/data-analysis/upload/plant'
   const counts = data?.counts
   const history = data?.history
   const last = data?.lastSubmitted
@@ -64,7 +64,7 @@ function OverviewPage() {
         <S.PerformanceSection aria-labelledby="history-title">
           <S.PerformanceHeader>
             <h2 id="history-title">{t("Meu histórico de relatórios")}</h2>
-            <S.AnalysisLink to="/data-analysis/upload">{t("Nova análise")}</S.AnalysisLink>
+            <S.AnalysisLink to="/data-analysis/upload/plant">{t("Nova análise")}</S.AnalysisLink>
           </S.PerformanceHeader>
           {history?.status === 'ready' ? <>
             <S.PerformanceTable>

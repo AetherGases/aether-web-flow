@@ -9,7 +9,7 @@ Node 24 + TypeScript + Express. O processo do BFF é separado do Vite. O navegad
 3. Preencha `SESSION_SECRET` com uma chave aleatória de pelo menos 32 caracteres e confirme `MS_AUTH_URL`. A URL local padrão do exemplo é `http://localhost:8080`, conforme API_PORT padrão do serviço.
 4. Inicie o ms-auth com suas dependências/configuração próprias com o contrato de role descrito abaixo disponível no login e no refresh.
 5. Na raiz, terminal 1: `npm run dev:bff`. Terminal 2: `npm run dev`.
-6. Acesse `http://localhost:5173`. Se a origem/porta mudar, ajuste FRONTEND_ORIGIN. O proxy do Vite encaminha `/api` para `127.0.0.1:3001`.
+6. Acesse `http://localhost:5173/dashboard/`. Se a origem/porta mudar, ajuste FRONTEND_ORIGIN. O proxy do Vite encaminha `/api` para `127.0.0.1:3001`.
 
 Não colocar tokens, senhas ou secrets em variáveis VITE_*. Arquivos .env são ignorados; o exemplo não contém credenciais reais. Nunca versionar o store de sessão. Redis não deve ficar acessível publicamente.
 
@@ -55,16 +55,16 @@ Desenvolvimento sem REDIS_URL usa MemoryStore e perde sessões ao reiniciar. Pro
 
 Na raiz: `npm run build`, `npm run lint`, `npm test`, `npm run typecheck:bff` e `npm run test:bff`. Os testes do BFF utilizam um ms-auth HTTP simulado e nunca credenciais reais. Testes de Redis/HTTPS e E2E com os serviços implantados ainda devem ser feitos no ambiente integrado.
 
-A overview integra inventários pessoais reais e o perfil consulta e atualiza dados no ms-auth; a calculadora e o assistente usam seus microsserviços quando configurados; as demais telas continuam com dados demonstrativos até suas integrações. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção de análise é restrita a administrator; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
+A overview integra inventários pessoais reais e o perfil consulta e atualiza dados no ms-auth; a calculadora e o assistente usam seus microsserviços quando configurados; as demais telas continuam com dados demonstrativos até suas integrações. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção do escopo organizacional é restrita a administrator; o upload por planta também está disponível ao analista; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
 
 ## Overview e inventários
 
 GET /api/v1/overview exige sessão validada e usa MS_INVENTORY_URL no ambiente do BFF. Não configurar esta variável em VITE_*. Ausência retorna seções indisponíveis, sem afetar os endpoints de login. Produção exige HTTPS.
 
-A overview agrega /api/inventories/count, /api/inventories/mine?take=6&skip=0 e /api/inventories/mine/last. Somente o 404 de último inventário vira null. Cada seção retorna ready/data ou error/error. Falha em uma consulta não oculta as demais seções; não há fallback fictício. As contagens são pessoais para ambos os papéis. Não há consolidação financeira, ranking entre plantas ou alertas estatísticos nestes contratos.
+A overview agrega /api/inventories/count, /api/inventories/mine?take=6&skip=0 e /api/inventories/mine/last. Somente o 404 de último inventário vira null. Cada seção retorna ready/data ou error/error. Falha em uma consulta não oculta as demais seções; não há fallback fictício. O endpoint `/overview` tem contagens pessoais; a interface administrativa usa `/overview/organization`, com escopo de departamento. Não há consolidação financeira, ranking entre plantas ou alertas estatísticos nestes contratos.
 ### Indicadores por papel
 
-A overview também usa o filtro status de /api/inventories/mine para os totais pessoais do analista (UNDER_REVIEW, APPROVED, PROCESSING_FAILED), via totalCount. Para administrador consulta /api/inventories/pending com escopo departamental, explicitado no contrato. O papel vem da sessão validada; parâmetros do browser não escolhem esse escopo. Cada indicador retorna seu próprio estado de sucesso/erro. A interface usa relatórios sem renomear APIs ou tabelas.
+A overview também usa o filtro status de /api/inventories/mine para os totais pessoais do analista (UNDER_REVIEW, APPROVED, PROCESSING_FAILED), via totalCount. A interface administrativa usa `/overview/organization`, que consulta `/api/inventories/reviewed` com filtros de situação e `totalCount`, com escopo departamental explicitado no contrato. O papel vem da sessão validada; parâmetros do browser não escolhem esse escopo. Cada indicador retorna seu próprio estado de sucesso/erro. A interface usa relatórios sem renomear APIs ou tabelas.
 
 ## Perfil
 
@@ -72,7 +72,7 @@ A overview também usa o filtro status de /api/inventories/mine para os totais p
 
 `PATCH /api/v1/profile` aceita somente `name` e/ou `phone`, exige origem válida e encaminha a atualização para o ms-auth. Nome deve ter de 3 a 150 caracteres, com letras e espaços; telefone deve conter DDD e seguir os formatos aceitos pelo serviço. Campos administrativos, senha, imagem, email e identificador não podem ser enviados por essa rota. A resposta contém os dados pessoais confirmados, sem permissões; a interface atualiza os dados confirmados. Erros 400/422 do serviço de atualização retornam validação 422 sem invalidar a sessão.
 
-O card Organização permanece sem dados até existir contrato para empresa, unidade e departamento. Configurações ocupa o card abaixo de Organização, ao lado dos dados pessoais no desktop e empilhado em telas menores. Idioma e alto contraste são globais e persistem no navegador. O modo claro será implementado separadamente. A tela não utiliza mais o mock de perfil. Após salvar, o nome confirmado é refletido na sidebar; a próxima verificação de sessão também recupera o nome atualizado do ms-auth.
+O card Organização exibe empresa, localização da unidade e departamento retornados pelo ms-auth; campos ausentes mostram “Não disponível”. Configurações ocupa o card abaixo de Organização, ao lado dos dados pessoais no desktop e empilhado em telas menores. Modo claro, idioma e alto contraste são globais e persistem no navegador com schema versão 3. A tela não utiliza mais o mock de perfil. Após salvar, o nome confirmado é refletido na sidebar; a próxima verificação de sessão também recupera o nome atualizado do ms-auth.
 
 ## Calculadora
 

@@ -61,7 +61,7 @@ export const PresentationContent = styled.div`
   width: 100%;
   max-width: 28rem;
   text-align: left;
-  h2, p { color: var(--color-text-primary); }
+  h2, p { color: var(--color-on-brand); }
   @media (max-width: 75rem) { h2 { font-size: 1.6rem; } }
   @media (max-width: 64rem) {
     max-width: 36rem;
@@ -159,7 +159,7 @@ export const SubmitButton = styled.button`
   width: 100%;
   padding: var(--space-2);
   margin-top: var(--space-4);
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   background: var(--gradient-brand-diagonal);

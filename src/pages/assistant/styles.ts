@@ -160,7 +160,8 @@ export const Suggestions = styled.div`
   button:hover:not(:disabled) { color: var(--color-text-primary); background: var(--color-surface); border-color: var(--color-brand-purple); }
 `
 
-export const Message = styled.article<{ $author: 'user' | 'assistant' }>`
+interface MessageProps { $author: 'user' | 'assistant' }
+export const Message = styled.article<MessageProps>`
   display: flex;
   flex-shrink: 0;
   align-self: ${({ $author }) => $author === 'user' ? 'flex-end' : 'flex-start'};

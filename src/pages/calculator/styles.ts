@@ -49,23 +49,27 @@ export const Header = styled.header`
 
 export const CalculatorGrid = styled.div`
   display: grid;
-  grid-template-columns: minmax(20rem, 1.1fr) minmax(20rem, 1fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: var(--space-12);
   align-items: start;
 
   @media (max-width: 64rem) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-6);
   }
 `
 
 export const FormCard = styled.form`
+  min-width: 0;
+  overflow-wrap: anywhere;
   ${card}
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
   min-height: 27rem;
   padding: var(--space-8);
+
+  @media (max-width: 40rem) { padding: var(--space-5); gap: var(--space-6); }
 `
 
 export const Field = styled.div`
@@ -104,7 +108,8 @@ export const RangeHeader = styled.div`
   }
 `
 
-export const RangeInput = styled.input<{ $progress: number }>`
+interface RangeInputProps { $progress: number }
+export const RangeInput = styled.input<RangeInputProps>`
   width: 100%;
   height: 0.35rem;
   cursor: pointer;
@@ -144,10 +149,11 @@ export const PeriodOptions = styled.div`
   gap: var(--space-4);
 `
 
-export const PeriodButton = styled.button<{ $active: boolean }>`
+interface PeriodButtonProps { $active: boolean }
+export const PeriodButton = styled.button<PeriodButtonProps>`
   min-width: 4rem;
   padding: var(--space-2) var(--space-4);
-  color: var(--color-text-primary);
+  color: ${({ $active }) => $active ? 'var(--color-on-brand)' : 'var(--color-text-primary)'};
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   background: ${({ $active }) => $active ? 'var(--gradient-brand)' : 'var(--color-background)'};
@@ -171,22 +177,26 @@ export const ExportButton = styled.button`
 `
 
 export const Results = styled.section`
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 `
 
 export const TotalSavingsCard = styled.article`
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-6);
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   background: var(--gradient-brand);
   border-radius: var(--radius-md);
 
   span { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); }
-  strong { font-size: var(--font-size-3xl); line-height: var(--line-height-tight); }
+  strong { font-size: clamp(1.5rem, 3vw, var(--font-size-3xl)); line-height: var(--line-height-tight); }
 `
 
 export const SummaryGrid = styled.div`
@@ -198,6 +208,8 @@ export const SummaryGrid = styled.div`
 `
 
 export const SummaryCard = styled.article`
+  min-width: 0;
+  overflow-wrap: anywhere;
   ${card}
   display: flex;
   flex-direction: column;
@@ -211,6 +223,8 @@ export const SummaryCard = styled.article`
 `
 
 export const ProjectionCard = styled.article`
+  min-width: 0;
+  overflow-wrap: anywhere;
   ${card}
   min-height: 15rem;
   padding: var(--space-5);
@@ -262,6 +276,7 @@ export const Bar = styled.span`
   transition: height var(--duration-normal) var(--easing-standard);
 
   &::after {
+    display: none;
     position: absolute;
     bottom: calc(100% + var(--space-2));
     left: 50%;
@@ -284,8 +299,20 @@ export const Bar = styled.span`
 
   &:hover::after,
   &:focus-visible::after {
+    display: block;
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+
+  @media (max-width: 40rem) {
+    &::after {
+      position: fixed;
+      bottom: var(--space-4);
+      left: calc(var(--sidebar-width) + var(--space-4));
+      right: var(--space-4);
+      white-space: normal;
+    }
+    &:hover::after, &:focus-visible::after { transform: none; }
   }
 `
 

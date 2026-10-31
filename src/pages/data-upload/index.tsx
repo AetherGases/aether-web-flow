@@ -1,24 +1,25 @@
 import { useTranslation } from '../../hooks/useTranslation'
 import { type ChangeEvent, useRef, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { getAnalysisScope } from '../../utils/analysis'
+import { getAnalysisScope, isAnalysisScope, validateReportFileName } from '../../utils/analysis'
 
 import uploadFileIcon from '../../assets/icons/data-upload/upload-file.svg'
 import Sidebar from '../../components/Sidebar'
+import ErrorPage from '../error'
 import * as S from './styles'
-
-const acceptedExtensions = ['xlsx']
 
 function DataUploadPage() {
   const { t } = useTranslation()
   const { user, logout } = useAuth()
+  const { scope: routeScope } = useParams<{ scope: string }>()
   const [searchParams] = useSearchParams()
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState('')
   if (!user) return null
-  const scope = getAnalysisScope(user.role, searchParams.get('scope'))
+  if (routeScope !== undefined && (!isAnalysisScope(routeScope) || (routeScope === 'company' && user.role !== 'administrator'))) return <ErrorPage />
+  const scope = getAnalysisScope(user.role, routeScope ?? searchParams.get('scope'))
 
   function openFileSelector() {
     setErrorMessage('')
@@ -29,10 +30,9 @@ function DataUploadPage() {
     const selectedFile = event.target.files?.[0]
     if (!selectedFile) return
 
-    const extension = selectedFile.name.split('.').pop()?.toLowerCase() ?? ''
-
-    if (!acceptedExtensions.includes(extension)) {
-      setErrorMessage(t("Selecione um arquivo Excel (.xlsx)."))
+    const validationError = validateReportFileName(selectedFile.name)
+    if (validationError) {
+      setErrorMessage(validationError)
       event.target.value = ''
       return
     }
@@ -65,11 +65,12 @@ function DataUploadPage() {
             <span>{t("Aceita apenas Excel (.xlsx)")}</span>
           </S.UploadText>
 
+          <S.FileLabel htmlFor="analysis-report">{t("Selecionar arquivo")}</S.FileLabel>
           <S.FileInput
+            id="analysis-report"
             ref={inputRef}
             type="file"
             tabIndex={-1}
-            aria-label={t("Selecionar arquivo")}
             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={handleFileSelection}
           />

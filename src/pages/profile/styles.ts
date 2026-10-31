@@ -34,11 +34,13 @@ export const ProfileGrid = styled.div`
   gap: var(--space-6);
 
   @media (max-width: 64rem) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 `
 
 const Card = styled.section`
+  min-width: 0;
+  overflow-wrap: anywhere;
   background-color: var(--color-surface-muted);
   border: var(--border-width) solid var(--color-border-strong);
   border-radius: var(--radius-xl);
@@ -58,6 +60,8 @@ export const PersonalCard = styled(Card)`
 `
 
 export const Identity = styled.div`
+  max-width: 100%;
+  min-width: 0;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -71,6 +75,9 @@ export const Identity = styled.div`
 `
 
 export const NameRow = styled.div`
+  min-width: 0;
+  max-width: 100%;
+  h2 { min-width: 0; overflow-wrap: anywhere; }
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,6 +139,7 @@ export const NameAction = styled.button<NameActionProps>`
 `
 
 export const Fields = styled.div`
+  grid-template-columns: minmax(0, 1fr);
   min-width: 0;
   width: 100%;
   overflow-wrap: anywhere;
@@ -141,6 +149,7 @@ export const Fields = styled.div`
 `
 
 export const InformationCard = styled(Card)`
+  @media (max-width: 40rem) { padding: var(--space-4); h2 { font-size: 1.3rem; } }
   padding: var(--space-5) var(--space-6);
 
   h2 {
@@ -148,6 +157,7 @@ export const InformationCard = styled(Card)`
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-medium);
   }
+  @media (max-width: 40rem) { h2 { font-size: 1.3rem; } }
 `
 
 export const DefinitionList = styled.dl`
@@ -209,6 +219,7 @@ export const LanguageText = styled.span`
   padding: var(--space-2) var(--space-6) var(--space-2) var(--space-2);
   white-space: nowrap;
   visibility: hidden;
+  overflow: hidden;
 `
 
 export const LanguageSelect = styled.select`

@@ -81,8 +81,10 @@ export const NavigationLink = styled(Link)`
     outline-offset: 2px;
   }
 
+  html:not([data-high-contrast='true']) &[aria-current='page'] img { filter: brightness(0) opacity(0.85); }
+
   &[aria-current='page'] {
-    color: var(--color-text-primary);
+    color: var(--color-on-brand);
     background: var(--gradient-brand);
   }
 `
@@ -112,7 +114,7 @@ export const Avatar = styled.span`
   width: 2.5rem;
   height: 2.5rem;
 
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
 

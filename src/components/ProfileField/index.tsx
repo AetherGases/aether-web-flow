@@ -1,5 +1,5 @@
 import { useTranslation } from '../../hooks/useTranslation'
-import { type KeyboardEvent, useState } from 'react'
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 import * as S from './styles'
 
 interface ProfileFieldProps {
@@ -26,20 +26,31 @@ function ProfileField({
   error,
 }: ProfileFieldProps) {
   const { t } = useTranslation()
-  const [isEditing, setIsEditing] = useState(false)
-  const [draft, setDraft] = useState(value)
+  const [editor, setEditor] = useState({ editing: false, draft: value })
+  const { editing: isEditing, draft } = editor
+  const editButtonRef = useRef<HTMLButtonElement>(null)
+  const restoreFocus = useRef(false)
+  useEffect(() => {
+    if (!isEditing && restoreFocus.current) {
+      editButtonRef.current?.focus()
+      restoreFocus.current = false
+    }
+  }, [isEditing])
 
   async function saveValue() {
     if (disabled) return
     const nextValue = draft.trim()
 
     const saved = await onChange?.(nextValue)
-    if (saved !== false) setIsEditing(false)
+    if (saved !== false) {
+      restoreFocus.current = true
+      setEditor((current) => ({ ...current, editing: false }))
+    }
   }
 
   function cancelEditing() {
-    setDraft(value)
-    setIsEditing(false)
+    restoreFocus.current = true
+    setEditor({ editing: false, draft: value })
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -62,7 +73,7 @@ function ProfileField({
               value={draft}
               maxLength={maxLength}
               autoFocus
-              onChange={(event) => setDraft(event.target.value)}
+              onChange={(event) => setEditor((current) => ({ ...current, draft: event.target.value }))}
               onKeyDown={handleKeyDown}
             />
             <S.ConfirmButton type="button" disabled={disabled} onClick={() => { void saveValue() }}>
@@ -79,10 +90,11 @@ function ProfileField({
             <S.Value>{value}</S.Value>
             {editable && (
               <S.EditButton
+                ref={editButtonRef}
                 type="button"
                 aria-label={t("Editar {0}", { "0": label.toLowerCase() })}
                 disabled={disabled}
-                onClick={() => { setDraft(value); setIsEditing(true) }}
+                onClick={() => { setEditor({ editing: true, draft: value }) }}
               >
                 ✎
               </S.EditButton>

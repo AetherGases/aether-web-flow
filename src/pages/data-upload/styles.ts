@@ -89,7 +89,7 @@ export const SelectFileButton = styled.button`
   width: min(100%, 18.25rem);
   min-height: 2.7rem;
   padding: var(--space-2) var(--space-6);
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   background: var(--gradient-brand);
@@ -125,4 +125,13 @@ export const BackLink = styled.a`
   text-decoration: none;
   &:hover { color: var(--color-brand-green); }
   &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+`
+
+export const FileLabel = styled.label`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 `

@@ -116,6 +116,8 @@ export const MetricIcon = styled.span`
   font-size: var(--font-size-xl);
   background: var(--gradient-brand-diagonal);
   border-radius: var(--radius-md);
+
+  color: var(--color-on-brand);
 `
 
 export const MetricContent = styled.div`
@@ -126,7 +128,8 @@ export const MetricContent = styled.div`
   > strong { margin: var(--space-1) 0; font-size: var(--font-size-xl); line-height: var(--line-height-tight); }
 `
 
-export const Variation = styled.small<{ $status: 'positive' | 'negative' }>`
+interface VariationProps { $status: 'positive' | 'negative' }
+export const Variation = styled.small<VariationProps>`
   color: ${({ $status }) => $status === 'positive' ? 'var(--color-success)' : 'var(--color-danger)'};
   font-size: 0.68rem;
   white-space: normal;
@@ -293,7 +296,7 @@ export const ImpactBox = styled.div`
 export const PrimaryButton = styled.button`
   width: 100%;
   padding: var(--space-3);
-  color: var(--color-text-inverse);
+  color: var(--color-on-brand);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   background: var(--gradient-brand);

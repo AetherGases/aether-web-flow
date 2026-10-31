@@ -46,8 +46,11 @@ function DataAnalysisPage({ data, onLogout }: DataAnalysisPageProps) {
   const currency = new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 2 })
   const [searchParams] = useSearchParams()
   const availablePlants = data.role === 'administrator' ? [{ value: 'company', label: 'Empresa completa' }, ...plantOptions] : plantOptions
-  const [selectedPlant, setSelectedPlant] = useState(getAnalysisScope(data.role, searchParams.get('scope')) === 'company' ? 'company' : 'plant-04')
-  const [selectedPeriod, setSelectedPeriod] = useState('12-months')
+  const [filters, setFilters] = useState({
+    plant: getAnalysisScope(data.role, searchParams.get('scope')) === 'company' ? 'company' : 'plant-04',
+    period: '12-months',
+  })
+  const { plant: selectedPlant, period: selectedPeriod } = filters
 
   const selectedPlantLabel = availablePlants.find(({ value }) => value === selectedPlant)?.label ?? ''
   const selectedPeriodLabel = periodOptions.find(({ value }) => value === selectedPeriod)?.label ?? ''
@@ -66,14 +69,14 @@ function DataAnalysisPage({ data, onLogout }: DataAnalysisPageProps) {
           <S.Filters aria-label={t("Filtros da análise")}>
             <S.Filter>
               <S.FilterIcon aria-hidden="true" />
-              <S.Select aria-label={t("Selecionar planta")} value={selectedPlant} onChange={(event) => setSelectedPlant(event.target.value)}>
+              <S.Select aria-label={t("Selecionar planta")} value={selectedPlant} onChange={(event) => setFilters((current) => ({ ...current, plant: event.target.value }))}>
                 {availablePlants.map((plant) => <option key={plant.value} value={plant.value}>{t(plant.label)}</option>)}
               </S.Select>
             </S.Filter>
 
             <S.Filter>
               <S.FilterIcon aria-hidden="true" />
-              <S.Select aria-label={t("Selecionar período")} value={selectedPeriod} onChange={(event) => setSelectedPeriod(event.target.value)}>
+              <S.Select aria-label={t("Selecionar período")} value={selectedPeriod} onChange={(event) => setFilters((current) => ({ ...current, period: event.target.value }))}>
                 {periodOptions.map((period) => <option key={period.value} value={period.value}>{t(period.label)}</option>)}
               </S.Select>
             </S.Filter>

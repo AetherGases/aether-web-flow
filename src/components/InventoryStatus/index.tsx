@@ -8,11 +8,13 @@ const colors: Record<Status, string> = {
   UNDER_REVIEW: 'var(--color-warning)', PROCESSING: 'var(--color-brand-blue)',
   REQUESTED: 'var(--color-text-secondary)',
 }
-const Label = styled.span<{ $status: Status }>`
+interface InventoryStatusProps { status: Status }
+interface LabelProps { $status: Status }
+const Label = styled.span<LabelProps>`
   color: ${({ $status }) => colors[$status]};
   font-weight: var(--font-weight-semibold);
 `
-export default function InventoryStatus({ status }: { status: Status }) {
+export default function InventoryStatus({ status }: InventoryStatusProps) {
   const { t } = useTranslation()
   return <Label $status={status}>{t(inventoryStatusLabels[status])}</Label>
 }

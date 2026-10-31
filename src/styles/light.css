@@ -10,6 +10,7 @@ html[data-theme='light'] {
   --color-text-secondary: #59516b;
   --color-text-muted: #6c647b;
   --color-text-inverse: #ffffff;
+  --color-on-brand: #272039;
   --color-border: #dcd5e7;
   --color-border-strong: #b7adc9;
   --color-focus: #087b53;

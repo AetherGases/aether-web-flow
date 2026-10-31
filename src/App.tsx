@@ -53,6 +53,7 @@ function App() {
       <Route path="/overview" element={<AuthenticatedPage page="overview" />} />
       <Route path="/data-analysis" element={<AuthenticatedPage page="analysis" />} />
       <Route path="/data-analysis/upload" element={<AuthenticatedPage page="upload" />} />
+      <Route path="/data-analysis/upload/:scope" element={<AuthenticatedPage page="upload" />} />
       <Route element={<PrivateRoute allowedRoles={['analyst']} />}>
         <Route path="/calculator" element={<AuthenticatedPage page="calculator" />} />
       </Route>
