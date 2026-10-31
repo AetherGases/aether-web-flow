@@ -5,6 +5,7 @@ Portal do ecossistema Aether para consultar relatórios, usar a calculadora de r
 - [Portal](https://aethergases.org/dashboard/)
 - [Repositório](https://github.com/AetherGases/aether-web-flow)
 - [Entregas e evidências dos requisitos mínimos de DAD](docs/entregas-dad.md)
+- [Extras de DAD: implementação e demonstrações](docs/extras-dad.md)
 - [Configuração, contratos e segurança do BFF](server/README.md)
 
 O endereço publicado precisa ser validado após o deploy de cada versão, incluindo as rotas do BFF. Alterações na branch não são publicadas automaticamente só por existir esse link.
@@ -84,3 +85,9 @@ Os testes usam respostas simuladas e não provam disponibilidade em produção. 
 O Dockerfile constrói o front e serve os arquivos com Nginx. O BFF é um processo separado e precisa de deploy próprio, HTTPS, Redis e encaminhamento de `/api/v1` no gateway. O proxy de desenvolvimento do Vite não existe na hospedagem estática.
 
 Há CI e workflow de deploy para EKS. O PDF de DAD cita Vercel/GitHub Pages: a aceitação da infraestrutura EKS deve ser confirmada com o professor, ou deve ser preparada uma publicação do front na plataforma exigida com acesso a um BFF hospedado separadamente. Este documento não declara essa validação como concluída.
+
+## Carregamento e acessibilidade
+
+As páginas são carregadas sob demanda com React.lazy/Suspense. Falhas ao carregar uma página mostram uma opção de atualização. A navegação atualiza o título do documento, leva o foco ao título da página e oferece um link para pular ao conteúdo. Os fluxos de edição e chat restauram foco; dicas do gráfico podem ser fechadas com Escape. A aplicação respeita preferência de movimento reduzido.
+
+O estado do chatbot é coordenado por um reducer tipado. Intl.DateTimeFormat e NumberFormat são reutilizados por idioma/localidade com useMemo, e funções de tradução/formatação usam useCallback. A justificativa, medição controlada e o roteiro de demonstração estão no documento de extras.

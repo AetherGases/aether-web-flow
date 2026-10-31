@@ -1,6 +1,6 @@
 # Entregas — requisitos mínimos de DAD
 
-Referência: Requisitos por disciplina – Interdisciplinar – Maio2026, seção Desenvolvimento de Aplicações Dinâmicas. Este documento cobre os mínimos; não declara os extras como entregues.
+Referência: Requisitos por disciplina – Interdisciplinar – Maio2026, seção Desenvolvimento de Aplicações Dinâmicas. Este documento cobre os mínimos. Consulte [extras de DAD](extras-dad.md) para as implementações extras e as demonstrações pendentes.
 
 Os links relativos apontam para o código da mesma versão deste documento. Após o merge, usar o link da versão/commit entregue na apresentação.
 

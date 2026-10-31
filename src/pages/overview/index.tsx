@@ -1,3 +1,4 @@
+import { useReportDateFormatter } from '../../hooks/useReportDateFormatter'
 import InventoryStatus from '../../components/InventoryStatus'
 import { useTranslation } from '../../hooks/useTranslation'
 import MetricCard from '../../components/MetricCard'
@@ -12,7 +13,8 @@ import CalculadoraIcon from '../../assets/icons/calculator.svg'
 import ChatbotIcon from '../../assets/icons/chatbot.svg'
 
 function OverviewPage() {
-  const { t, locale, formatDate } = useTranslation()
+  const { t, locale } = useTranslation()
+  const formatDate = useReportDateFormatter()
   const { user, logout, retry: recoverSession } = useAuth()
   const { data, loading, sessionExpired, reload } = useOverview()
   if (!user) return null
@@ -39,9 +41,9 @@ function OverviewPage() {
   ]
   return <S.Page>
     <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
-    <S.Content>
+    <S.Content id="main-content">
       <S.Header>
-        <h4 id="id-page">{t("Painel do analista")}</h4>
+        <p data-page-eyebrow id="id-page">{t("Painel do analista")}</p>
         <div><h1>{t("Olá,")}{" "}{user.name}👋🏻</h1><p>{t("Aqui está um resumo dos seus relatórios.")}</p></div>
       </S.Header>
       {sessionExpired && <S.StatePanel role="alert"><p>{t("Sua sessão precisa ser verificada.")}</p><S.RetryButton type="button" onClick={recoverSession}>{t("Verificar sessão")}</S.RetryButton></S.StatePanel>}

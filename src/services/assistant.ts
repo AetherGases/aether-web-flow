@@ -1,7 +1,8 @@
 import type { Conversation, AssistantTurn, AssistantReply, SendAssistantMessage } from '../types/assistant.ts'
 import { HttpError, request } from './http.ts'
+import { validateAssistantMessage } from '../utils/assistant.ts'
+export { assistantMessageLimit } from '../utils/assistant.ts'
 
-export const assistantMessageLimit = 8192
 export function isConversationId(id: string): boolean { return typeof id === 'string' && /^[a-f0-9]{24}$/i.test(id) }
 function parseConversation(data: Conversation): Conversation {
   if (!data || !isConversationId(data.id) || typeof data.name !== 'string' || !data.name.trim()) throw new Error('Resposta de conversa inválida.')
@@ -36,7 +37,8 @@ export async function getConversationMessages(id: string, signal?: AbortSignal):
 }
 export async function sendAssistantMessage(input: SendAssistantMessage, signal?: AbortSignal): Promise<AssistantReply> {
   const text = input.text.trim()
-  if (!text || text.length > assistantMessageLimit) throw new Error('Escreva uma mensagem de até 8192 caracteres.')
+  const validationError = validateAssistantMessage(text)
+  if (validationError) throw new Error(validationError)
   if (input.conversationId !== undefined && !isConversationId(input.conversationId)) throw new Error('Selecione uma conversa válida.')
   try {
     const data = await request('/assistant/messages', { method: 'POST', signal, body: JSON.stringify({ text, ...(input.conversationId ? { conversationId: input.conversationId } : {}) }) }) as AssistantReply

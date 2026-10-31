@@ -31,12 +31,12 @@ export const Content = styled.main`
 export const Header = styled.header`
   flex-shrink: 0;
   margin-bottom: var(--space-4);
-  h4 { color: var(--color-brand-green); font-size: var(--font-size-sm); margin: 0 0 var(--space-1); }
+  [data-page-eyebrow] { color: var(--color-brand-green); font-size: var(--font-size-sm); margin: 0 0 var(--space-1); }
   h1 { font-size: clamp(1.5rem, 3vw, 2.5rem); text-align: left; }
-  @media (max-height: 40rem) { h4 { display: none; } margin-bottom: var(--space-2); }
+  @media (max-height: 40rem) { [data-page-eyebrow] { display: none; } margin-bottom: var(--space-2); }
 
   h1 { ${pageTitle} }
-  h4 { ${pageEyebrow} }
+  [data-page-eyebrow] { ${pageEyebrow} }
 `
 
 export const ConversationControls = styled.nav`
@@ -205,7 +205,7 @@ export const Composer = styled.form`
   min-height: 3.5rem;
   padding: var(--space-4) 4.5rem var(--space-4) var(--space-4);
   background: var(--color-surface);
-  border: var(--border-width) solid var(--color-border-strong);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-lg);
   label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   textarea {

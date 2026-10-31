@@ -32,11 +32,11 @@ export const Content = styled.main`
 `
 
 export const Header = styled.header`
-  p, h1, h4 {
+  p, h1, [data-page-eyebrow] {
     text-align: left;
   }
 
-  h4{
+  [data-page-eyebrow]{
     color: var(--color-brand-green);
     font-size: var(--font-size-sm);
     margin-bottom: var(--space-1);
@@ -44,7 +44,7 @@ export const Header = styled.header`
     margin-bottom: var(--space-12);
 
   h1 { ${pageTitle} }
-  h4 { ${pageEyebrow} }
+  [data-page-eyebrow] { ${pageEyebrow} }
 `
 
 export const CalculatorGrid = styled.div`
@@ -92,7 +92,7 @@ export const NumberInput = styled.input`
   font: inherit;
   font-weight: var(--font-weight-semibold);
   background-color: var(--color-background);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-md);
 `
 
@@ -265,56 +265,7 @@ export const BarTrack = styled.div`
   border-bottom: var(--border-width) solid var(--color-border);
 `
 
-export const Bar = styled.span`
-  position: relative;
-  display: block;
-  width: 100%;
-  min-width: 0;
-  cursor: help;
-  background: linear-gradient(180deg, var(--color-brand-purple), var(--color-brand-blue), var(--color-brand-green));
-  border-radius: 4px 4px 0 0;
-  transition: height var(--duration-normal) var(--easing-standard);
 
-  &::after {
-    display: none;
-    position: absolute;
-    bottom: calc(100% + var(--space-2));
-    left: 50%;
-    z-index: 2;
-    padding: var(--space-1) var(--space-2);
-    color: var(--color-text-primary);
-    font-size: 0.65rem;
-    white-space: nowrap;
-    pointer-events: none;
-    content: attr(data-tooltip);
-    background-color: var(--color-background-deep);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-sm);
-    opacity: 0;
-    transform: translate(-50%, var(--space-1));
-    transition:
-      opacity var(--duration-fast) var(--easing-standard),
-      transform var(--duration-fast) var(--easing-standard);
-  }
-
-  &:hover::after,
-  &:focus-visible::after {
-    display: block;
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-
-  @media (max-width: 40rem) {
-    &::after {
-      position: fixed;
-      bottom: var(--space-4);
-      left: calc(var(--sidebar-width) + var(--space-4));
-      right: var(--space-4);
-      white-space: normal;
-    }
-    &:hover::after, &:focus-visible::after { transform: none; }
-  }
-`
 
 export const BarLabel = styled.span`
   display: flex;

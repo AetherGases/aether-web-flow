@@ -5,7 +5,7 @@ import * as S from './styles'
 function ErrorPage() {
   const { t } = useTranslation()
   return (
-    <S.Page>
+    <S.Page id="main-content">
       <S.Content>
         <S.ErrorCode aria-label={t("Erro 404")}>
           <span aria-hidden="true">4</span>

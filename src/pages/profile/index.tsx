@@ -65,7 +65,7 @@ function ProfilePage() {
         onLogout={() => { void logout() }}
       />
 
-      <S.Content>
+      <S.Content id="main-content">
         <S.Eyebrow>{t("Perfil")}</S.Eyebrow>
         <S.Title>{t("Meu perfil")}</S.Title>
 

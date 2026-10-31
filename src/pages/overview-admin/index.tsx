@@ -1,3 +1,4 @@
+import { useReportDateFormatter } from '../../hooks/useReportDateFormatter'
 import InventoryStatus from '../../components/InventoryStatus'
 import { useAuth } from '../../hooks/useAuth'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -13,7 +14,8 @@ import * as S from './styles'
 
 export default function AdministratorOverviewPage() {
   const { user, logout, retry: recoverSession } = useAuth()
-  const { t, locale, formatDate } = useTranslation()
+  const { t, locale } = useTranslation()
+  const formatDate = useReportDateFormatter()
   const { data, loading, reload, sessionExpired } = useOrganizationOverview()
   if (!user) return null
   const reports = data?.reports
@@ -29,9 +31,9 @@ export default function AdministratorOverviewPage() {
 
   return <S.Page>
     <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
-    <S.Content>
+    <S.Content id="main-content">
       <S.Header>
-        <h4>{t('Visão geral')}</h4>
+        <p data-page-eyebrow>{t('Visão geral')}</p>
         <h1>{t('Olá,')} {user.name}</h1>
         <p>{t('Acompanhe os relatórios do seu departamento e acesse os recursos administrativos.')}</p>
       </S.Header>

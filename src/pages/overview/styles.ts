@@ -17,18 +17,18 @@ export const Content = styled.main`
 `
 
 export const Header = styled.header`
-  p, h1, h4 {
+  p, h1, [data-page-eyebrow] {
     text-align: left;
   }
 
-  h4{
+  [data-page-eyebrow]{
     color: var(--color-brand-green);
     font-size: var(--font-size-sm);
     margin-bottom: var(--space-1);
   }
 
   h1 { ${pageTitle} }
-  h4 { ${pageEyebrow} }
+  [data-page-eyebrow] { ${pageEyebrow} }
 `
 
 export const MetricsSection = styled.section`

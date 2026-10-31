@@ -1,5 +1,5 @@
 import { useTranslation } from '../../hooks/useTranslation'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { getAnalysisScope } from '../../utils/analysis'
 import { Link, useSearchParams } from 'react-router-dom'
 
@@ -42,8 +42,10 @@ interface DataAnalysisPageProps {
 
 function DataAnalysisPage({ data, onLogout }: DataAnalysisPageProps) {
   const { t, locale } = useTranslation()
-  const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 })
-  const currency = new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 2 })
+  const { number, currency } = useMemo(() => ({
+    number: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
+    currency: new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 2 }),
+  }), [locale])
   const [searchParams] = useSearchParams()
   const availablePlants = data.role === 'administrator' ? [{ value: 'company', label: 'Empresa completa' }, ...plantOptions] : plantOptions
   const [filters, setFilters] = useState({
@@ -59,7 +61,7 @@ function DataAnalysisPage({ data, onLogout }: DataAnalysisPageProps) {
     <S.Page>
       <Sidebar userName={data.userName} userRole={data.role} onLogout={onLogout} />
 
-      <S.Content>
+      <S.Content id="main-content">
         <S.Header>
           <S.TitleArea>
             <S.Breadcrumb>{t("Análise de dados -")}{" "}{t(selectedPlantLabel)}</S.Breadcrumb>

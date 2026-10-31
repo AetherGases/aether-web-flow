@@ -22,6 +22,8 @@
   --color-border: #514768;
   --color-border-strong: #71658a;
   --color-focus: #48e29b;
+  --color-control-border: #9a8bab;
+  --color-switch-track: #71658a;
 
   /* Feedback */
   --color-success: #48e29b;

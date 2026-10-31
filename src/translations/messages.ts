@@ -1,5 +1,10 @@
 // As chaves são os textos em português; cada entrada contém inglês e espanhol.
 export const messages: Record<string, readonly [english: string, spanish: string]> = {
+  "Não foi possível carregar esta página.": ["This page could not be loaded.", "No se pudo cargar esta página."],
+  "Atualize a página para tentar novamente.": ["Reload the page to try again.", "Actualiza la página para intentarlo de nuevo."],
+  "Carregando página…": ["Loading page…", "Cargando página…"],
+  "Pular para o conteúdo": ["Skip to content", "Saltar al contenido"],
+
   "Perfis de acesso": ["Access profiles", "Perfiles de acceso"],
   "Carregando perfil...": ["Loading profile...", "Cargando perfil..."],
   "Voltar à escolha de análise": ["Back to analysis selection", "Volver a elegir el análisis"],

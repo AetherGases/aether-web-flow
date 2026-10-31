@@ -61,15 +61,19 @@ export const PresentationContent = styled.div`
   width: 100%;
   max-width: 28rem;
   text-align: left;
-  h2, p { color: var(--color-on-brand); }
-  @media (max-width: 75rem) { h2 { font-size: 1.6rem; } }
+  [data-presentation-title], p { color: var(--color-on-brand); }
+  @media (max-width: 75rem) { [data-presentation-title] { font-size: 1.6rem; } }
   @media (max-width: 64rem) {
     max-width: 36rem;
     gap: var(--space-2);
-    h2 { font-size: 1.3rem; }
+    [data-presentation-title] { font-size: 1.3rem; }
     p { font-size: var(--font-size-sm); }
   }
   @media (max-width: 40rem) { display: none; }
+
+  [data-presentation-title] { font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); line-height: var(--line-height-tight); }
+  @media (max-width: 75rem) { [data-presentation-title] { font-size: 1.6rem; } }
+  @media (max-width: 64rem) { [data-presentation-title] { font-size: 1.3rem; } }
 `
 
 export const Authentication = styled.section`
@@ -116,7 +120,7 @@ export const ProfileCard = styled.article`
 
   height: 100%;
   overflow-wrap: anywhere;
-  h3 { font-size: clamp(1rem, 1.8vw, 1.5rem); }
+  h2 { font-size: clamp(1rem, 1.8vw, 1.5rem); }
   p { font-size: var(--font-size-sm); }
   img { width: 2rem; height: 2rem; object-fit: contain; }
   @media (max-width: 40rem) { padding: var(--space-3); border-radius: var(--radius-lg); }
@@ -147,7 +151,7 @@ export const Input = styled.input`
   padding: var(--space-2) var(--space-3);
   color: var(--color-text-primary);
   background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-md);
 
   min-width: 0;

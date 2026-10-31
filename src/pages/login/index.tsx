@@ -9,7 +9,7 @@ function LoginPage() {
   const { t } = useTranslation()
   const { form, setForm, loading, errors, error, handleSubmit } = useLogin()
     return (
-      <S.Page>
+      <S.Page id="main-content">
         <S.BackgroundShape
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
@@ -43,8 +43,8 @@ function LoginPage() {
             />
   
           <S.PresentationContent>
-            <h2 id="presentation-title">
-              {t("Inteligência para decisões que reduzem custos")}</h2>
+            <p data-presentation-title id="presentation-title">
+              {t("Inteligência para decisões que reduzem custos")}</p>
   
             <p>
               {t("Analistas ganham clareza. Administradores ganham controle. Toda a operação unificada.")}</p>
@@ -71,7 +71,7 @@ function LoginPage() {
                         data-theme-icon src={analistaIcon}
                         alt={t("Analista")}
                     />
-                    <h3>{t("Analista")}</h3>
+                    <h2>{t("Analista")}</h2>
                     <p>{t("Dados e análises")}</p>
                   </S.ProfileCard>
                 </li>
@@ -82,7 +82,7 @@ function LoginPage() {
                         data-theme-icon src={adminIcon}
                         alt={t("Admin")}
                     />
-                    <h3>{t("Administrador")}</h3>
+                    <h2>{t("Administrador")}</h2>
                     <p>{t("Gestão da plataforma")}</p>
                   </S.ProfileCard>
                 </li>

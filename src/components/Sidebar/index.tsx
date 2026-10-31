@@ -40,7 +40,7 @@ function Sidebar({
     <S.Container aria-label={t("Navegação principal")}>
       <S.Logo src={lightMode && !highContrast ? lightLogo : aetherLogo} alt="Aether" />
 
-      <S.Navigation>
+      <S.Navigation aria-label={t("Navegação principal")}>
         <S.NavigationList>
           <li>
             <S.NavigationLink

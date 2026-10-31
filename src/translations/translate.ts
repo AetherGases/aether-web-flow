@@ -20,7 +20,7 @@ export function translateLabel(text: string, language: Language): string {
   if (comparison) return translate(`{0}% ${comparison[2]} que o período anterior`, language, { 0: comparison[1] })
   return translate(text, language)
 }
-export function formatReportDate(value: string, language: Language): string {
+export function formatReportDate(value: string, language: Language, formatter = new Intl.DateTimeFormat(locales[language])): string {
   const [year, month, day] = value.slice(0, 10).split('-').map(Number)
-  return new Intl.DateTimeFormat(locales[language]).format(new Date(year, month - 1, day))
+  return formatter.format(new Date(year, month - 1, day))
 }

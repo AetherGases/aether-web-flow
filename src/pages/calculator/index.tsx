@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import ProjectionBar from '../../components/ProjectionBar'
+import { useMemo, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useTranslation } from '../../hooks/useTranslation'
 import { useCalculator } from '../../hooks/useCalculator'
@@ -14,8 +15,8 @@ function CalculatorPage() {
   const { t, locale } = useTranslation()
   const { user, logout, retry } = useAuth()
   const { inputs, setInputs, data, validationError, error, loading, sessionExpired, retry: retryForecast } = useCalculator()
+  const currencyFormatter = useMemo(() => new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL' }), [locale])
   if (!user) return null
-  const currencyFormatter = new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL' })
   const labelInterval = Math.ceil((data?.periodMonths ?? inputs.periodMonths) / 6)
   const projectionScale = Math.max(1, ...(data?.projection.map((item) => item.accumulatedSavings) ?? []))
   const money = (value?: number) => value === undefined ? '—' : currencyFormatter.format(value)
@@ -23,9 +24,9 @@ function CalculatorPage() {
   return (
     <S.Page>
       <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
-      <S.Content>
+      <S.Content id="main-content">
         <S.Header>
-          <h4 id="id-page">{t("Calculadora")}</h4>
+          <p data-page-eyebrow id="id-page">{t("Calculadora")}</p>
           <div>
             <h1>{t("Calculadora de redução de custos")}</h1>
             <p>{t("Simule cenários e visualize o impacto no seu orçamento.")}</p>
@@ -91,9 +92,8 @@ function CalculatorPage() {
                 {data.projection.map(({ month, accumulatedSavings }) => (
                   <S.BarColumn key={month}>
                     <S.BarTrack>
-                      <S.Bar style={{ height: `${(accumulatedSavings / projectionScale) * 100}%` }}
-                        data-tooltip={t("Mês {0}: {1}", { "0": month, "1": money(accumulatedSavings) })}
-                        aria-label={t("Mês {0}: {1}", { "0": month, "1": money(accumulatedSavings) })} tabIndex={0} />
+                      <ProjectionBar month={month} formattedValue={money(accumulatedSavings)}
+                        height={(accumulatedSavings / projectionScale) * 100} />
                     </S.BarTrack>
                     <S.BarLabel aria-hidden="true">{month === 1 || month % labelInterval === 0 ? `${month}m` : ''}</S.BarLabel>
                   </S.BarColumn>

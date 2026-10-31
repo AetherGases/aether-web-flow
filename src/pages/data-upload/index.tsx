@@ -50,7 +50,7 @@ function DataUploadPage() {
         onLogout={() => { void logout() }}
       />
 
-      <S.Content>
+      <S.Content id="main-content">
         {user.role === 'administrator' && <S.BackLink as={Link} to="/data-analysis/select"><span aria-hidden="true">←</span> {t('Voltar à escolha de análise')}</S.BackLink>}
         <S.Eyebrow>{t('Análise de dados')}</S.Eyebrow>
         <S.Title>{scope === 'company' ? t("Análise - Empresa completa") : t("Análise - Plantas individuais")}</S.Title>

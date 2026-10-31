@@ -12,7 +12,7 @@ export default function AdministrationPage() {
 
   return <S.Page>
     <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
-    <S.Content>
+    <S.Content id="main-content">
       <S.Eyebrow>{t('Área administrativa')}</S.Eyebrow>
       <S.Title>{t('Gestão administrativa')}</S.Title>
       <S.Description>{t('Funcionários, unidades, setores e permissões')}</S.Description>

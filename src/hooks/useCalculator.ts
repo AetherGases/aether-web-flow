@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { getCostReductionForecast } from '../services/calculator'
 import { HttpError } from '../services/http'
 import type { CostReductionForecast } from '../types/calculator'
@@ -11,7 +11,19 @@ interface CalculatorState {
   sessionExpired: boolean
 }
 
-export function useCalculator() {
+interface CalculatorInputs { monthlyCost: string; reductionPercentage: number; periodMonths: number }
+interface UseCalculatorResult {
+  inputs: CalculatorInputs
+  setInputs: Dispatch<SetStateAction<CalculatorInputs>>
+  validationError: string | null
+  data: CostReductionForecast | null
+  error: string | null
+  sessionExpired: boolean
+  loading: boolean
+  retry: () => void
+}
+
+export function useCalculator(): UseCalculatorResult {
   const [inputs, setInputs] = useState({ monthlyCost: '100000', reductionPercentage: 15, periodMonths: 12 })
   const [attempt, setAttempt] = useState(0)
   const [state, setState] = useState<CalculatorState>({ key: '', data: null, error: null, sessionExpired: false })
