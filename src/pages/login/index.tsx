@@ -68,7 +68,7 @@ function LoginPage() {
                 <li>
                   <S.ProfileCard>
                     <img
-                        src={analistaIcon}
+                        data-theme-icon src={analistaIcon}
                         alt={t("Analista")}
                     />
                     <h3>{t("Analista")}</h3>
@@ -79,7 +79,7 @@ function LoginPage() {
                 <li>
                   <S.ProfileCard>
                   <img
-                        src={adminIcon}
+                        data-theme-icon src={adminIcon}
                         alt={t("Admin")}
                     />
                     <h3>{t("Administrador")}</h3>

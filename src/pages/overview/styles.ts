@@ -59,6 +59,9 @@ export const FastAcessGrid = styled.div`
 `
 
 export const FastAcessDiv = styled.article`
+  html[data-theme='light']:not([data-high-contrast='true']) & {
+    box-shadow: inset 0 0 0 1px var(--color-border);
+  }
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -100,6 +103,9 @@ export const FastAcessLink = styled(Link)`
 `
 
 export const Icon = styled.img`
+  html[data-theme='light']:not([data-high-contrast='true']) & {
+    background: var(--gradient-brand);
+  }
   flex-shrink: 0;
   width: 3rem;
   height: 3rem;

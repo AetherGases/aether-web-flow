@@ -162,7 +162,7 @@ export const ExportButton = styled.button`
   color: var(--color-text-inverse);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  background-color: #13bd86;
+  background-color: var(--color-export-background, #13bd86);
   border: 0;
   border-radius: var(--radius-md);
 

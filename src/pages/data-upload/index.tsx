@@ -57,7 +57,7 @@ function DataUploadPage() {
 
         <S.UploadPanel>
           <S.UploadIcon aria-hidden="true">
-            <img src={uploadFileIcon} alt="" />
+            <img data-theme-icon src={uploadFileIcon} alt="" />
           </S.UploadIcon>
 
           <S.UploadText>

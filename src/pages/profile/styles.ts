@@ -264,7 +264,7 @@ export const Switch = styled.button<SwitchProps>`
     left: ${({ $active }) => ($active ? '1.4375rem' : '0.1875rem')};
     width: 1.125rem;
     height: 1.125rem;
-    background-color: var(--color-text-primary);
+    background-color: var(--color-switch-thumb, var(--color-text-primary));
     border-radius: 50%;
     transition: left var(--duration-fast) var(--easing-standard);
   }

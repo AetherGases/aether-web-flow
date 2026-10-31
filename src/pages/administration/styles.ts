@@ -5,6 +5,8 @@ import styled from 'styled-components'
 export const LaunchPanel = styled.section`
   margin-top: var(--space-6);
   padding: var(--space-6);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-lg);
   h2 { font-size: var(--font-size-xl); }
@@ -25,7 +27,11 @@ const launchStyle = `
 export const LaunchLink = styled.a`${launchStyle}`
 export const LaunchButton = styled.button`
   ${launchStyle}
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
+  &:disabled {
+    color: var(--color-text-secondary);
+    background: var(--color-surface-raised);
+    cursor: not-allowed;
+  }
 `
 
 

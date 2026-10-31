@@ -18,8 +18,7 @@ function ProfilePage() {
   const { t } = useTranslation()
   const { user, logout, retry } = useAuth()
   const { data: profile, loading, error, notification, dismissNotification, fieldErrors, saving, sessionExpired, reload, save } = useProfile()
-  const [lightMode, setLightMode] = useState(false)
-  const { highContrast, toggleHighContrast, language, setLanguage } = usePreferences()
+  const { lightMode, toggleLightMode, highContrast, toggleHighContrast, language, setLanguage } = usePreferences()
   const [isEditingName, setIsEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
   const [nameError, setNameError] = useState<string | null>(null)
@@ -160,7 +159,7 @@ function ProfilePage() {
                   aria-checked={lightMode}
                   aria-label={t("Ativar modo claro")}
                   $active={lightMode}
-                  onClick={() => setLightMode((currentMode) => !currentMode)}
+                  onClick={toggleLightMode}
                 >
                   <span />
                 </S.Switch>

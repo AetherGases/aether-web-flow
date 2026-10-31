@@ -51,7 +51,7 @@ function AssistantPage() {
       <S.Messages tabIndex={0} role="log" aria-live="polite" aria-relevant="additions" aria-busy={busy} aria-label={t("Conversa com o Assistente Aether")}>
         {chat.loading && <p role="status">{t("Carregando conversas…")}</p>}
         {isNewConversation && !chat.loading && !chat.error && <S.EmptyConversation>
-          <S.EmptyIcon src={assistantIcon} alt="" aria-hidden="true" />
+          <S.EmptyIcon data-theme-icon src={assistantIcon} alt="" aria-hidden="true" />
           <h2>{t("Como posso ajudar com suas análises hoje?")}</h2>
           <S.Suggestions aria-label={t("Sugestões para você")}>
             {suggestions.map((suggestion) => <button key={suggestion} type="button" disabled={busy}
@@ -59,7 +59,7 @@ function AssistantPage() {
           </S.Suggestions>
         </S.EmptyConversation>}
         {chat.messages.map((message) => <S.Message key={message.id} $author={message.author}>
-          {message.author === 'assistant' && <S.MessageAvatar aria-hidden="true"><img src={assistantIcon} alt="" /></S.MessageAvatar>}
+          {message.author === 'assistant' && <S.MessageAvatar aria-hidden="true"><img data-theme-icon src={assistantIcon} alt="" /></S.MessageAvatar>}
           <p>{message.text}</p>
         </S.Message>)}
         {chat.sending && <p role="status">{t("O assistente está preparando uma resposta…")}</p>}
@@ -75,7 +75,7 @@ function AssistantPage() {
                 event.preventDefault(); void chat.send(chat.draft)
               }
             }} />
-          <button type="submit" aria-label={t("Enviar mensagem")} disabled={busy || !chat.draft.trim()}><img src={sendIcon} alt="" aria-hidden="true" /></button>
+          <button type="submit" aria-label={t("Enviar mensagem")} disabled={busy || !chat.draft.trim()}><img data-theme-icon src={sendIcon} alt="" aria-hidden="true" /></button>
         </S.Composer>
       </S.ComposerArea>
     </S.Content>
