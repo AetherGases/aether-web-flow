@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { parseOverview } from '../src/services/overview.ts'
+import { parseOverview, parseOrganizationOverview } from '../src/services/overview.ts'
 const inventory = { id: 1, name: 'Inventário', createdAt: '2026-10-22T12:00:00', status: 'ISSUED', type: 'OUTPUT' }
 const response = { scope: 'personal', indicators: { awaitingReview: { status: 'ready', data: 2 }, approved: { status: 'ready', data: 3 }, processingFailed: { status: 'ready', data: 1 }, pendingReview: null }, counts: { status: 'ready', data: { submittedCount: 3, reviewedCount: 1 } }, history: { status: 'ready', data: { inventories: [inventory], totalCount: 3 } }, lastSubmitted: { status: 'ready', data: null } }
 
@@ -25,4 +25,13 @@ test('indicadores preservam contagens reais e distinguem revisão pessoal de pen
   const admin = parseOverview({ ...response, indicators: { awaitingReview: null, approved: null, processingFailed: null, pendingReview: { status: 'ready', data: { count: 4, scope: 'department' } } } })
   assert.deepEqual(admin.indicators.pendingReview, { status: 'ready', data: { count: 4, scope: 'department' } })
   assert.throws(() => parseOverview({ ...response, indicators: { ...response.indicators, approved: { status: 'ready', data: -1 } } }))
+})
+
+test('visão departamental preserva totais e erros reais, sem converter relatórios em análises', () => {
+  const data = { scope: 'department', reports: { status: 'ready', data: { inventories: [inventory], totalCount: 12 } }, underReview: { status: 'ready', data: 2 }, approved: { status: 'ready', data: 8 }, rejected: { status: 'error', error: { code: 'INVENTORY_UNAVAILABLE', message: 'Indisponível.' } } }
+  const parsed = parseOrganizationOverview(data)
+  assert.deepEqual(parsed.reports, data.reports)
+  assert.deepEqual(parsed.rejected, data.rejected)
+  assert.throws(() => parseOrganizationOverview({ ...data, scope: 'company' }))
+  assert.throws(() => parseOrganizationOverview({ ...data, approved: { status: 'ready', data: -1 } }))
 })

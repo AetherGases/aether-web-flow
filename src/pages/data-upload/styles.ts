@@ -1,3 +1,4 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
 
 export const Page = styled.div`
@@ -15,10 +16,14 @@ export const Content = styled.main`
   @media (max-width: 48rem) {
     padding: var(--space-6);
   }
+
+  ${pageContent}
 `
 
 export const Title = styled.h1`
   font-size: var(--font-size-2xl);
+
+  ${pageTitle}
 `
 
 export const UploadPanel = styled.section`
@@ -84,7 +89,7 @@ export const SelectFileButton = styled.button`
   width: min(100%, 18.25rem);
   min-height: 2.7rem;
   padding: var(--space-2) var(--space-6);
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   background: var(--gradient-brand);
@@ -107,4 +112,26 @@ export const ErrorMessage = styled.p`
   color: var(--color-danger);
   font-size: var(--font-size-sm);
   text-align: center;
+`
+
+export const Eyebrow = styled.p`${pageEyebrow}`
+export const BackLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  &:hover { color: var(--color-brand-green); }
+  &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+`
+
+export const FileLabel = styled.label`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 `

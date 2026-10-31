@@ -1,10 +1,19 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type Dispatch, type SetStateAction } from 'react'
 import type { LoginCredentials, LoginErrors } from '../types/auth'
 import { validateLogin } from '../utils/validation'
 import { useAuth } from './useAuth'
 import { HttpError } from '../services/http'
 
-export function useLogin() {
+interface UseLoginResult {
+  form: LoginCredentials
+  setForm: Dispatch<SetStateAction<LoginCredentials>>
+  loading: boolean
+  errors: LoginErrors
+  error: string | null
+  handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+}
+
+export function useLogin(): UseLoginResult {
   const { login, error: sessionError } = useAuth()
   const [form, setForm] = useState<LoginCredentials>({ email: '', password: '' })
   const [state, setState] = useState<{ loading: boolean; errors: LoginErrors; error: string | null }>({ loading: false, errors: {}, error: null })

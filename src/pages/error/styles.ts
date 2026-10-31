@@ -91,7 +91,7 @@ export const RetryLink = styled(Link)`
   padding: var(--space-3) var(--space-8);
   margin-top: clamp(var(--space-6), 4vh, var(--space-10));
   margin-bottom: 20px;
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   font-family: Comfortaa, var(--font-family-primary);
   font-size: clamp(var(--font-size-lg), 2.2vw, var(--font-size-2xl));
   font-weight: var(--font-weight-medium);

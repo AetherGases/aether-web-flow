@@ -1,3 +1,4 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
 
 export const Page = styled.div`
@@ -23,14 +24,19 @@ export const Content = styled.main`
 
   @media (max-width: 62rem) { padding-inline: var(--space-4); }
   @media (max-height: 40rem) { padding-top: var(--space-3); }
+
+  ${pageContent}
 `
 
 export const Header = styled.header`
   flex-shrink: 0;
   margin-bottom: var(--space-4);
-  h4 { color: var(--color-brand-green); font-size: var(--font-size-sm); margin: 0 0 var(--space-1); }
+  [data-page-eyebrow] { color: var(--color-brand-green); font-size: var(--font-size-sm); margin: 0 0 var(--space-1); }
   h1 { font-size: clamp(1.5rem, 3vw, 2.5rem); text-align: left; }
-  @media (max-height: 40rem) { h4 { display: none; } margin-bottom: var(--space-2); }
+  @media (max-height: 40rem) { [data-page-eyebrow] { display: none; } margin-bottom: var(--space-2); }
+
+  h1 { ${pageTitle} }
+  [data-page-eyebrow] { ${pageEyebrow} }
 `
 
 export const ConversationControls = styled.nav`
@@ -154,7 +160,8 @@ export const Suggestions = styled.div`
   button:hover:not(:disabled) { color: var(--color-text-primary); background: var(--color-surface); border-color: var(--color-brand-purple); }
 `
 
-export const Message = styled.article<{ $author: 'user' | 'assistant' }>`
+interface MessageProps { $author: 'user' | 'assistant' }
+export const Message = styled.article<MessageProps>`
   display: flex;
   flex-shrink: 0;
   align-self: ${({ $author }) => $author === 'user' ? 'flex-end' : 'flex-start'};
@@ -198,7 +205,7 @@ export const Composer = styled.form`
   min-height: 3.5rem;
   padding: var(--space-4) 4.5rem var(--space-4) var(--space-4);
   background: var(--color-surface);
-  border: var(--border-width) solid var(--color-border-strong);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-lg);
   label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   textarea {

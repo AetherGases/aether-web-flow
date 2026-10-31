@@ -2,6 +2,17 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 export const Container = styled.aside`
+  @media (max-width: 48rem) {
+    padding: var(--space-4) var(--space-2);
+    > img { width: 100%; margin-bottom: var(--space-6); }
+    nav a { justify-content: center; padding: var(--space-3); }
+    nav a span, footer > div {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    }
+    footer { grid-template-columns: 1fr; justify-items: center; gap: var(--space-2); }
+  }
+
   position: sticky;
   top: 0;
   align-self: start;
@@ -70,13 +81,16 @@ export const NavigationLink = styled(Link)`
     outline-offset: 2px;
   }
 
+  html:not([data-high-contrast='true']) &[aria-current='page'] img { filter: brightness(0) opacity(0.85); }
+
   &[aria-current='page'] {
-    color: var(--color-text-primary);
+    color: var(--color-on-brand);
     background: var(--gradient-brand);
   }
 `
 
 export const Icon = styled.img`
+  flex-shrink: 0;
   width: 1.3rem;
   height: 1.3rem;
 `
@@ -100,7 +114,7 @@ export const Avatar = styled.span`
   width: 2.5rem;
   height: 2.5rem;
 
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
 
@@ -153,3 +167,9 @@ export const LogoutButton = styled.button`
     outline-offset: 2px;
   }
 `
+export const AnalysisLabel = styled.span`
+  font-size: 0.76rem;
+  white-space: nowrap;
+`
+
+export const Label = styled.span``

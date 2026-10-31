@@ -4,7 +4,8 @@ export function isLanguage(value: string): value is Language {
   return languages.some((language) => language === value)
 }
 export interface Preferences {
-  _versao: 2
+  _versao: 3
+  lightMode: boolean
   highContrast: boolean
   language: Language
 }

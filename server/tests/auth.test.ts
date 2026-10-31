@@ -594,3 +594,57 @@ test('configuração da calculadora exige uma origem válida e HTTPS em produç�
   assert.throws(() => readConfig({ ...env, MS_CALCULATOR_URL: 'https://aethergases.org/api/calculator' }))
   assert.throws(() => readConfig({ ...env, NODE_ENV: 'production', FRONTEND_ORIGIN: 'https://web.example', MS_AUTH_URL: 'https://auth.example', REDIS_URL: 'redis://localhost:6379', MS_CALCULATOR_URL: 'http://localhost:3004' }))
 })
+
+
+test('calculadora bloqueia administrador antes de chamar o microsserviço', async (t) => {
+  const h = await harness(t, token('administrator'))
+  const { cookie } = await h.login()
+  const response = await postForecast(h.base, cookie)
+  assert.equal(response.status, 403)
+  assert.equal((await response.json()).error.code, 'CALCULATOR_FORBIDDEN')
+  assert.equal(h.state.calculatorCalls, 0)
+  assert.equal((await fetch(`${h.base}/api/v1/auth/me`, { headers: { Cookie: cookie } })).status, 200)
+})
+
+
+test('visão departamental exige administrador e não consulta inventário para analista', async (t) => {
+  const h = await harness(t)
+  assert.equal((await fetch(`${h.base}/api/v1/overview/organization`)).status, 401)
+  const { cookie } = await h.login()
+  assert.equal((await fetch(`${h.base}/api/v1/overview/organization`, { headers: { Cookie: cookie } })).status, 403)
+  assert.equal(h.state.inventoryCalls.length, 0)
+})
+
+test('visão departamental usa totais reais e somente as rotas de consulta autorizadas', async (t) => {
+  const h = await harness(t, token('administrator'))
+  const { cookie } = await h.login()
+  const response = await fetch(`${h.base}/api/v1/overview/organization`, { headers: { Cookie: cookie } })
+  assert.equal(response.status, 200)
+  const data = await response.json()
+  assert.equal(data.scope, 'department')
+  assert.equal(data.reports.data.totalCount, 7)
+  assert.equal(data.reports.data.inventories.length, 1)
+  assert.equal(data.underReview.data, 2)
+  assert.equal(data.approved.data, 3)
+  assert(!JSON.stringify(data).includes('private-'))
+  assert.deepEqual(h.state.inventoryCalls.sort(), [
+    '/api/inventories/reviewed?take=6&skip=0',
+    '/api/inventories/reviewed?status=UNDER_REVIEW&take=1&skip=0',
+    '/api/inventories/reviewed?status=APPROVED&take=1&skip=0',
+    '/api/inventories/reviewed?status=REJECTED&take=1&skip=0',
+  ].sort())
+})
+
+test('visão departamental isola falhas e distingue resposta vazia de dados indisponíveis', async (t) => {
+  const h = await harness(t, token('administrator'))
+  const { cookie } = await h.login()
+  h.state.inventoryFailures.approved = 500
+  const partial = await (await fetch(`${h.base}/api/v1/overview/organization`, { headers: { Cookie: cookie } })).json()
+  assert.equal(partial.approved.status, 'error')
+  assert.equal(partial.reports.status, 'ready')
+  h.state.inventoryFailures = {}
+  h.state.inventoryEmpty = true
+  const empty = await (await fetch(`${h.base}/api/v1/overview/organization`, { headers: { Cookie: cookie } })).json()
+  assert.deepEqual(empty.reports, { status: 'ready', data: { inventories: [], totalCount: 0 } })
+  assert.deepEqual(empty.approved, { status: 'ready', data: 0 })
+})

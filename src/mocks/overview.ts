@@ -77,7 +77,7 @@ export const analystOverviewMock: OverviewData = {
 }
 // Dados demonstrativos utilizados pelas telas que ainda não foram integradas.
 administratorOverviewMock.metrics = [
-  { id: 'total-economy', label: 'Economia informada', value: 'R$ 1,24 mi', currentValue: 1240000, previousValue: null, positiveDirection: 'increase' },
+  { id: 'total-economy', label: 'Economia potencial', value: 'R$ 1,24 mi', currentValue: 1240000, previousValue: null, positiveDirection: 'increase' },
   { id: 'completed-analyses', label: 'Análises concluídas', value: '1', currentValue: 1, previousValue: null, positiveDirection: 'increase' },
   { id: 'available-plants', label: 'Plantas no comparativo', value: '6', currentValue: 6, previousValue: null, positiveDirection: 'increase' },
   { id: 'critical-anomalies', label: 'Alertas críticos', value: '1', currentValue: 1, previousValue: null, positiveDirection: 'decrease' },

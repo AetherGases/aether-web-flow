@@ -10,9 +10,12 @@ html[data-high-contrast='true'] {
   --color-text-secondary: #ffffff;
   --color-text-muted: #eeeeee;
   --color-text-inverse: #000000;
+  --color-on-brand: #ffffff;
   --color-border: #ffffff;
   --color-border-strong: #ffffff;
   --color-focus: #ffff00;
+  --color-control-border: #ffffff;
+  --color-switch-track: #000000;
   --color-brand-purple: #dfb5ff;
   --color-brand-blue: #99d5ff;
   --color-brand-green: #7dffb3;

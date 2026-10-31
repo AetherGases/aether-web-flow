@@ -16,7 +16,7 @@ export const Avatar = styled.div<AvatarProps>`
   width: ${({ $size }) => avatarSizes[$size]};
   height: ${({ $size }) => avatarSizes[$size]};
   overflow: hidden;
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-semibold);
   background: var(--gradient-brand-diagonal);

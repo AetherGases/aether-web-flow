@@ -1,0 +1,66 @@
+{
+  "scenario": "7 datas, 120 renders, 3 rodadas; React.Profiler em Chromium; hook atual versus criação de Intl por data",
+  "results": [
+    {
+      "round": 0,
+      "variant": "before",
+      "renders": 120,
+      "intlConstructions": 840,
+      "callbackChanges": 119,
+      "totalRenderMs": 153.5999998152256,
+      "medianRenderMs": 1,
+      "output": "20/10/202621/10/202622/10/202623/10/202624/10/202625/10/202626/10/2026"
+    },
+    {
+      "round": 0,
+      "variant": "after",
+      "renders": 120,
+      "intlConstructions": 1,
+      "callbackChanges": 0,
+      "totalRenderMs": 16.299999862909317,
+      "medianRenderMs": 0.09999999403953552,
+      "output": "20/10/202621/10/202622/10/202623/10/202624/10/202625/10/202626/10/2026"
+    },
+    {
+      "round": 1,
+      "variant": "before",
+      "renders": 120,
+      "intlConstructions": 840,
+      "callbackChanges": 119,
+      "totalRenderMs": 56.10000026226044,
+      "medianRenderMs": 0.4000000059604645,
+      "output": "20/10/202621/10/202622/10/202623/10/202624/10/202625/10/202626/10/2026"
+    },
+    {
+      "round": 1,
+      "variant": "after",
+      "renders": 120,
+      "intlConstructions": 1,
+      "callbackChanges": 0,
+      "totalRenderMs": 15.400000154972076,
+      "medianRenderMs": 0.09999999403953552,
+      "output": "20/10/202621/10/202622/10/202623/10/202624/10/202625/10/202626/10/2026"
+    },
+    {
+      "round": 2,
+      "variant": "before",
+      "renders": 120,
+      "intlConstructions": 840,
+      "callbackChanges": 119,
+      "totalRenderMs": 50.90000003576279,
+      "medianRenderMs": 0.4000000059604645,
+      "output": "20/10/202621/10/202622/10/202623/10/202624/10/202625/10/202626/10/2026"
+    },
+    {
+      "round": 2,
+      "variant": "after",
+      "renders": 120,
+      "intlConstructions": 1,
+      "callbackChanges": 0,
+      "totalRenderMs": 9.09999993443489,
+      "medianRenderMs": 0.09999999403953552,
+      "output": "20/10/202621/10/202622/10/202623/10/202624/10/202625/10/202626/10/2026"
+    }
+  ],
+  "browser": "156.0.8078.73"
+}

@@ -1,3 +1,4 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
 
 const card = `
@@ -26,40 +27,49 @@ export const Content = styled.main`
   margin: 0 auto;
   padding: var(--space-8);
   text-align: left;
+
+  ${pageContent}
 `
 
 export const Header = styled.header`
-  p, h1, h4 {
+  p, h1, [data-page-eyebrow] {
     text-align: left;
   }
 
-  h4{
+  [data-page-eyebrow]{
     color: var(--color-brand-green);
     font-size: var(--font-size-sm);
     margin-bottom: var(--space-1);
   }
     margin-bottom: var(--space-12);
+
+  h1 { ${pageTitle} }
+  [data-page-eyebrow] { ${pageEyebrow} }
 `
 
 export const CalculatorGrid = styled.div`
   display: grid;
-  grid-template-columns: minmax(20rem, 1.1fr) minmax(20rem, 1fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: var(--space-12);
   align-items: start;
 
   @media (max-width: 64rem) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-6);
   }
 `
 
 export const FormCard = styled.form`
+  min-width: 0;
+  overflow-wrap: anywhere;
   ${card}
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
   min-height: 27rem;
   padding: var(--space-8);
+
+  @media (max-width: 40rem) { padding: var(--space-5); gap: var(--space-6); }
 `
 
 export const Field = styled.div`
@@ -82,7 +92,7 @@ export const NumberInput = styled.input`
   font: inherit;
   font-weight: var(--font-weight-semibold);
   background-color: var(--color-background);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-md);
 `
 
@@ -98,7 +108,8 @@ export const RangeHeader = styled.div`
   }
 `
 
-export const RangeInput = styled.input<{ $progress: number }>`
+interface RangeInputProps { $progress: number }
+export const RangeInput = styled.input<RangeInputProps>`
   width: 100%;
   height: 0.35rem;
   cursor: pointer;
@@ -138,10 +149,11 @@ export const PeriodOptions = styled.div`
   gap: var(--space-4);
 `
 
-export const PeriodButton = styled.button<{ $active: boolean }>`
+interface PeriodButtonProps { $active: boolean }
+export const PeriodButton = styled.button<PeriodButtonProps>`
   min-width: 4rem;
   padding: var(--space-2) var(--space-4);
-  color: var(--color-text-primary);
+  color: ${({ $active }) => $active ? 'var(--color-on-brand)' : 'var(--color-text-primary)'};
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   background: ${({ $active }) => $active ? 'var(--gradient-brand)' : 'var(--color-background)'};
@@ -156,7 +168,7 @@ export const ExportButton = styled.button`
   color: var(--color-text-inverse);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  background-color: #13bd86;
+  background-color: var(--color-export-background, #13bd86);
   border: 0;
   border-radius: var(--radius-md);
 
@@ -165,22 +177,26 @@ export const ExportButton = styled.button`
 `
 
 export const Results = styled.section`
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 `
 
 export const TotalSavingsCard = styled.article`
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-6);
-  color: var(--color-text-primary);
+  color: var(--color-on-brand);
   background: var(--gradient-brand);
   border-radius: var(--radius-md);
 
   span { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); }
-  strong { font-size: var(--font-size-3xl); line-height: var(--line-height-tight); }
+  strong { font-size: clamp(1.5rem, 3vw, var(--font-size-3xl)); line-height: var(--line-height-tight); }
 `
 
 export const SummaryGrid = styled.div`
@@ -192,6 +208,8 @@ export const SummaryGrid = styled.div`
 `
 
 export const SummaryCard = styled.article`
+  min-width: 0;
+  overflow-wrap: anywhere;
   ${card}
   display: flex;
   flex-direction: column;
@@ -205,6 +223,8 @@ export const SummaryCard = styled.article`
 `
 
 export const ProjectionCard = styled.article`
+  min-width: 0;
+  overflow-wrap: anywhere;
   ${card}
   min-height: 15rem;
   padding: var(--space-5);
@@ -245,43 +265,7 @@ export const BarTrack = styled.div`
   border-bottom: var(--border-width) solid var(--color-border);
 `
 
-export const Bar = styled.span`
-  position: relative;
-  display: block;
-  width: 100%;
-  min-width: 0;
-  cursor: help;
-  background: linear-gradient(180deg, var(--color-brand-purple), var(--color-brand-blue), var(--color-brand-green));
-  border-radius: 4px 4px 0 0;
-  transition: height var(--duration-normal) var(--easing-standard);
 
-  &::after {
-    position: absolute;
-    bottom: calc(100% + var(--space-2));
-    left: 50%;
-    z-index: 2;
-    padding: var(--space-1) var(--space-2);
-    color: var(--color-text-primary);
-    font-size: 0.65rem;
-    white-space: nowrap;
-    pointer-events: none;
-    content: attr(data-tooltip);
-    background-color: var(--color-background-deep);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-sm);
-    opacity: 0;
-    transform: translate(-50%, var(--space-1));
-    transition:
-      opacity var(--duration-fast) var(--easing-standard),
-      transform var(--duration-fast) var(--easing-standard);
-  }
-
-  &:hover::after,
-  &:focus-visible::after {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-`
 
 export const BarLabel = styled.span`
   display: flex;

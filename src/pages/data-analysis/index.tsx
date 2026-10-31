@@ -1,5 +1,7 @@
 import { useTranslation } from '../../hooks/useTranslation'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { getAnalysisScope } from '../../utils/analysis'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import Sidebar from '../../components/Sidebar'
 import type { OverviewData } from '../../types/overview'
@@ -40,19 +42,26 @@ interface DataAnalysisPageProps {
 
 function DataAnalysisPage({ data, onLogout }: DataAnalysisPageProps) {
   const { t, locale } = useTranslation()
-  const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 })
-  const currency = new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 2 })
-  const [selectedPlant, setSelectedPlant] = useState('plant-04')
-  const [selectedPeriod, setSelectedPeriod] = useState('12-months')
+  const { number, currency } = useMemo(() => ({
+    number: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
+    currency: new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 2 }),
+  }), [locale])
+  const [searchParams] = useSearchParams()
+  const availablePlants = data.role === 'administrator' ? [{ value: 'company', label: 'Empresa completa' }, ...plantOptions] : plantOptions
+  const [filters, setFilters] = useState({
+    plant: getAnalysisScope(data.role, searchParams.get('scope')) === 'company' ? 'company' : 'plant-04',
+    period: '12-months',
+  })
+  const { plant: selectedPlant, period: selectedPeriod } = filters
 
-  const selectedPlantLabel = plantOptions.find(({ value }) => value === selectedPlant)?.label ?? ''
+  const selectedPlantLabel = availablePlants.find(({ value }) => value === selectedPlant)?.label ?? ''
   const selectedPeriodLabel = periodOptions.find(({ value }) => value === selectedPeriod)?.label ?? ''
 
   return (
     <S.Page>
       <Sidebar userName={data.userName} userRole={data.role} onLogout={onLogout} />
 
-      <S.Content>
+      <S.Content id="main-content">
         <S.Header>
           <S.TitleArea>
             <S.Breadcrumb>{t("Análise de dados -")}{" "}{t(selectedPlantLabel)}</S.Breadcrumb>
@@ -62,19 +71,20 @@ function DataAnalysisPage({ data, onLogout }: DataAnalysisPageProps) {
           <S.Filters aria-label={t("Filtros da análise")}>
             <S.Filter>
               <S.FilterIcon aria-hidden="true" />
-              <S.Select aria-label={t("Selecionar planta")} value={selectedPlant} onChange={(event) => setSelectedPlant(event.target.value)}>
-                {plantOptions.map((plant) => <option key={plant.value} value={plant.value}>{t(plant.label)}</option>)}
+              <S.Select aria-label={t("Selecionar planta")} value={selectedPlant} onChange={(event) => setFilters((current) => ({ ...current, plant: event.target.value }))}>
+                {availablePlants.map((plant) => <option key={plant.value} value={plant.value}>{t(plant.label)}</option>)}
               </S.Select>
             </S.Filter>
 
             <S.Filter>
               <S.FilterIcon aria-hidden="true" />
-              <S.Select aria-label={t("Selecionar período")} value={selectedPeriod} onChange={(event) => setSelectedPeriod(event.target.value)}>
+              <S.Select aria-label={t("Selecionar período")} value={selectedPeriod} onChange={(event) => setFilters((current) => ({ ...current, period: event.target.value }))}>
                 {periodOptions.map((period) => <option key={period.value} value={period.value}>{t(period.label)}</option>)}
               </S.Select>
             </S.Filter>
           </S.Filters>
         </S.Header>
+        <S.DemoNotice id="analysis-demo-note">{t('Dados demonstrativos. Os filtros alteram a prévia; a consulta real será integrada posteriormente.')}</S.DemoNotice>
 
         <S.MetricsGrid aria-label={t("Resumo da análise")}>
           {metrics.map((metric) => (
@@ -136,13 +146,13 @@ function DataAnalysisPage({ data, onLogout }: DataAnalysisPageProps) {
               <S.ImpactBox><span>{t("Impacto estimado")}</span><strong>{currency.format(45000)}</strong></S.ImpactBox>
               <h3>{t("Recomendação")}</h3>
               <p>{t("Verifique equipamentos de maior carga e revise a programação operacional.")}</p>
-              <S.PrimaryButton type="button">{t("✦ Perguntar ao Assistente")}</S.PrimaryButton>
+              <S.PrimaryButton as={Link} to="/assistant">{t("✦ Perguntar ao Assistente")}</S.PrimaryButton>
             </S.InsightCard>
 
             <S.ActionsCard>
-              <S.PrimaryButton type="button">{t("Exportar relatório")}</S.PrimaryButton>
-              <S.SecondaryButton type="button">{t("✦ Perguntar ao Assistente")}</S.SecondaryButton>
-              <p>{t("Relatório inclui dados filtrados, análises e recomendações.")}</p>
+              <S.PrimaryButton type="button" disabled aria-describedby="analysis-export-note">{t("Exportar relatório")}</S.PrimaryButton>
+              <S.SecondaryButton as={Link} to="/assistant">{t("✦ Perguntar ao Assistente")}</S.SecondaryButton>
+              <p id="analysis-export-note">{t("A exportação da análise estará disponível após a integração dos relatórios.")}</p>
             </S.ActionsCard>
           </S.RightColumn>
         </S.DashboardGrid>

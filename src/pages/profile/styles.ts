@@ -1,3 +1,4 @@
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
 
 export const Page = styled.div`
@@ -8,7 +9,7 @@ export const Page = styled.div`
 `
 
 export const Content = styled.main`
-  width: min(100%, 72rem);
+  width: 100%;
   min-width: 0;
   padding: clamp(var(--space-6), 5vh, var(--space-12)) var(--space-8);
   text-align: left;
@@ -16,11 +17,15 @@ export const Content = styled.main`
   @media (max-width: 48rem) {
     padding: var(--space-6);
   }
+
+  ${pageContent}
 `
 
 export const Title = styled.h1`
   margin-bottom: var(--space-6);
   font-size: var(--font-size-3xl);
+
+  ${pageTitle}
 `
 
 export const ProfileGrid = styled.div`
@@ -29,11 +34,13 @@ export const ProfileGrid = styled.div`
   gap: var(--space-6);
 
   @media (max-width: 64rem) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 `
 
 const Card = styled.section`
+  min-width: 0;
+  overflow-wrap: anywhere;
   background-color: var(--color-surface-muted);
   border: var(--border-width) solid var(--color-border-strong);
   border-radius: var(--radius-xl);
@@ -53,6 +60,8 @@ export const PersonalCard = styled(Card)`
 `
 
 export const Identity = styled.div`
+  max-width: 100%;
+  min-width: 0;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -66,6 +75,9 @@ export const Identity = styled.div`
 `
 
 export const NameRow = styled.div`
+  min-width: 0;
+  max-width: 100%;
+  h2 { min-width: 0; overflow-wrap: anywhere; }
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,12 +139,17 @@ export const NameAction = styled.button<NameActionProps>`
 `
 
 export const Fields = styled.div`
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  width: 100%;
+  overflow-wrap: anywhere;
   display: grid;
   gap: var(--space-3);
   width: 100%;
 `
 
 export const InformationCard = styled(Card)`
+  @media (max-width: 40rem) { padding: var(--space-4); h2 { font-size: 1.3rem; } }
   padding: var(--space-5) var(--space-6);
 
   h2 {
@@ -140,6 +157,7 @@ export const InformationCard = styled(Card)`
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-medium);
   }
+  @media (max-width: 40rem) { h2 { font-size: 1.3rem; } }
 `
 
 export const DefinitionList = styled.dl`
@@ -153,6 +171,8 @@ export const DefinitionList = styled.dl`
     border-bottom: var(--border-width) solid var(--color-border);
   }
 
+  @media (max-width: 40rem) { div { grid-template-columns: 1fr; gap: var(--space-1); } }
+
   div:last-child {
     border-bottom: 0;
   }
@@ -162,6 +182,7 @@ export const DefinitionList = styled.dl`
   }
 
   dd {
+    overflow-wrap: anywhere;
     margin: 0;
     color: var(--color-text-primary);
     font-weight: var(--font-weight-semibold);
@@ -174,6 +195,7 @@ export const SettingsList = styled.div`
 `
 
 export const SettingsRow = styled.div`
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -197,6 +219,7 @@ export const LanguageText = styled.span`
   padding: var(--space-2) var(--space-6) var(--space-2) var(--space-2);
   white-space: nowrap;
   visibility: hidden;
+  overflow: hidden;
 `
 
 export const LanguageSelect = styled.select`
@@ -242,7 +265,7 @@ export const Switch = styled.button<SwitchProps>`
   height: 1.5rem;
   flex-shrink: 0;
   background-color: ${({ $active }) =>
-    $active ? 'var(--color-success)' : 'var(--color-text-muted)'};
+    $active ? 'var(--color-success)' : 'var(--color-switch-track)'};
   border-radius: var(--radius-pill);
   transition: background-color var(--duration-fast) var(--easing-standard);
 
@@ -252,7 +275,7 @@ export const Switch = styled.button<SwitchProps>`
     left: ${({ $active }) => ($active ? '1.4375rem' : '0.1875rem')};
     width: 1.125rem;
     height: 1.125rem;
-    background-color: var(--color-text-primary);
+    background-color: ${({ $active }) => $active ? 'var(--color-switch-thumb, var(--color-text-inverse))' : 'var(--color-text-primary)'};
     border-radius: 50%;
     transition: left var(--duration-fast) var(--easing-standard);
   }
@@ -268,3 +291,5 @@ export const NameLabel = styled.label`
   clip-path: inset(50%);
   white-space: nowrap;
 `
+
+export const Eyebrow = styled.p`${pageEyebrow}`
