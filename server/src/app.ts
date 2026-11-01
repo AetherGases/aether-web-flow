@@ -1,3 +1,4 @@
+import { reportRoutes } from './routes/reports.ts'
 import { createCalculatorService, forecastInputSchema } from './services/calculator.ts'
 import { createProfileService, updateProfileSchema } from './services/profile.ts'
 import { createAuthController } from './controllers/auth.ts'
@@ -48,6 +49,7 @@ export function createApp(config: Config, store?: Store) {
   const overview = createOverviewService(config)
   app.use('/api/v1/auth', authRoutes(config, authController))
   app.use('/api/v1/assistant', assistantRoutes(config, authController))
+  app.use('/api/v1/reports', reportRoutes(config, authController))
   app.get('/api/v1/overview', async (request, response) => {
     response.locals.sessionOnly = true
     await authController.me(request, response)

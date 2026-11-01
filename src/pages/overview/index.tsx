@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useReportDateFormatter } from '../../hooks/useReportDateFormatter'
 import InventoryStatus from '../../components/InventoryStatus'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -59,7 +60,7 @@ function OverviewPage() {
         <S.FastAcessGrid>
           <S.FastAcessDiv><S.Icon src={AnaliseIcon} alt="" aria-hidden="true" /><S.FastAcessContent><S.FastAcessLink to={analysisPath}>{t("Análise de dados")}</S.FastAcessLink><p>{t("Explore os dados dos seus relatórios")}</p></S.FastAcessContent></S.FastAcessDiv>
           <S.FastAcessDiv><S.Icon src={CalculadoraIcon} alt="" aria-hidden="true" /><S.FastAcessContent><S.FastAcessLink to="/calculator">{t("Calculadora")}</S.FastAcessLink><p>{t("Teste novos cenários")}</p></S.FastAcessContent></S.FastAcessDiv>
-          <S.FastAcessDiv><S.Icon src={ChatbotIcon} alt="" aria-hidden="true" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t("Assistente Aether")}</S.FastAcessLink><p>{t("Converse com o Aether")}</p></S.FastAcessContent></S.FastAcessDiv>
+          <S.FastAcessDiv><S.Icon src={ChatbotIcon} alt="" aria-hidden="true" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t("Assistente Aeko")}</S.FastAcessLink><p>{t("Converse com o Aeko")}</p></S.FastAcessContent></S.FastAcessDiv>
         </S.FastAcessGrid>
       </S.FastAcessSection>
       <S.DashboardGrid>
@@ -72,7 +73,7 @@ function OverviewPage() {
             <S.PerformanceTable>
               <thead><tr><th scope="col">{t("Nome")}</th><th scope="col">{t("Data")}</th><th scope="col">{t("Situação")}</th></tr></thead>
               <tbody>{history.data.inventories.length === 0 ? <tr><td colSpan={3}><S.StatePanel><p>{t("Você ainda não possui relatórios.")}</p></S.StatePanel></td></tr> : history.data.inventories.map((inventory, index) => <tr key={inventory.id}>
-                <td><S.PlantIdentification><S.Position>{index + 1}</S.Position><span>{inventory.name}</span></S.PlantIdentification></td>
+                <td><S.PlantIdentification><S.Position>{index + 1}</S.Position>{inventory.type === 'INPUT' ? <Link data-report-link to={'/data-analysis?id=' + inventory.id}>{inventory.name}</Link> : inventory.name}</S.PlantIdentification></td>
                 <td><time dateTime={inventory.createdAt}>{formatDate(inventory.createdAt)}</time></td>
                 <td><InventoryStatus status={inventory.status} /></td>
               </tr>)}</tbody>

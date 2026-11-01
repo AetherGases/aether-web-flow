@@ -22,10 +22,10 @@ export default function DataAnalysisChoicePage() {
           <S.OptionText><strong>{t('Plantas individuais')}</strong><span>{t('Analise uma unidade por vez')}</span></S.OptionText>
           <S.Availability>{t('Selecionar relatório')}</S.Availability>
         </S.OptionCard>
-        <S.OptionCard as={S.AnalysisLink} to="/data-analysis/upload/company">
+        <S.OptionCard aria-disabled="true">
           <S.OptionIconBox><S.OptionIcon data-theme-icon src={EmpresaIcon} alt="" aria-hidden="true" /></S.OptionIconBox>
           <S.OptionText><strong>{t('Empresa completa')}</strong><span>{t('Visão consolidada de todas as plantas')}</span></S.OptionText>
-          <S.Availability>{t('Selecionar relatório')}</S.Availability>
+          <S.Availability>{t('Em breve')}</S.Availability>
         </S.OptionCard>
       </S.Options>
     </S.Content>

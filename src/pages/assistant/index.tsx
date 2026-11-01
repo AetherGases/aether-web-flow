@@ -41,7 +41,7 @@ function AssistantPage() {
   return <S.Page>
     <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
     <S.Content id="main-content">
-      <S.Header><p data-page-eyebrow id="id-page">{t("Assistente IA")}</p><h1>{t("Assistente Aether")}</h1></S.Header>
+      <S.Header><p data-page-eyebrow id="id-page">{t("Assistente IA")}</p><h1>{t("Assistente Aeko")}</h1></S.Header>
       <S.ConversationControls aria-label={t("Suas conversas")}>
         <S.NewConversationButton type="button" disabled={busy} onClick={() => { void chat.openConversation(null).then(() => requestAnimationFrame(() => composerRef.current?.focus())) }}>
           <span aria-hidden="true">+</span>{t("Nova conversa")}
@@ -52,7 +52,7 @@ function AssistantPage() {
             <select ref={historyRef} id="assistant-conversation" value={chat.conversationId ?? ''} disabled={busy}
               onChange={(event) => { void chat.openConversation(event.target.value || null).then(() => requestAnimationFrame(() => historyRef.current?.focus())) }}>
               <option value="">{t("Suas conversas")}</option>
-              {chat.conversations.map((conversation) => <option key={conversation.id} value={conversation.id}>{conversation.name}</option>)}
+              {chat.conversations.map((conversation) => <option key={conversation.id} value={conversation.id}>{conversation.name === 'Conversa sem título' ? t('Conversa sem título') : conversation.name}</option>)}
             </select>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
           </S.SelectWrapper>
@@ -62,7 +62,7 @@ function AssistantPage() {
         </S.RefreshButton>
       </S.ConversationControls>
       {chat.error && <SectionState error description={chat.error} onRetry={chat.sessionExpired ? retry : chat.reload} />}
-      <S.Messages tabIndex={0} role="log" aria-live="polite" aria-relevant="additions" aria-busy={busy} aria-label={t("Conversa com o Assistente Aether")}>
+      <S.Messages tabIndex={0} role="log" aria-live="polite" aria-relevant="additions" aria-busy={busy} aria-label={t("Conversa com o Assistente Aeko")}>
         {chat.loading && <p role="status">{t("Carregando conversas…")}</p>}
         {isNewConversation && !chat.loading && !chat.error && <S.EmptyConversation>
           <S.EmptyIcon data-theme-icon src={assistantIcon} alt="" aria-hidden="true" />
@@ -81,7 +81,7 @@ function AssistantPage() {
       </S.Messages>
       <S.ComposerArea>
         <S.Composer onSubmit={handleSubmit}>
-          <label htmlFor="assistant-message">{t("Digite sua pergunta para o Assistente Aether")}</label>
+          <label htmlFor="assistant-message">{t("Digite sua pergunta para o Assistente Aeko")}</label>
           <textarea ref={composerRef} id="assistant-message" aria-invalid={Boolean(chat.draftError)} aria-describedby={chat.draftError ? "assistant-input-error" : undefined} rows={1} value={chat.draft} maxLength={assistantMessageLimit} disabled={chat.sending}
             placeholder={t("Digite sua pergunta...")} onChange={(event) => chat.setDraft(event.target.value)}
             onKeyDown={(event) => {

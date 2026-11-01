@@ -31,6 +31,6 @@ Os links relativos apontam para o código da mesma versão deste documento. Apó
 
 ## Limites desta entrega
 
-A tela de análise está identificada como demonstrativa. Selecionar XLSX não faz upload nem registra um relatório. Envio, processamento, análise real e exportação dessa análise dependem da integração futura. O CRUD administrativo também depende de um endereço funcional configurado. A implementação de interface não substitui essas etapas nem o teste integrado.
+Envio XLSX, registro, acompanhamento do processamento e consulta de emissões/plano de melhoria estão integrados ao back-end para a unidade do usuário. A exportação possui documento próprio. A validação ponta a ponta com um Excel real no ambiente publicado continua necessária; testes automatizados usam respostas simuladas. A análise consolidada da empresa permanece pendente. O CRUD administrativo também depende de um endereço funcional configurado. A implementação de interface não substitui essas etapas nem o teste integrado.
 
 Os requisitos das outras disciplinas exigem suas próprias evidências nos repositórios do banco, microsserviços, app, IA e documentação de UX.

@@ -42,5 +42,6 @@ export interface AuthSession {
 declare module 'express-session' {
   interface SessionData {
     auth?: AuthSession
+    reportUpload?: { cloudName: string; cloudinaryFolder: string; expiresAt: number }
   }
 }

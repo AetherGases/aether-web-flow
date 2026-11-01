@@ -3,7 +3,6 @@ import PageBoundary from './components/PageBoundary'
 import NavigationAccessibility from './components/NavigationAccessibility'
 import { useTranslation } from './hooks/useTranslation'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { analystOverviewMock, administratorOverviewMock } from './mocks/overview'
 import PrivateRoute from './components/PrivateRoute'
 import { useAuth } from './hooks/useAuth'
 import { getHomePath } from './utils/auth'
@@ -25,13 +24,11 @@ interface AuthenticatedPageProps { page: Page }
 
 function AuthenticatedPage({ page }: AuthenticatedPageProps) {
   const { t } = useTranslation()
-  const { user, logout, error } = useAuth()
+  const { user, error } = useAuth()
   if (!user) return <Navigate to="/" replace />
-  const fixture = user.role === 'administrator' ? administratorOverviewMock : analystOverviewMock
-  const analysisData = { ...fixture, userName: user.name, role: user.role }
   const pages = {
     overview: user.role === 'administrator' ? <AdministratorOverviewPage key={user.id} /> : <OverviewPage key={user.id} />,
-    analysis: <DataAnalysisPage key={user.id} data={analysisData} onLogout={() => { void logout() }} />,
+    analysis: <DataAnalysisPage key={user.id} />,
     select: <DataAnalysisChoicePage key={user.id} />,
     upload: <DataUploadPage key={user.id} />,
     calculator: <CalculatorPage key={user.id} />,

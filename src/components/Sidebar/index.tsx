@@ -75,7 +75,7 @@ function Sidebar({
               aria-current={pathname === '/assistant' ? 'page' : undefined}
             >
               <S.Icon data-theme-icon src={ChatbotLogo} alt="" aria-hidden="true" />
-              <S.Label>{t("Assistente Aether")}</S.Label></S.NavigationLink>
+              <S.Label>{t("Assistente Aeko")}</S.Label></S.NavigationLink>
           </li>
 
           <li>

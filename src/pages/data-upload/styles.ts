@@ -135,3 +135,29 @@ export const FileLabel = styled.label`
   clip-path: inset(50%);
   white-space: nowrap;
 `
+
+export const Fields = styled.fieldset`
+  display: grid; gap: var(--space-3); width: min(100%, 30rem); min-width: 0;
+  border: 0; padding: 0; margin: 0 0 var(--space-6);
+  text-align: left;
+  input:not([type='file']), select { width: 100%; min-width: 0; padding: var(--space-3); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); color: var(--color-text-primary); background: var(--color-background); font: inherit; }
+  small { color: var(--color-text-secondary); }
+`
+export const FileName = styled.p`overflow-wrap: anywhere;`
+
+export const SelectFileLink = styled.button`
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: var(--space-2) 0;
+  color: var(--color-text-primary);
+  font: inherit;
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { color: var(--color-brand-green); }
+  &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+  &:disabled { opacity: 0.6; cursor: default; }
+`

@@ -35,6 +35,7 @@ export function createHttpClient(origin: string, timeoutMs: number, service: 'AU
       }
       if (!response.ok) {
         await response.body?.cancel()
+        if (service === 'INVENTORY' && [400, 422].includes(response.status)) throw new ApiError(422, 'REPORT_VALIDATION_ERROR', 'O serviço recusou os dados do relatório. Confira os campos e o arquivo.')
         if (service === 'AI' && response.status === 400) throw new ApiError(400, 'AI_VALIDATION_ERROR', 'Não foi possível enviar a mensagem para esta conversa. Atualize o histórico.')
         if (service === 'AI' && response.status === 422) throw new ApiError(422, 'AI_ANSWER_REJECTED', 'O assistente não conseguiu responder a essa pergunta. Tente reformular a mensagem.')
         if (service === 'AI' && response.status === 403) throw new ApiError(403, 'AI_FORBIDDEN', 'Sua conta não tem acesso a esta conversa.')

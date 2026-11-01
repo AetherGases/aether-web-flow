@@ -66,7 +66,7 @@ Versões anteriores são migradas sem apagar idioma/contraste. Dados incompatív
 
 Login, perfil, organização, overview, calculadora e chatbot consultam seus serviços através do BFF. Falhas exibem indisponibilidade/erro, sem resultados fictícios de fallback. Os indicadores do analista são pessoais; os do admin têm o escopo de departamento fornecido pelo inventory.
 
-A seleção de `.xlsx` ainda abre a **análise demonstrativa**: não envia nem processa o arquivo e não registra um relatório no banco. Upload real, análise, filtros com dados reais e PDF da análise aguardam o contrato do back-end. O PDF da calculadora possui apresentação própria para impressão. O acesso ao CRUD fica desabilitado enquanto `VITE_ADMIN_URL` não estiver configurada com um endereço funcional.
+O envio de XLSX é integrado ao BFF, ao upload assinado do Cloudinary e ao processamento do inventory. A tela consulta emissões, reduções e plano de melhoria reais e possui documento próprio para impressão/PDF. Empresa completa aguarda suporte de consolidação no back-end. Consulte [configuração e validação da integração](docs/integracao-relatorios.md). O PDF da calculadora possui apresentação própria para impressão. O acesso ao CRUD fica desabilitado enquanto `VITE_ADMIN_URL` não estiver configurada com um endereço funcional.
 
 ## Verificação
 
