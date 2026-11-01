@@ -27,3 +27,12 @@ jobs:
   deploy:
     uses: AetherGases/.github/.github/workflows/deploy-eks.yml@main
     secrets: inherit
+
+  # The BFF in server/ is a separate service; Kong routes /api/v1 to it.
+  deploy-bff:
+    uses: AetherGases/.github/.github/workflows/deploy-eks.yml@main
+    with:
+      context: server
+      name: aether-web-bff
+      container_port: "3001"
+    secrets: inherit
