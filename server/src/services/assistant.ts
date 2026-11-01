@@ -9,12 +9,13 @@ export const sendMessageSchema = z.object({
   text: z.string().trim().min(1).max(8192),
   conversationId: conversationIdSchema.optional(),
 }).strict()
-const conversationSchema = z.object({ id: conversationIdSchema, name: z.string().min(1) })
+const conversationNameSchema = z.string().transform(value => value.trim() || 'Conversa sem título')
+const conversationSchema = z.object({ id: conversationIdSchema, name: conversationNameSchema })
 const messageSchema = z.object({
   input_message: z.string(), output_message: z.string().min(1),
   submitted_at: z.string().datetime({ offset: true, local: true }),
 })
-const replySchema = messageSchema.extend({ id_session: conversationIdSchema, session_name: z.string().min(1) })
+const replySchema = messageSchema.extend({ id_session: conversationIdSchema, session_name: conversationNameSchema })
 const identitySchema = z.object({ id: z.number().int().positive(), email: z.string().email(), enterprise: z.object({ id: z.number().int().positive() }), permissions: z.array(z.object({ name: z.string() })) })
 
 function invalidResponse(): never {
@@ -35,7 +36,11 @@ export function createAssistantService(config: Config) {
     const data = await client()(`/ai/sessions/user/${userId}`, { method: 'GET', token, requestId, allowNotFound: true })
     if (data === null) return []
     const parsed = z.array(conversationSchema).safeParse(data)
-    if (!parsed.success || new Set(parsed.data.map((item) => item.id)).size !== parsed.data.length) invalidResponse()
+    if (!parsed.success) {
+      console.warn('AI_CONTRACT_INVALID', { requestId, operation: 'conversations', issues: parsed.error.issues.map(issue => ({ path: issue.path.join('.'), code: issue.code })) })
+      invalidResponse()
+    }
+    if (new Set(parsed.data.map((item) => item.id)).size !== parsed.data.length) invalidResponse()
     return parsed.data
   }
   async function ensureOwnership(id: string, userId: number, token: string, requestId: string) {

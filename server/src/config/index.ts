@@ -14,6 +14,7 @@ const schema = z.object({
   FRONTEND_ORIGIN: origin,
   MS_AUTH_URL: origin,
   MS_INVENTORY_URL: origin.optional(),
+  MS_CLOUDINARY_URL: origin.optional(),
   MS_CALCULATOR_URL: origin.optional(),
   MS_AI_URL: origin.optional(),
   MS_AI_PATH_PREFIX: z.string().max(128).regex(/^(?:\/[a-zA-Z0-9_-]+)*$/).default(''),
@@ -30,6 +31,7 @@ const schema = z.object({
   if (config.NODE_ENV === 'production' && config.MS_INVENTORY_URL && !config.MS_INVENTORY_URL.startsWith('https:')) {
     context.addIssue({ code: 'custom', path: ['MS_INVENTORY_URL'], message: 'Produção exige HTTPS no inventory' })
   }
+  if (config.NODE_ENV === 'production' && config.MS_CLOUDINARY_URL && !config.MS_CLOUDINARY_URL.startsWith('https:')) context.addIssue({ code: 'custom', path: ['MS_CLOUDINARY_URL'], message: 'Produção exige HTTPS no Cloudinary' })
   if (config.NODE_ENV === 'production' && config.MS_CALCULATOR_URL && !config.MS_CALCULATOR_URL.startsWith('https:')) {
     context.addIssue({ code: 'custom', path: ['MS_CALCULATOR_URL'], message: 'Produção exige HTTPS na calculadora' })
   }

@@ -66,4 +66,4 @@ Não foi criado um modal ou uma aba sem necessidade para demonstrar ARIA. Os con
 
 ## Limites que permanecem
 
-A análise do relatório continua demonstrativa, e o envio/processamento/PDF dessa análise aguardam o back-end. A escolha de XLSX valida o nome/extensão e não envia arquivo; limites de tamanho e validação do conteúdo real devem acompanhar o contrato de upload. CRUD e publicação ainda dependem da configuração e validação dos serviços. Esses pontos não foram declarados concluídos por adicionar hooks ou acessibilidade.
+O fluxo de relatórios agora envia XLSX (até 10 MB) por upload assinado, registra no inventory e acompanha o processamento. Emissões e plano de melhoria vêm dos serviços, com documento próprio para impressão/PDF. A consolidação da empresa permanece pendente e o fluxo real ainda precisa ser validado com um Excel no ambiente publicado. CRUD e publicação ainda dependem da configuração e validação dos serviços. Esses pontos não foram declarados concluídos por adicionar hooks ou acessibilidade.

@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   // Served by the Kong gateway under /dashboard.
   base: '/dashboard/',
+  preview: { proxy: { "/api": "http://127.0.0.1:3001" } },
   server: {
     proxy: { '/api': 'http://127.0.0.1:3001' },
   },

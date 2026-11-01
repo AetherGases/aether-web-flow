@@ -81,3 +81,14 @@ p {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Route changes announce the page without outlining an entire noninteractive region. */
+#main-content[tabindex='-1']:focus,
+#main-content h1[tabindex='-1']:focus { outline: none; }
+
+a[data-report-link] { transition: color var(--duration-fast) var(--easing-standard); }
+a[data-report-link]:hover, a[data-report-link]:focus-visible { color: var(--color-brand-green); text-decoration: underline; text-underline-offset: .2em; }
+@media print {
+  .skip-link, .visually-hidden { display: none !important; }
+  :focus, :focus-visible { outline: none !important; box-shadow: none !important; }
+}

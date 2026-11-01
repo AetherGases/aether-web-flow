@@ -1,334 +1,75 @@
-import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 import styled from 'styled-components'
-
-const panel = `
-  background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-`
-
+import { pageContent, pageTitle, pageEyebrow } from '../../styles/page'
 export const Page = styled.div`
-  display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-  min-height: 100vh;
-  background-color: var(--color-background);
+  display: grid; min-height: 100dvh; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); background: var(--color-background);
+  @media print { display: block; min-height: 0; background: white; > :not([data-analysis-report]) { display: none !important; } }
 `
-
-export const Content = styled.main`
-  min-width: 0;
-  padding: var(--space-6);
-  text-align: left;
-
-  ${pageContent}
-`
-
+export const Content = styled.main`${pageContent} display: grid; align-content: start; gap: var(--space-6);`
+export const Eyebrow = styled.p`${pageEyebrow}`
+export const Title = styled.h1`${pageTitle}`
 export const Header = styled.header`
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-8);
-  margin-bottom: var(--space-6);
-
-  @media (max-width: 75rem) { align-items: stretch; flex-direction: column; }
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-5);
+  p:last-child { margin: var(--space-2) 0 0; color: var(--color-text-secondary); overflow-wrap: anywhere; }
 `
-
-export const TitleArea = styled.div`
-  h1 { ${pageTitle} }
-  h1 { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-2); ${pageTitle} }
-  h1 span { color: var(--color-success); font-size: var(--font-size-xl); }
+export const Period = styled.div`
+  display: grid; gap: var(--space-1); padding: var(--space-3) var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  color: var(--color-text-secondary); font-size: var(--font-size-sm);
 `
-
-export const Breadcrumb = styled.p`
-  ${pageEyebrow}
+export const Card = styled.section`
+  min-width: 0; padding: var(--space-6); border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg); background: var(--color-surface); text-align: left;
+  h2 { font-size: var(--font-size-lg); margin: 0 0 var(--space-4); font-weight: var(--font-weight-semibold); }
+  h3 { font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); margin: var(--space-4) 0 var(--space-2); }
+  p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; }
+  dl { display: grid; gap: var(--space-4); margin-top: var(--space-4); }
+  dt { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--space-1); }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  details { margin-top: var(--space-5); }
+  summary { cursor: pointer; font-weight: var(--font-weight-semibold); margin-bottom: var(--space-3); }
+  @media(max-width: 30rem) { padding: var(--space-4); }
 `
-
-export const Filters = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(12rem, 1fr));
-  gap: var(--space-4);
-  width: min(100%, 34rem);
-  @media (max-width: 40rem) { grid-template-columns: 1fr; }
+export const Metrics = styled.div`
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4);
+  @media(max-width: 80rem) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media(max-width: 35rem) { grid-template-columns: 1fr; }
 `
-
-export const Filter = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 2.75rem;
-  padding: 0 var(--space-4);
-  background-color: rgb(255 255 255 / 2%);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
-  &:focus-within { border-color: var(--color-focus); outline: 2px solid rgb(72 226 155 / 18%); }
+export const Metric = styled(Card)`
+  display: flex; gap: var(--space-4); align-items: flex-start; padding: var(--space-5);
+  .icon { width: 2.5rem; height: 2.5rem; border-radius: var(--radius-md); background: var(--gradient-brand-diagonal); display: grid; place-items: center; flex-shrink: 0; color: var(--color-on-brand); }
+  .value { min-width: 0; }
+  .value > span { display: block; min-height: 2.8em; }
+  span { font-size: var(--font-size-sm); }
+  strong { display: block; margin-top: var(--space-2); font-size: clamp(1.3rem, 2vw, 1.85rem); line-height: 1.2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  small { display: block; margin-top: var(--space-1); color: var(--color-text-secondary); font-size: var(--font-size-xs); }
 `
-
-export const FilterIcon = styled.span`
-  flex-shrink: 0;
-  width: 0.7rem;
-  height: 0.7rem;
-  border: 1px solid var(--color-text-primary);
-  &::after { content: ''; display: block; width: 0.2rem; height: 0.2rem; margin: 0.18rem; background-color: var(--color-text-primary); }
+export const Charts = styled.div`
+  display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: var(--space-5);
+  @media(max-width: 64rem) { grid-template-columns: 1fr; }
 `
-
-export const Select = styled.select`
-  width: 100%;
-  color: var(--color-text-primary);
-  font: inherit;
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  appearance: none;
-  background-color: transparent;
-  border: 0;
-  outline: 0;
-  option { color: var(--color-text-primary); background-color: var(--color-surface); }
+export const LowerGrid = styled.div`
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, .9fr); gap: var(--space-5);
+  @media(max-width: 75rem) { grid-template-columns: repeat(2, minmax(0, 1fr)); > :last-child { grid-column: 1 / -1; } }
+  @media(max-width: 48rem) { grid-template-columns: 1fr; }
 `
-
-export const Chevron = styled.span`
-  flex-shrink: 0;
-  color: var(--color-text-secondary);
-  pointer-events: none;
+export const Actions = styled.div`
+  display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center;
+  a, button { color: var(--color-text-primary); padding: var(--space-3) var(--space-5); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); background: var(--color-surface); text-decoration: none; font: inherit; }
+  a:hover, button:hover:not(:disabled) { border-color: var(--color-brand-green); }
+  .primary { background: var(--gradient-brand); color: var(--color-on-brand); border-color: transparent; font-weight: var(--font-weight-semibold); }
 `
-
-export const MetricsGrid = styled.section`
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
-  @media (max-width: 75rem) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  @media (max-width: 40rem) { grid-template-columns: 1fr; }
+export const ReportActions = styled(Actions)`
+  display: grid; align-content: start; > * { width: 100%; text-align: center; }
+  p { color: var(--color-text-secondary); font-size: var(--font-size-xs); text-align: left; }
 `
-
-export const MetricCard = styled.article`
-  ${panel}
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  min-width: 0;
-  padding: var(--space-5);
+export const Caption = styled.p`color: var(--color-text-secondary); font-size: var(--font-size-sm); margin: calc(-1 * var(--space-2)) 0 var(--space-5);`
+export const Recommendations = styled.div`
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); margin-top: var(--space-4);
+  > div { padding: var(--space-4); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+  strong { display: block; margin-bottom: var(--space-2); }
+  @media(max-width: 48rem) { grid-template-columns: 1fr; }
 `
-
-export const MetricIcon = styled.span`
-  display: grid;
-  flex: 0 0 3.5rem;
-  place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  font-size: var(--font-size-xl);
-  background: var(--gradient-brand-diagonal);
-  border-radius: var(--radius-md);
-
-  color: var(--color-on-brand);
-`
-
-export const MetricContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  > span { font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); }
-  > strong { margin: var(--space-1) 0; font-size: var(--font-size-xl); line-height: var(--line-height-tight); }
-`
-
-interface VariationProps { $status: 'positive' | 'negative' }
-export const Variation = styled.small<VariationProps>`
-  color: ${({ $status }) => $status === 'positive' ? 'var(--color-success)' : 'var(--color-danger)'};
-  font-size: 0.68rem;
-  white-space: normal;
-`
-
-export const DashboardGrid = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 2.3fr) minmax(16rem, 1fr);
-  gap: var(--space-4);
-  @media (max-width: 68rem) { grid-template-columns: 1fr; }
-`
-
-export const LeftColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  min-width: 0;
-`
-
-export const RightColumn = styled.aside`
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-`
-
-export const ChartCard = styled.section`
-  ${panel}
-  padding: var(--space-5);
-  box-shadow: 0 0 0 2px #168bd8;
-`
-
-export const CardHeader = styled.header`
-  flex-wrap: wrap;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-  h2 { font-size: var(--font-size-md); }
-  p { margin-top: var(--space-1); color: var(--color-text-muted); font-size: var(--font-size-xs); }
-`
-
-export const ChartControls = styled.div`
-  display: flex;
-  gap: var(--space-2);
-  button { min-width: 5rem; padding: var(--space-2) var(--space-4); color: var(--color-text-secondary); cursor: pointer; background: transparent; border: var(--border-width) solid var(--color-border); border-radius: var(--radius-md); }
-`
-
-export const Chart = styled.div`
-  margin-top: var(--space-4);
-  svg { display: block; width: 100%; height: 18rem; overflow: visible; }
-  .grid-lines line { stroke: var(--color-surface-muted); stroke-width: 1; }
-  .area { fill: url(#chart-fill); }
-  .trend { fill: none; stroke: var(--color-brand-purple); stroke-width: 2; stroke-dasharray: 7 7; }
-  .consumption { fill: none; stroke: var(--color-success); stroke-linejoin: round; stroke-width: 3; }
-`
-
-export const ChartLabels = styled.div`
-  display: flex;
-  justify-content: space-between;
-  color: var(--color-text-secondary);
-  font-size: 0.68rem;
-`
-
-export const ChartNote = styled.p`
-  margin-top: var(--space-5);
-  padding: var(--space-3) var(--space-4);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  background-color: rgb(255 255 255 / 3%);
-  border-radius: var(--radius-md);
-`
-
-export const BottomGrid = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(13rem, 1fr);
-  gap: var(--space-4);
-  @media (max-width: 50rem) { grid-template-columns: 1fr; }
-`
-
-export const CostCard = styled.section`
-  ${panel}
-  padding: var(--space-5);
-  h2 { font-size: var(--font-size-md); }
-`
-
-export const CostContent = styled.div`
-  flex-wrap: wrap;
-  @media (max-width: 40rem) { gap: var(--space-4); padding-top: var(--space-4); }
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-10);
-  min-height: 9.5rem;
-`
-
-export const Donut = styled.div`
-  display: grid;
-  place-items: center;
-  width: 7rem;
-  height: 7rem;
-  background: conic-gradient(#48e29b 0 36%, #b76cf4 36% 65%, #7f9ee8 65% 80%, #f2bb45 80% 100%);
-  border-radius: 50%;
-  div { display: flex; align-items: center; justify-content: center; flex-direction: column; width: 4.6rem; height: 4.6rem; background-color: var(--color-surface); border-radius: 50%; }
-  strong { font-size: var(--font-size-xs); }
-  span { color: var(--color-text-muted); font-size: 0.65rem; }
-`
-
-export const Legend = styled.ul`
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 12rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-2); color: var(--color-text-secondary); font-size: var(--font-size-xs); }
-  i { width: 0.7rem; height: 0.7rem; border-radius: 50%; }
-  strong { color: var(--color-text-primary); font-weight: var(--font-weight-regular); }
-`
-
-export const AppliedFiltersCard = styled.section`
-  ${panel}
-  padding: var(--space-5);
-  align-items: flex-start;
-  h2 { font-size: var(--font-size-md); }
-  dl { display: flex; flex-direction: column; gap: var(--space-4); margin-top: var(--space-5); }
-  dt { color: var(--color-text-muted); font-size: 0.65rem; text-transform: uppercase; }
-  dd { margin: 0; color: var(--color-text-secondary); font-size: var(--font-size-xs); }
-`
-
-export const InsightCard = styled.section`
-  ${panel}
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  h2 { font-size: var(--font-size-md); }
-  h3 { font-size: var(--font-size-xs); }
-  p { color: var(--color-text-muted); font-size: var(--font-size-xs); }
-`
-
-export const InsightTitle = styled.p`
-  color: var(--color-text-primary) !important;
-  font-size: var(--font-size-xl) !important;
-  font-weight: var(--font-weight-bold);
-  strong { color: var(--color-danger); }
-`
-
-export const Divider = styled.hr`
-  width: 100%;
-  border: 0;
-  border-top: var(--border-width) solid var(--color-surface-muted);
-`
-
-export const ImpactBox = styled.div`
-  padding: var(--space-4);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
-  span { display: block; color: var(--color-text-muted); font-size: var(--font-size-xs); }
-  strong { color: var(--color-danger); font-size: var(--font-size-xl); }
-`
-
-export const PrimaryButton = styled.button`
-  width: 100%;
-  padding: var(--space-3);
-  color: var(--color-on-brand);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  background: var(--gradient-brand);
-  border: 0;
-  border-radius: var(--radius-md);
-`
-
-export const ActionsCard = styled.section`
-  ${panel}
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  p { color: var(--color-text-muted); font-size: var(--font-size-xs); }
-`
-
-export const SecondaryButton = styled.button`
-  width: 100%;
-  padding: var(--space-3);
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  background: transparent;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
-`
-
-export const DemoNotice = styled.p`
-  margin-bottom: var(--space-5);
-  padding: var(--space-3) var(--space-4);
-  color: var(--color-text-secondary);
-  border-left: 3px solid var(--color-brand-purple);
-  background: var(--color-surface);
-  font-size: var(--font-size-sm);
+export const Table = styled.div`
+  max-width: 100%; overflow-x: auto;
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th, td { padding: var(--space-3); border-bottom: 1px solid var(--color-border); overflow-wrap: anywhere; }
 `

@@ -1,6 +1,6 @@
 export const inventoryStatusLabels = {
   UNDER_REVIEW: 'Em revisão', APPROVED: 'Aprovado', REJECTED: 'Rejeitado',
-  PROCESSING: 'Em processamento', PROCESSING_FAILED: 'Falha no processamento',
+  PROCESSING: 'Em processamento', PROCESSING_FAILED: 'Falha no processamento', INSUFFICIENT_DATA: 'Dados insuficientes',
   REQUESTED: 'Solicitado', ISSUED: 'Emitido',
 } as const
 export type InventoryStatus = keyof typeof inventoryStatusLabels

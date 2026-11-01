@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useReportDateFormatter } from '../../hooks/useReportDateFormatter'
 import InventoryStatus from '../../components/InventoryStatus'
 import { useAuth } from '../../hooks/useAuth'
@@ -34,7 +35,7 @@ export default function AdministratorOverviewPage() {
     <S.Content id="main-content">
       <S.Header>
         <p data-page-eyebrow>{t('Visão geral')}</p>
-        <h1>{t('Olá,')} {user.name}</h1>
+        <h1>{t('Olá,')} {user.name}👋🏻</h1>
         <p>{t('Acompanhe os relatórios do seu departamento e acesse os recursos administrativos.')}</p>
       </S.Header>
       <S.MetricsSection aria-label={t('Indicadores')}>
@@ -49,7 +50,7 @@ export default function AdministratorOverviewPage() {
         <S.FastAcessGrid>
           <S.FastAcessDiv><S.Icon src={AnalysisIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/data-analysis/select">{t('Análises da organização')}</S.FastAcessLink><p>{t('Plantas individuais e empresa completa')}</p></S.FastAcessContent></S.FastAcessDiv>
           <S.FastAcessDiv><S.Icon src={ManagementIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/administration">{t('Gestão administrativa')}</S.FastAcessLink><p>{t('Funcionários, unidades, setores e permissões')}</p></S.FastAcessContent></S.FastAcessDiv>
-          <S.FastAcessDiv><S.Icon src={AssistantIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t('Assistente Aether')}</S.FastAcessLink><p>{t('Converse com o Aether')}</p></S.FastAcessContent></S.FastAcessDiv>
+          <S.FastAcessDiv><S.Icon src={AssistantIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t('Assistente Aeko')}</S.FastAcessLink><p>{t('Converse com o Aeko')}</p></S.FastAcessContent></S.FastAcessDiv>
         </S.FastAcessGrid>
       </S.FastAcessSection>
       <S.History aria-labelledby="admin-reports-title">
@@ -59,7 +60,7 @@ export default function AdministratorOverviewPage() {
           : <S.PerformanceTable>
             <thead><tr><th scope="col">{t('Nome')}</th><th scope="col">{t('Data')}</th><th scope="col">{t('Situação')}</th></tr></thead>
             <tbody>{reports.data.inventories.map(report => <tr key={report.id}>
-              <td>{report.name}</td><td><time dateTime={report.createdAt}>{formatDate(report.createdAt)}</time></td><td><InventoryStatus status={report.status} /></td>
+              <td>{report.type === 'INPUT' ? <Link data-report-link to={'/data-analysis?id=' + report.id}>{report.name}</Link> : report.name}</td><td><time dateTime={report.createdAt}>{formatDate(report.createdAt)}</time></td><td><InventoryStatus status={report.status} /></td>
             </tr>)}</tbody>
           </S.PerformanceTable>
           : <SectionState loading={loading} error={!loading} description={t('Não foi possível carregar as informações dos relatórios.')} onRetry={retry} />}

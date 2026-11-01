@@ -1,5 +1,5 @@
 import { useTranslation } from '../../hooks/useTranslation'
-import aetherLogo from '../../assets/logos/logo.svg'
+import aetherLogo from '../../assets/logos/icon-light.svg'
 import analistaIcon from '../../assets/icons/analista-icon.svg'
 import adminIcon from '../../assets/icons/admin-icon.svg'
 import * as S from './styles'
@@ -38,7 +38,7 @@ function LoginPage() {
 
         <S.Presentation aria-labelledby="presentation-title">
             <S.Logo
-                src={aetherLogo}
+                src={aetherLogo} width={610} height={440}
                 alt="Aether"
             />
   
@@ -130,11 +130,10 @@ function LoginPage() {
                 {errors.password && <p id="password-error" role="alert">{t(errors.password)}</p>}
               </S.Field>
   
-              {error && <p role="alert">{t(error)}</p>}
-              {loading && <p role="status">{t("Autenticando…")}</p>}
               <S.SubmitButton type="submit" disabled={loading}>
                 {loading ? t("Entrando…") : t("Entrar")}
               </S.SubmitButton>
+              {!loading && error && <p role="alert">{t(error)}</p>}
             </S.Form>
           </S.AuthenticationContent>
         </S.Authentication>

@@ -1,6 +1,6 @@
 import type { CostReductionForecast } from '../../types/calculator'
 import { useTranslation } from '../../hooks/useTranslation'
-import logo from '../../assets/logos/logo.svg'
+import logo from '../../assets/logos/icon-light.svg'
 import * as S from './styles'
 
 interface CalculatorReportProps {

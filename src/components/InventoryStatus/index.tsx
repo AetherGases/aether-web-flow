@@ -6,7 +6,7 @@ const colors: Record<Status, string> = {
   APPROVED: 'var(--color-success)', ISSUED: 'var(--color-success)',
   REJECTED: 'var(--color-danger)', PROCESSING_FAILED: 'var(--color-danger)',
   UNDER_REVIEW: 'var(--color-warning)', PROCESSING: 'var(--color-brand-blue)',
-  REQUESTED: 'var(--color-text-secondary)',
+  REQUESTED: 'var(--color-text-secondary)', INSUFFICIENT_DATA: 'var(--color-warning)',
 }
 interface InventoryStatusProps { status: Status }
 interface LabelProps { $status: Status }

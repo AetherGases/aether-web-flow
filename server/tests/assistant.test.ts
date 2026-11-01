@@ -23,7 +23,7 @@ async function harness(t: TestContext) {
   const sendStarted = new Promise<void>((resolve) => { started = resolve })
   const state = {
     status: 200, listStatus: 200, malformed: false, malformedHistory: false, wrongReply: false, hold: false, delay: false,
-    hasPermission: true, missingCompany: false, identityMismatch: false, profileCalls: 0, role: 'analyst',
+    hasPermission: true, missingCompany: false, identityMismatch: false, profileCalls: 0, emptyTitle: false, role: 'analyst',
     aiPaths: [] as string[], bodies: [] as { input: string; id_external_user: number; id_external_company: number; id_session?: string }[],
   }
   const upstream = createServer(async (request, response) => {
@@ -39,7 +39,7 @@ async function harness(t: TestContext) {
     assert(request.headers['x-request-id'])
     if (aiPath === '/ai/sessions/user/1') {
       response.statusCode = state.listStatus
-      return response.end(JSON.stringify(state.listStatus === 200 ? state.malformed ? {} : [{ id, name: 'Conversa', internal: 'private-stack' }] : { detail: 'private-stack' }))
+      return response.end(JSON.stringify(state.listStatus === 200 ? state.malformed ? {} : [{ id, name: state.emptyTitle ? '' : 'Conversa', internal: 'private-stack' }] : { detail: 'private-stack' }))
     }
     if (aiPath === `/ai/session/${id}/messages`) return response.end(JSON.stringify(state.malformedHistory ? {} : [{ ...historyTurn, internal: 'private-stack' }]))
     if (aiPath === '/ai/user/session/message') {
@@ -54,7 +54,7 @@ async function harness(t: TestContext) {
       response.statusCode = state.status
       return response.end(JSON.stringify(state.status === 200 ? {
         input_message: state.wrongReply ? 'Outra mensagem' : body.input, output_message: 'Resposta real do serviço simulado',
-        submitted_at: '2026-10-25T12:00:00Z', id_session: body.id_session ?? id, session_name: 'Conversa', internal: 'private-stack',
+        submitted_at: '2026-10-25T12:00:00Z', id_session: body.id_session ?? id, session_name: state.emptyTitle ? '' : 'Conversa', internal: 'private-stack',
       } : { detail: 'private-stack-secret' }))
     }
     response.statusCode = 404
@@ -234,4 +234,19 @@ test('prefixo da IA rejeita URLs externas, query e segmentos relativos', () => {
   for (const prefix of ['//other.example', '/../other', '/hub?key=x', 'https://other.example', '/hub/']) {
     assert.throws(() => readConfig({ ...env, MS_AI_PATH_PREFIX: prefix }))
   }
+})
+
+test('admin com conversa legada sem título pode carregar histórico e enviar mantendo propriedade e permissões', async t => {
+  const h = await harness(t)
+  h.state.role = 'administrator'; h.state.emptyTitle = true
+  const cookie = await h.login()
+  const list = await h.get(cookie, 'conversations')
+  assert.equal(list.status, 200)
+  assert.deepEqual(await list.json(), [{ id, name: 'Conversa sem título' }])
+  assert.equal((await h.get(cookie, 'conversations/' + id + '/messages')).status, 200)
+  const reply = await h.send(cookie, { text: 'Olá', conversationId: id })
+  assert.equal(reply.status, 200)
+  assert.equal((await reply.json()).conversation.name, 'Conversa sem título')
+  h.state.hasPermission = false
+  assert.equal((await h.get(cookie, 'conversations')).status, 403)
 })

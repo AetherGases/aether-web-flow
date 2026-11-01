@@ -4,7 +4,7 @@ import type { Config } from '../config/index.ts'
 import { ApiError } from '../middleware/errors.ts'
 import { createHttpClient } from './http.ts'
 
-const status = z.enum(['UNDER_REVIEW', 'APPROVED', 'REJECTED', 'PROCESSING', 'PROCESSING_FAILED', 'REQUESTED', 'ISSUED'])
+const status = z.enum(['UNDER_REVIEW', 'APPROVED', 'REJECTED', 'PROCESSING', 'PROCESSING_FAILED', 'INSUFFICIENT_DATA', 'REQUESTED', 'ISSUED'])
 const inventory = z.object({
   id: z.number().int().positive(), name: z.string().min(1),
   createdAt: z.iso.datetime({ local: true, offset: true }),
