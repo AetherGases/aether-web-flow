@@ -82,7 +82,7 @@ Os testes usam respostas simuladas e não provam disponibilidade em produção. 
 
 ## Publicação
 
-O Dockerfile constrói o front e serve os arquivos com Nginx. O BFF é um processo separado e precisa de deploy próprio, HTTPS, Redis e encaminhamento de `/api/v1` no gateway. O proxy de desenvolvimento do Vite não existe na hospedagem estática.
+O Dockerfile constrói o front e serve os arquivos com Nginx. O BFF é um processo separado: `server/Dockerfile` gera a imagem `aether-web-bff`, publicada pelo mesmo workflow de deploy, e o Kong encaminha `/api/v1` para ela. A configuração (`SESSION_SECRET`, `FRONTEND_ORIGIN`, `MS_*_URL`) vem do `.env` do aether-infra; o Redis usa o `REDIS_URI` compartilhado. O proxy de desenvolvimento do Vite não existe na hospedagem estática.
 
 Há CI e workflow de deploy para EKS. O PDF de DAD cita Vercel/GitHub Pages: a aceitação da infraestrutura EKS deve ser confirmada com o professor, ou deve ser preparada uma publicação do front na plataforma exigida com acesso a um BFF hospedado separadamente. Este documento não declara essa validação como concluída.
 
