@@ -1,10 +1,9 @@
-import { useState, useRef, type FormEvent } from 'react'
+import { useRef, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from '../../hooks/useTranslation'
 import { useAuth } from '../../hooks/useAuth'
 import { isAnalysisScope } from '../../utils/analysis'
-import { validateReportFile } from '../../utils/reports'
-import { uploadReport, registerReport } from '../../services/reports'
+import { useReportUpload } from '../../hooks/useReportUpload'
 import Sidebar from '../../components/Sidebar'
 import ErrorPage from '../error'
 import uploadFileIcon from '../../assets/icons/data-upload/upload-file.svg'
@@ -17,35 +16,14 @@ export default function DataUploadPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const input = useRef<HTMLInputElement>(null)
-  const busy = useRef(false)
-  const [file, setFile] = useState<File | null>(null)
-  const [name, setName] = useState('')
-  const [approach, setApproach] = useState('')
-  const [phase, setPhase] = useState<'idle' | 'uploading' | 'registering' | 'uncertain'>('idle')
-  const [error, setError] = useState('')
+  const { form: { file, name, approach }, phase, error, sending, setName, setApproach, selectFile, submit: submitReport } = useReportUpload()
   if (!user) return null
   const scope = routeScope ?? params.get('scope')
   if (scope != null && !isAnalysisScope(scope)) return <ErrorPage />
-  const sending = phase === 'uploading' || phase === 'registering'
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (busy.current || phase === 'uncertain' || !file) return
-    const validation = validateReportFile(file)
-    if (validation) { setError(validation); return }
-    busy.current = true
-    setError('')
-    setPhase('uploading')
-    let registering = false
-    try {
-      const path = await uploadReport(file)
-      registering = true
-      setPhase('registering')
-      const report = await registerReport({ name: name.trim(), consolidationApproach: approach, fileName: file.name, path })
-      navigate('/data-analysis?id=' + report.id)
-    } catch (error) {
-      setError(registering ? 'Não foi possível confirmar o registro. Confira seus relatórios antes de fazer um novo envio.' : (error as Error).message)
-      setPhase(registering ? 'uncertain' : 'idle')
-    } finally { busy.current = false }
+    const id = await submitReport()
+    if (id !== null) navigate('/data-analysis?id=' + id)
   }
   return <S.Page>
     <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
@@ -69,10 +47,7 @@ export default function DataUploadPage() {
           <S.FileInput id="analysis-report" ref={input} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" tabIndex={-1} onChange={event => {
             const selected = event.target.files?.[0]
             if (!selected) return
-            const error = validateReportFile(selected)
-            setError(error ?? '')
-            setFile(error ? null : selected)
-            if (error) event.target.value = ''
+            if (!selectFile(selected)) event.target.value = ''
           }} />
           <S.SelectFileLink type="button" onClick={() => input.current?.click()}>{t(file ? 'Trocar arquivo' : 'Selecionar arquivo')}</S.SelectFileLink>
           {file && <S.FileName>{file.name}</S.FileName>}

@@ -37,7 +37,7 @@ export const MetricsSection = styled.section`
 
 export const MetricsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   gap: var(--space-4);
   margin-top: var(--space-4);
   @media (max-width: 75rem) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -103,6 +103,8 @@ export const FastAcessLink = styled(Link)`
 `
 
 export const Icon = styled.img`
+  &[data-aeko-icon] { padding: 0.4rem 0.125rem 0; object-position: center; }
+  object-fit: contain;
   html[data-theme='light']:not([data-high-contrast='true']) & {
     background: var(--gradient-brand);
   }
@@ -120,7 +122,7 @@ export const Icon = styled.img`
 
 export const DashboardGrid = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   align-items: stretch;
   gap: var(--space-4);
   margin-top: var(--space-8);
@@ -132,6 +134,7 @@ export const DashboardGrid = styled.div`
 `
 
 export const PerformanceSection = styled.section`
+  overflow-x: auto;
   min-width: 0;
   padding: clamp(var(--space-4), 2vw, var(--space-6));
   background-color: var(--color-surface);

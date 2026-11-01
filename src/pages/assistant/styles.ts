@@ -63,7 +63,19 @@ export const NewConversationButton = styled.button`
   background: transparent;
   border: var(--border-width) solid transparent;
   cursor: pointer;
-  span { color: var(--color-brand-green); font-size: 1.3rem; line-height: 1; }
+  white-space: nowrap;
+  span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-brand-green);
+    font-size: 1.25rem;
+    line-height: 1;
+    transform: translateY(-0.06rem);
+  }
   &:hover:not(:disabled) { color: var(--color-text-primary); background: var(--color-surface); }
 `
 
@@ -130,13 +142,15 @@ export const EmptyConversation = styled.div`
   margin: auto 0;
   padding: var(--space-6) 0;
   text-align: center;
-  h2 { max-width: 28rem; font-size: clamp(1.2rem, 2vw, 1.75rem); font-weight: var(--font-weight-medium); }
+  h2 { margin: 0; max-width: 28rem; font-size: clamp(1.2rem, 2vw, 1.75rem); font-weight: var(--font-weight-medium); }
 `
 
 export const EmptyIcon = styled.img`
-  width: 2.5rem;
-  height: 2.5rem;
-  opacity: 0.85;
+  object-fit: contain;
+  width: 8rem;
+  height: 7rem;
+  flex-shrink: 0;
+  margin: 0 0 calc(-1 * var(--space-5));
 `
 
 export const Suggestions = styled.div`
@@ -189,7 +203,7 @@ export const MessageAvatar = styled.span`
   width: 2rem;
   height: 2rem;
   margin-top: var(--space-3);
-  img { width: 1.4rem; height: 1.4rem; }
+  img { width: 2rem; height: 2rem; object-fit: contain; }
 `
 
 export const ComposerArea = styled.section`

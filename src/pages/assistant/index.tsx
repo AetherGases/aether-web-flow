@@ -3,7 +3,7 @@ import { type FormEvent, useEffect, useRef } from 'react'
 import { useAssistant } from '../../hooks/useAssistant'
 import { useAuth } from '../../hooks/useAuth'
 import { assistantMessageLimit } from '../../utils/assistant'
-import assistantIcon from '../../assets/icons/chatbot/assistant-icon.svg'
+import assistantIcon from '../../assets/icons/aeko.png'
 import sendIcon from '../../assets/icons/chatbot/send-icon.svg'
 import Sidebar from '../../components/Sidebar'
 import SectionState from '../../components/SectionState'
@@ -65,7 +65,7 @@ function AssistantPage() {
       <S.Messages tabIndex={0} role="log" aria-live="polite" aria-relevant="additions" aria-busy={busy} aria-label={t("Conversa com o Assistente Aeko")}>
         {chat.loading && <p role="status">{t("Carregando conversas…")}</p>}
         {isNewConversation && !chat.loading && !chat.error && <S.EmptyConversation>
-          <S.EmptyIcon data-theme-icon src={assistantIcon} alt="" aria-hidden="true" />
+          <S.EmptyIcon src={assistantIcon} alt="" aria-hidden="true" />
           <h2>{t("Como posso ajudar com suas análises hoje?")}</h2>
           <S.Suggestions aria-label={t("Sugestões para você")}>
             {suggestions.map((suggestion) => <button key={suggestion} type="button" disabled={busy}
@@ -73,7 +73,7 @@ function AssistantPage() {
           </S.Suggestions>
         </S.EmptyConversation>}
         {chat.messages.map((message) => <S.Message key={message.id} $author={message.author}>
-          {message.author === 'assistant' && <S.MessageAvatar aria-hidden="true"><img data-theme-icon src={assistantIcon} alt="" /></S.MessageAvatar>}
+          {message.author === 'assistant' && <S.MessageAvatar aria-hidden="true"><img src={assistantIcon} alt="" /></S.MessageAvatar>}
           <p>{message.text}</p>
         </S.Message>)}
         {chat.sending && <p role="status">{t("O assistente está preparando uma resposta…")}</p>}

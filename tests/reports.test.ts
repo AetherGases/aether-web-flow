@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { reportFileLimit, validateReportFile, reportTotals, reportBreakdown, compactEmissionGroups } from '../src/utils/reports.ts'
+import { reportFileLimit, validateReportFile, validateReportForm, reportTotals, reportBreakdown, compactEmissionGroups } from '../src/utils/reports.ts'
 test('upload aceita somente XLSX com conteúdo e até 10 MB', () => {
   assert.equal(validateReportFile({ name: 'relatorio.xlsx', size: reportFileLimit }), null)
   for (const file of [{ name: 'a.xlsx.exe', size: 1 }, { name: 'a.xlsx', size: 0 }, { name: 'a.xlsx', size: reportFileLimit + 1 }]) assert.ok(validateReportFile(file))
@@ -36,4 +36,12 @@ test('gráficos agrupam cauda em Outros sem perder valores ou inventar séries',
   assert.deepEqual(compact.at(-1), { key: 'others', name: 'Outros', value: 6 })
   assert.equal(compact.reduce((sum, item) => sum + item.value, 0), groups.reduce((sum, item) => sum + item.value, 0))
   assert.deepEqual(compactEmissionGroups([]), [])
+})
+
+test('registro valida nome, abordagem e arquivo antes do serviço', () => {
+  const input = { file: { name: 'inventario.xlsx', size: 10 }, name: 'Inventário da unidade', approach: 'Controle operacional' }
+  assert.equal(validateReportForm(input), null)
+  for (const name of ['', 'ab', 'Teste 123', 'a'.repeat(151)]) assert.ok(validateReportForm({ ...input, name }))
+  assert.ok(validateReportForm({ ...input, approach: 'desconhecida' }))
+  assert.ok(validateReportForm({ ...input, file: { name: 'inventario.csv', size: 10 } }))
 })

@@ -1,100 +1,74 @@
-# BFF Aether — autenticação e sessão
+# BFF Aether
 
-Node 24 + TypeScript + Express. O processo do BFF é separado do Vite. O navegador chama somente `/api/v1`; o BFF chama o ms-auth e mantém os tokens em seu store de sessão. O cookie contém apenas um identificador assinado, HttpOnly e SameSite=Lax; em produção também é Secure.
+Servidor Node.js + TypeScript que conecta o portal aos microsserviços. O front chama `/api/v1`; o BFF mantém os tokens no servidor e identifica a sessão pelo cookie HttpOnly.
 
-## Executar localmente
+## Rodar localmente
 
-1. Na raiz: `npm ci`.
-2. Na pasta server: `npm ci` e `Copy-Item .env.example .env`.
-3. Preencha `SESSION_SECRET` com uma chave aleatória de pelo menos 32 caracteres e confirme `MS_AUTH_URL`. A URL local padrão do exemplo é `http://localhost:8080`, conforme API_PORT padrão do serviço.
-4. Inicie o ms-auth com suas dependências/configuração próprias com o contrato de role descrito abaixo disponível no login e no refresh.
-5. Na raiz, terminal 1: `npm run dev:bff`. Terminal 2: `npm run dev`.
-6. Acesse `http://localhost:5173/dashboard/`. Se a origem/porta mudar, ajuste FRONTEND_ORIGIN. O proxy do Vite encaminha `/api` para `127.0.0.1:3001`.
+Na raiz do projeto:
 
-Não colocar tokens, senhas ou secrets em variáveis VITE_*. Arquivos .env são ignorados; o exemplo não contém credenciais reais. Nunca versionar o store de sessão. Redis não deve ficar acessível publicamente.
-
-## Arquivos e fluxo
-
-`routes/auth.ts` associa URLs aos métodos de `controllers/auth.ts`; o controller coordena validação e sessão; `services/auth.ts` valida os contratos externos e usa o cliente HTTP de `services/http.ts`; `types/auth.ts` define o contrato e o formato interno da sessão. `app.ts` monta middleware e rotas; `index.ts` inicia o processo e conecta Redis, quando configurado.
-
-| Endpoint | Entrada | Resultado |
-| --- | --- | --- |
-| GET /api/v1/health | Nenhuma | Liveness do processo; não atesta saúde dos serviços |
-| POST /api/v1/auth/login | JSON email/password; Origin configurada | Cookie de sessão + `{ user: { id, name, email, role } }` |
-| GET /api/v1/auth/me | Cookie | Recupera identidade validada pelo ms-auth; renova token próximo da expiração |
-| POST /api/v1/auth/logout | JSON `{}`; Origin configurada | Destrói sessão e limpa cookie; 204 |
-
-Todas as respostas têm X-Request-Id e Cache-Control: no-store. Erros: `{ error: { code, message, requestId } }`. Configuração, request JSON (8 KB), resposta upstream (64 KB) e tempo de chamada são limitados. Não há retries de login/refresh nem propagação indiscriminada de headers. CORS não está habilitado: a implantação usa origem única para browser e BFF.
-
-O ms-auth precisa retornar no login e refresh:
-
-```json
-{
-  "email": "usuario@example.com",
-  "authenticated": true,
-  "expiration": "2030-01-01T12:00:00Z",
-  "accessToken": "token-do-servico",
-  "refreshToken": "token-do-servico",
-  "role": "analyst"
-}
+```bash
+npm ci --prefix server
 ```
 
-`role` aceita apenas analyst/administrator. Ausência/valor desconhecido bloqueia o login; nenhum fallback usa email ou dados mockados. O endpoint GET /api/profile deve retornar id/name/email coerentes com a identidade autenticada. CPF, tokens e outros campos não são devolvidos pelo contrato de sessão.
+Copie `server/.env.example` para `server/.env` e configure:
 
-A definição de administrator/analyst pertence ao ms-auth e deve acompanhar a regra de permissões aprovada pelo backend. O BFF utiliza apenas a role retornada pelo serviço. A tabela separada administrator não faz parte deste fluxo. O backend calcula o papel e atualiza permissões no refresh. O BFF não decodifica JWT para confiar em claims; usa o endpoint protegido do ms-auth, responsável pela validação.
+| Variável | Uso |
+| --- | --- |
+| `SESSION_SECRET` | Chave aleatória com pelo menos 32 caracteres. |
+| `FRONTEND_ORIGIN` | Origem do front, como `http://localhost:5173`. |
+| `MS_AUTH_URL` | Origem do serviço de autenticação. |
+| `MS_INVENTORY_URL` | Origem do serviço de inventários. |
+| `MS_CLOUDINARY_URL` | Origem do serviço de assinatura de uploads. |
+| `MS_CALCULATOR_URL` | Origem do serviço da calculadora. |
+| `MS_AI_URL` | Origem do hub do Aeko. |
+| `MS_AI_PATH_PREFIX` | `/hub` no gateway ou vazio no acesso direto. |
+| `REDIS_URL` | Armazenamento das sessões; obrigatório em produção. |
 
-## Sessão e limites
+Use apenas a origem nas URLs dos serviços, sem o caminho do endpoint. As opções de porta, tempo de resposta e sessão estão em [.env.example](.env.example).
 
-Sessão possui prazo absoluto de oito horas por padrão, configurável até 24 horas; recuperar a sessão não estende esse prazo. O frontend verifica a sessão na montagem, ao voltar à janela e a cada minuto enquanto visível. Refresh próximo da expiração atualiza o papel. Desativação do funcionário é validada pelo ms-auth nos endpoints protegidos.
+```bash
+npm run dev:bff
+```
 
-Login regenera o ID de sessão. Logout é local ao BFF; o serviço atual não oferece revogação de tokens. A fila por sessão evita refresh simultâneo dentro do processo e coordena logout. Em múltiplas réplicas, avaliar coordenação distribuída se o backend implementar refresh de uso único; o rate limit atual é por processo.
+O BFF usa a porta 3001. Para testar o front com `npm run preview`, altere `FRONTEND_ORIGIN` para `http://localhost:4173` e reinicie o BFF.
 
-Desenvolvimento sem REDIS_URL usa MemoryStore e perde sessões ao reiniciar. Produção exige Redis, HTTPS nas origens e SESSION_SECRET forte; configurar TRUST_PROXY_HOPS somente para a quantidade real de proxies confiáveis. Cookie Secure exige HTTPS e proxy correto. Usar secret manager no deploy. O reverse proxy deve encaminhar `/api` para o BFF; GitHub Pages sozinho não hospeda este processo.
+## Rotas
+
+Todas usam o prefixo `/api/v1`.
+
+| Recurso | Rotas |
+| --- | --- |
+| Saúde do processo | `GET /health` |
+| Autenticação | `POST /auth/login`, `GET /auth/me`, `POST /auth/logout` |
+| Perfil | `GET /profile`, `PATCH /profile` |
+| Visão geral | `GET /overview`, `GET /overview/organization` |
+| Relatórios | `POST /reports/upload-signature`, `POST /reports`, `GET /reports/:id`, `GET /reports/:id/analysis` |
+| Calculadora | `POST /calculator/cost-reduction/forecast` |
+| Assistente | `GET /assistant/conversations`, `GET /assistant/conversations/:conversationId/messages`, `POST /assistant/messages` |
+
+Confira a implementação em [src/routes](src/routes) e [src/controllers](src/controllers). O health verifica o processo, não a disponibilidade dos microsserviços.
+
+O login recebe e-mail e senha. O papel do usuário vem do ms-auth. As rotas protegidas verificam a sessão e as permissões; a visão administrativa usa os relatórios do departamento autorizado.
+
+O upload aceita XLSX de até 10 MB. O BFF obtém a assinatura do Cloudinary e registra a URL do arquivo no Inventory. O relatório pertence à unidade do usuário. O processamento acontece no backend; o web consulta o resultado e o plano de melhoria do Aeko. Aprovação e rejeição são feitas pelo app.
+
+Se o registro ou o envio de uma mensagem tiver resposta incerta, consulte os relatórios ou o histórico antes de repetir a operação. O BFF não repete esses envios automaticamente.
+
+## Produção
+
+A imagem é definida em [Dockerfile](Dockerfile) e publicada pelo workflow do projeto como `aether-web-bff`. O Kong encaminha `/api/v1` para o serviço, preservando o caminho.
+
+Configure `NODE_ENV=production`, `HOST=0.0.0.0`, `PORT=3001`, HTTPS nas origens, `SESSION_SECRET` e Redis. O Dockerfile também aceita `REDIS_URI` como alternativa para preencher `REDIS_URL`. Defina `TRUST_PROXY_HOPS` de acordo com os proxies da infraestrutura para o cookie Secure funcionar.
+
+As configurações privadas ficam no ambiente do servidor. Não coloque tokens ou segredos em variáveis `VITE_*`.
 
 ## Verificação
 
-Na raiz: `npm run build`, `npm run lint`, `npm test`, `npm run typecheck:bff` e `npm run test:bff`. Os testes do BFF utilizam um ms-auth HTTP simulado e nunca credenciais reais. Testes de Redis/HTTPS e E2E com os serviços implantados ainda devem ser feitos no ambiente integrado.
+Na raiz:
 
-A overview integra inventários pessoais reais e o perfil consulta e atualiza dados no ms-auth; a calculadora e o assistente usam seus microsserviços quando configurados; as demais telas continuam com dados demonstrativos até suas integrações. A autenticação já usa API; não existe fallback de autenticação mockado. A seleção do escopo organizacional é restrita a administrator; o upload por planta também está disponível ao analista; endpoints de dados futuros também precisam de autorização no BFF/microsserviços. Guardas React protegem a navegação, não substituem autorização de API.
+```bash
+npm run typecheck:bff
+npm run test:bff
+```
 
-## Overview e inventários
-
-GET /api/v1/overview exige sessão validada e usa MS_INVENTORY_URL no ambiente do BFF. Não configurar esta variável em VITE_*. Ausência retorna seções indisponíveis, sem afetar os endpoints de login. Produção exige HTTPS.
-
-A overview agrega /api/inventories/count, /api/inventories/mine?take=6&skip=0 e /api/inventories/mine/last. Somente o 404 de último inventário vira null. Cada seção retorna ready/data ou error/error. Falha em uma consulta não oculta as demais seções; não há fallback fictício. O endpoint `/overview` tem contagens pessoais; a interface administrativa usa `/overview/organization`, com escopo de departamento. Não há consolidação financeira, ranking entre plantas ou alertas estatísticos nestes contratos.
-### Indicadores por papel
-
-A overview também usa o filtro status de /api/inventories/mine para os totais pessoais do analista (UNDER_REVIEW, APPROVED, PROCESSING_FAILED), via totalCount. A interface administrativa usa `/overview/organization`, que consulta `/api/inventories/reviewed` com filtros de situação e `totalCount`, com escopo departamental explicitado no contrato. O papel vem da sessão validada; parâmetros do browser não escolhem esse escopo. Cada indicador retorna seu próprio estado de sucesso/erro. A interface usa relatórios sem renomear APIs ou tabelas.
-
-## Perfil
-
-`GET /api/v1/profile` consulta `GET /api/profile` do ms-auth usando a sessão existente. Retorna `id`, `fullName` (mapeado de `name`), `email`, `cpf`, `phone`, sem expor a lista de permissões. CPF e telefone nulos são apresentados como não informados. A resposta do ms-auth é validada e campos extras não são expostos.
-
-`PATCH /api/v1/profile` aceita somente `name` e/ou `phone`, exige origem válida e encaminha a atualização para o ms-auth. Nome deve ter de 3 a 150 caracteres, com letras e espaços; telefone deve conter DDD e seguir os formatos aceitos pelo serviço. Campos administrativos, senha, imagem, email e identificador não podem ser enviados por essa rota. A resposta contém os dados pessoais confirmados, sem permissões; a interface atualiza os dados confirmados. Erros 400/422 do serviço de atualização retornam validação 422 sem invalidar a sessão.
-
-O card Organização exibe empresa, localização da unidade e departamento retornados pelo ms-auth; campos ausentes mostram “Não disponível”. Configurações ocupa o card abaixo de Organização, ao lado dos dados pessoais no desktop e empilhado em telas menores. Modo claro, idioma e alto contraste são globais e persistem no navegador com schema versão 3. A tela não utiliza mais o mock de perfil. Após salvar, o nome confirmado é refletido na sidebar; a próxima verificação de sessão também recupera o nome atualizado do ms-auth.
-
-## Calculadora
-
-`POST /api/v1/calculator/cost-reduction/forecast` exige sessão de analista e origem válida. O BFF rejeita administradores com 403 antes de consultar o microsserviço; a permissão `calculator:roi` continua sendo validada no serviço. Encaminha somente `monthlyCost`, `reductionPercentage` e `periodMonths` para `POST /api/calculator/cost-reduction/forecast`, no serviço configurado por `MS_CALCULATOR_URL`. Configure somente a origem (por exemplo, `https://aethergases.org`), sem `/api` ou caminho, no ambiente do BFF. Não use VITE_* e não exponha tokens ao navegador. Produção exige HTTPS. A ausência da configuração retorna 503 sem afetar o login.
-
-O microsserviço deve verificar a permissão **calculator:roi** no token encaminhado; a role da interface não substitui essa autorização. Nenhuma permissão ou dado do banco é alterado por esta integração. Custos aceitam zero e até duas casas decimais, redução inteira de 0 a 50 e períodos de 3, 6, 12 ou 24 meses. Valores monetários devem ser representáveis com centavos seguros em JavaScript. O BFF valida entradas, formato e correspondência da resposta à simulação, sem executar fórmulas financeiras. Campos extras do serviço são descartados.
-
-A tela preserva os cards e gráfico, aguarda 350 ms após alterações e cancela consultas anteriores. Não mostra resultados antigos para novos valores, nem usa cálculos locais ou mock em caso de falha. Exportar PDF fica habilitado somente com resultado atual confirmado. Idioma e alto contraste seguem as preferências globais.
-
-400/422 do serviço tornam-se validação 422; 403 mantém a sessão e informa falta de permissão; 401 informa falha de autenticação; respostas incompatíveis ou falhas do serviço retornam 502; timeout retorna 504. Os testes HTTP utilizam um serviço simulado. A validação real depende da implementação do endpoint e da configuração de calculator:roi no back-end. Esta etapa não salva histórico nem gera PDF no servidor.
-
-## Assistente
-
-Configure `MS_AI_URL` com a origem do ms-aeko-hub, sem caminho. O serviço deve expor `/ai/sessions/user/{id_external_user}`, `/ai/session/{id_session}/messages` e `/ai/user/session/message`, conforme a develop consultada. No gateway do projeto, configure `MS_AI_URL=https://aethergases.org` e `MS_AI_PATH_PREFIX=/hub`, formando `/hub/ai/...`. Para acesso direto ao hub local, mantenha o prefixo vazio (padrão). O prefixo aceita apenas segmentos de caminho simples, sem query, URL externa ou navegação relativa. A configuração do gateway no repositório não confirma que o serviço esteja saudável no ambiente publicado. `AI_TIMEOUT_MS` é separado dos outros serviços, com padrão de 60 segundos. Produção exige HTTPS. Não coloque tokens ou chaves da IA em variáveis VITE_*.
-
-O browser usa GET `/api/v1/assistant/conversations`, GET `/api/v1/assistant/conversations/{conversationId}/messages` e POST `/api/v1/assistant/messages` com `{ text, conversationId? }`. O BFF exige sessão, valida os campos e só encaminha o ID do usuário autenticado. Antes de qualquer operação, confirma a permissão `chatbot` no perfil; administrator não ignora essa verificação. Obtém `enterprise.id` pelo GET `/api/profile` do ms-auth e confirma id/email antes de preencher `id_external_user` e `id_external_company`. Sem empresa válida, não envia nem usa um ID padrão. O navegador não pode escolher usuário ou empresa. Antes de ler/continuar uma conversa, o BFF confirma que ela aparece na lista do usuário; o hub também deve validar token, empresa e propriedade da conversa. Acesso não é liberado apenas pela role administrator.
-
-Datas UTC sem sufixo, utilizadas pelo hub/Mongo, são normalizadas com Z no BFF; datas com offset também são aceitas. As mensagens são limitadas a 8192 caracteres. Somente as rotas do assistente aceitam JSON até 64 KB, mantendo 8 KB nas demais rotas. As respostas da IA têm limite de 512 KB; históricos maiores geram erro em vez de serem truncados silenciosamente. Apenas o 404 de listagem vira uma lista vazia. Erros de guardrail 422 permitem reformular a mensagem, sem resposta fictícia. Tokens e mensagens internas de erro não são devolvidos. Respostas são exibidas como texto React, sem HTML externo ou tradução automática do conteúdo do usuário/modelo.
-
-Não há retry automático de mensagens: timeout pode ocorrer depois de o serviço ter processado e salvo a mensagem. Atualize a lista e selecione a conversa para recuperar o histórico antes de reenviar. O front bloqueia envios simultâneos; o BFF também impede envios concorrentes para a mesma conversa/usuário dentro do processo. Essa proteção não é idempotência distribuída: múltiplas réplicas e clientes exigem suporte do serviço se for necessário garantir envio único.
-
-As conversas são persistidas pelo hub; o web não salva textos ou tokens em localStorage. Trocar de conversa/unmount cancela leituras antigas. A interface mantém idioma e alto contraste, substitui a resposta local de teste e remove os indicadores financeiros demonstrativos do topo, pois esses dados não fazem parte do contrato de chat. A validação integrada depende do serviço ativo e do perfil do ms-auth contendo enterprise.id. Nenhum back-end ou banco é alterado por esta integração.
-
-
-`GET /api/v1/overview/organization` exige sessão de administrador. Consulta `/api/inventories/reviewed` e os filtros `UNDER_REVIEW`, `APPROVED` e `REJECTED`. O escopo é o departamento autorizado pelo ms-inventory, não a empresa inteira; exclui os estados de processamento conforme o backend. Totais usam `totalCount`, não o tamanho da página de até seis relatórios. Falhas são isoladas por seção, sem fallback para mocks.
+Os testes usam serviços simulados. A conferência com os serviços publicados é feita no ambiente integrado.

@@ -1,4 +1,4 @@
-import lightLogo from '../../assets/logos/icon-light.svg'
+import lightLogo from '../../assets/logos/aether-light.svg'
 import { usePreferences } from '../../hooks/usePreferences'
 import { useTranslation } from '../../hooks/useTranslation'
 import aetherLogo from '../../assets/logos/logo-aether.svg'
@@ -7,7 +7,7 @@ import OverviewLogo from '../../assets/icons/overview.svg'
 import AnaliseLogo from '../../assets/icons/analise-dados.svg'
 import GestaoLogo from '../../assets/icons/empresa.svg'
 import CalculadoraLogo from '../../assets/icons/calculator.svg'
-import ChatbotLogo from '../../assets/icons/chatbot.svg'
+import ChatbotLogo from '../../assets/icons/aeko.png'
 import type { UserRole } from '../../types/overview'
 import sair from '../../assets/icons/sair.svg'
 import { useLocation } from 'react-router-dom'
@@ -38,7 +38,7 @@ function Sidebar({
       : t("Analista")
   return (
     <S.Container aria-label={t("Navegação principal")}>
-      <S.Logo width={lightMode && !highContrast ? 610 : 132} height={lightMode && !highContrast ? 440 : 50} src={lightMode && !highContrast ? lightLogo : aetherLogo} alt="Aether" />
+      <S.Logo width={lightMode && !highContrast ? 542 : 132} height={lightMode && !highContrast ? 208 : 50} src={lightMode && !highContrast ? lightLogo : aetherLogo} alt="Aether" />
 
       <S.Navigation aria-label={t("Navegação principal")}>
         <S.NavigationList>
@@ -74,7 +74,7 @@ function Sidebar({
               to="/assistant"
               aria-current={pathname === '/assistant' ? 'page' : undefined}
             >
-              <S.Icon data-theme-icon src={ChatbotLogo} alt="" aria-hidden="true" />
+              <S.Icon data-aeko-icon src={ChatbotLogo} alt="" aria-hidden="true" />
               <S.Label>{t("Assistente Aeko")}</S.Label></S.NavigationLink>
           </li>
 

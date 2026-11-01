@@ -30,7 +30,7 @@ export const Title = styled.h1`
 
 export const ProfileGrid = styled.div`
   display: grid;
-  grid-template-columns: minmax(18rem, 0.9fr) minmax(22rem, 1.2fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: var(--space-6);
 
   @media (max-width: 64rem) {

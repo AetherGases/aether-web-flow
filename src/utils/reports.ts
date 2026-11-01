@@ -5,6 +5,14 @@ export function validateReportFile(file: { name: string; size: number }): string
   if (file.size <= 0 || file.size > reportFileLimit) return 'O arquivo deve ter conteúdo e no máximo 10 MB.'
   return null
 }
+export function validateReportForm(input: { file: { name: string; size: number }; name: string; approach: string }): string | null {
+  const fileError = validateReportFile(input.file)
+  if (fileError) return fileError
+  const name = input.name.trim()
+  if (name.length < 3 || name.length > 150 || !/^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/.test(name)) return 'Use apenas letras e espaços, de 3 a 150 caracteres.'
+  if (!['Participação acionária', 'Controle operacional', 'Controle financeiro'].includes(input.approach)) return 'Selecione a abordagem utilizada no relatório'
+  return null
+}
 export function reportTotals(report: InventoryReport) {
   // Reductions have their own collection; never subtract them from the gross emissions or sum them twice.
   const emissions = report.emissions.filter(item => !item.isReduction)

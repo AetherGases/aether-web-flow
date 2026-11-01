@@ -11,7 +11,7 @@ import SectionState from '../../components/SectionState'
 import * as S from './styles'
 import AnaliseIcon from '../../assets/icons/analise-dados.svg'
 import CalculadoraIcon from '../../assets/icons/calculator.svg'
-import ChatbotIcon from '../../assets/icons/chatbot.svg'
+import ChatbotIcon from '../../assets/icons/aeko.png'
 
 function OverviewPage() {
   const { t, locale } = useTranslation()
@@ -60,7 +60,7 @@ function OverviewPage() {
         <S.FastAcessGrid>
           <S.FastAcessDiv><S.Icon src={AnaliseIcon} alt="" aria-hidden="true" /><S.FastAcessContent><S.FastAcessLink to={analysisPath}>{t("Análise de dados")}</S.FastAcessLink><p>{t("Explore os dados dos seus relatórios")}</p></S.FastAcessContent></S.FastAcessDiv>
           <S.FastAcessDiv><S.Icon src={CalculadoraIcon} alt="" aria-hidden="true" /><S.FastAcessContent><S.FastAcessLink to="/calculator">{t("Calculadora")}</S.FastAcessLink><p>{t("Teste novos cenários")}</p></S.FastAcessContent></S.FastAcessDiv>
-          <S.FastAcessDiv><S.Icon src={ChatbotIcon} alt="" aria-hidden="true" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t("Assistente Aeko")}</S.FastAcessLink><p>{t("Converse com o Aeko")}</p></S.FastAcessContent></S.FastAcessDiv>
+          <S.FastAcessDiv><S.Icon data-aeko-icon src={ChatbotIcon} alt="" aria-hidden="true" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t("Assistente Aeko")}</S.FastAcessLink><p>{t("Converse com o Aeko")}</p></S.FastAcessContent></S.FastAcessDiv>
         </S.FastAcessGrid>
       </S.FastAcessSection>
       <S.DashboardGrid>
