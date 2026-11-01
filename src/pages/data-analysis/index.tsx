@@ -35,14 +35,14 @@ export default function DataAnalysisPage() {
     window.print()
   }
   if (!user) return null
-  if (!raw) return <Navigate to={user.role === 'administrator' ? '/data-analysis/select' : '/data-analysis/upload/plant'} replace />
+  if (!raw) return <Navigate to="/data-analysis/select" replace />
   const date = (value?: string | null) => value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? dateFormat.format(new Date(value + 'T00:00:00Z')) : t('Não informado')
   const finished = report && !['PROCESSING', 'PROCESSING_FAILED', 'INSUFFICIENT_DATA'].includes(report.status)
   return <S.Page>
     <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
     <S.Content id="main-content">
       <S.Header><div><S.Eyebrow>{t('Análise de dados')}</S.Eyebrow><S.Title>{t('Análise do relatório')}</S.Title>{report && <p>{report.name} · #{report.id}</p>}</div>{report && <S.Period><span>{t('Período do inventário')}</span><strong>{date(report.inventoryPeriodStart)} — {date(report.inventoryPeriodEnd)}</strong></S.Period>}</S.Header>
-      <S.Actions><Link to={user.role === 'administrator' ? '/data-analysis/select' : '/data-analysis/upload/plant'}>← {t('Novo relatório')}</Link><button type="button" onClick={retry}>{t('Atualizar análise')}</button>{report && <InventoryStatus status={report.status} />}</S.Actions>
+      <S.Actions><Link to="/data-analysis/select">← {t('Novo relatório')}</Link><button type="button" onClick={retry}>{t('Atualizar análise')}</button>{report && <InventoryStatus status={report.status} />}</S.Actions>
       {!id ? <p role="alert">{t('Selecione um relatório válido.')}</p> : loading ? <p role="status">{t('Carregando relatório…')}</p> : error ? <p role="alert">{t(error)}</p> : null}
       {report && <>
         {report.status === 'PROCESSING' && <S.Card role="status"><h2>{t('Análise em processamento')}</h2><p>{t(paused ? 'O processamento continua no servidor. Atualize a consulta para acompanhar.' : 'O relatório foi registrado. Aguarde enquanto o serviço processa o Excel; esta página será atualizada automaticamente.')}</p></S.Card>}

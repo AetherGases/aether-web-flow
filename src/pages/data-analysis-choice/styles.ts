@@ -33,7 +33,7 @@ export const Title = styled.h1`
 
 export const Options = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, minmax(15rem, 27rem));
+  grid-template-columns: minmax(0, 27rem);
   gap: var(--space-16);
   margin-top: var(--space-12);
 

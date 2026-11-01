@@ -20,7 +20,7 @@ npm ci --prefix server
 Copy-Item server/.env.example server/.env
 ```
 
-Preencha `server/.env` conforme a documentação do BFF. Os segredos e as origens dos microsserviços ficam no servidor, nunca em variáveis `VITE_*`. O arquivo `.env.example` da raiz documenta somente o endereço público opcional do CRUD (`VITE_ADMIN_URL`). Não substitua arquivos `.env` existentes sem preservar sua configuração.
+Preencha `server/.env` conforme a documentação do BFF. Os segredos e as origens dos microsserviços ficam no servidor, nunca em variáveis `VITE_*`. O arquivo `.env.example` da raiz documenta somente o endereço público do CRUD (`VITE_ADMIN_URL`, padrão `https://aethergases.org/login`). Não substitua arquivos `.env` existentes sem preservar sua configuração.
 
 Em dois terminais:
 
@@ -46,9 +46,9 @@ Acesse `http://localhost:5173/dashboard/`. O Vite encaminha `/api` para o BFF na
 
 ## Fluxos e rotas
 
-Analistas acessam overview pessoal, seleção de relatório, calculadora, assistente e perfil. Administradores acessam overview departamental, seleção do escopo de análise, gestão administrativa, assistente e perfil. As rotas privadas exigem sessão e as páginas exclusivas verificam o papel via `PrivateRoute`; as APIs também precisam de autorização no servidor.
+Analistas acessam overview pessoal, escolha de planta e seleção de relatório, calculadora, assistente e perfil. Administradores acessam overview departamental, escolha de planta para análise, gestão administrativa, assistente e perfil. As rotas privadas exigem sessão e as páginas exclusivas verificam o papel via `PrivateRoute`; as APIs também precisam de autorização no servidor.
 
-O envio tem rotas `/data-analysis/upload/plant` e `/data-analysis/upload/company`. A página lê `scope` com `useParams`, verifica sua presença e seu valor e restringe `company` a administradores. A rota antiga `/data-analysis/upload` e os links com query string continuam aceitos. Parâmetros inválidos mostram a página de erro.
+O envio por unidade usa `/data-analysis/upload/plant`. A página lê `scope` com `useParams` e aceita apenas `plant`. A rota antiga `/data-analysis/upload` e a query `scope=plant` continuam aceitas. O escopo `company` e outros valores inválidos mostram a página de erro.
 
 ## Preferências visuais e idioma
 
@@ -66,7 +66,7 @@ Versões anteriores são migradas sem apagar idioma/contraste. Dados incompatív
 
 Login, perfil, organização, overview, calculadora e chatbot consultam seus serviços através do BFF. Falhas exibem indisponibilidade/erro, sem resultados fictícios de fallback. Os indicadores do analista são pessoais; os do admin têm o escopo de departamento fornecido pelo inventory.
 
-O envio de XLSX é integrado ao BFF, ao upload assinado do Cloudinary e ao processamento do inventory. A tela consulta emissões, reduções e plano de melhoria reais e possui documento próprio para impressão/PDF. Empresa completa aguarda suporte de consolidação no back-end. Consulte [configuração e validação da integração](docs/integracao-relatorios.md). O PDF da calculadora possui apresentação própria para impressão. O acesso ao CRUD fica desabilitado enquanto `VITE_ADMIN_URL` não estiver configurada com um endereço funcional.
+O envio de XLSX é integrado ao BFF, ao upload assinado do Cloudinary e ao processamento do inventory. A tela consulta emissões, reduções e plano de melhoria reais e possui documento próprio para impressão/PDF. Cada relatório é vinculado à unidade do usuário; não há envio para a empresa inteira. Consulte [configuração e validação da integração](docs/integracao-relatorios.md). O PDF da calculadora possui apresentação própria para impressão. O acesso ao CRUD direciona para `https://aethergases.org/login`, podendo ser alterado por `VITE_ADMIN_URL`. A sessão do portal não é transferida automaticamente ao CRUD.
 
 ## Verificação
 

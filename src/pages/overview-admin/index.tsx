@@ -48,7 +48,7 @@ export default function AdministratorOverviewPage() {
       <S.FastAcessSection aria-labelledby="admin-access-title">
         <p id="admin-access-title">{t('Acesso rápido')}</p>
         <S.FastAcessGrid>
-          <S.FastAcessDiv><S.Icon src={AnalysisIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/data-analysis/select">{t('Análises da organização')}</S.FastAcessLink><p>{t('Plantas individuais e empresa completa')}</p></S.FastAcessContent></S.FastAcessDiv>
+          <S.FastAcessDiv><S.Icon src={AnalysisIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/data-analysis/select">{t('Análises da organização')}</S.FastAcessLink><p>{t('Analise uma unidade por vez')}</p></S.FastAcessContent></S.FastAcessDiv>
           <S.FastAcessDiv><S.Icon src={ManagementIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/administration">{t('Gestão administrativa')}</S.FastAcessLink><p>{t('Funcionários, unidades, setores e permissões')}</p></S.FastAcessContent></S.FastAcessDiv>
           <S.FastAcessDiv><S.Icon src={AssistantIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t('Assistente Aeko')}</S.FastAcessLink><p>{t('Converse com o Aeko')}</p></S.FastAcessContent></S.FastAcessDiv>
         </S.FastAcessGrid>

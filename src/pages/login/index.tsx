@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from '../../hooks/useTranslation'
 import aetherLogo from '../../assets/logos/icon-light.svg'
 import analistaIcon from '../../assets/icons/analista-icon.svg'
@@ -7,6 +8,7 @@ import { useLogin } from '../../hooks/useLogin'
 
 function LoginPage() {
   const { t } = useTranslation()
+  const [showPassword, setShowPassword] = useState(false)
   const { form, setForm, loading, errors, error, handleSubmit } = useLogin()
     return (
       <S.Page id="main-content">
@@ -113,10 +115,11 @@ function LoginPage() {
               <S.Field>
                 <S.Label htmlFor="password">{t("Senha")}</S.Label>
   
+                <S.PasswordField>
                 <S.Input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   placeholder='********'
                   required
@@ -127,6 +130,14 @@ function LoginPage() {
                   aria-describedby={errors.password ? 'password-error' : undefined}
                   onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
                 />
+                <S.PasswordToggle type="button" disabled={loading} aria-label={t(showPassword ? 'Ocultar senha' : 'Mostrar senha')} aria-controls="password" onClick={() => setShowPassword(current => !current)}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                    <circle cx="12" cy="12" r="3" />
+                    {showPassword && <path d="m3 3 18 18" />}
+                  </svg>
+                </S.PasswordToggle>
+                </S.PasswordField>
                 {errors.password && <p id="password-error" role="alert">{t(errors.password)}</p>}
               </S.Field>
   

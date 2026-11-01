@@ -2,7 +2,7 @@
 
 O web envia um Excel XLSX (até 10 MB), solicita a assinatura ao BFF e faz o upload assinado para o Cloudinary. Nenhum token de sessão nem chave interna é enviado ao navegador. A API key pública e a assinatura temporária fazem parte do contrato do upload assinado.
 
-O BFF registra nome, abordagem de consolidação, nome do arquivo e URL em POST /api/inventories. O nome respeita a regra atual do backend: somente letras e espaços, de 3 a 150 caracteres. O relatório é vinculado à unidade do usuário, tanto analista quanto administrador; não há escolha arbitrária de unidade. Empresa completa permanece indisponível.
+O BFF registra nome, abordagem de consolidação, nome do arquivo e URL em POST /api/inventories. O nome respeita a regra atual do backend: somente letras e espaços, de 3 a 150 caracteres. O relatório é vinculado à unidade do usuário, tanto analista quanto administrador; não há escolha arbitrária de unidade. A análise é somente por unidade; não há opção de relatório da empresa inteira.
 
 O worker do inventory processa o Excel e persiste as emissões e reduções. O web consulta o relatório a cada 5 segundos durante até 10 minutos, enquanto estiver PROCESSING. Depois disso, a consulta pode ser atualizada manualmente. Nenhuma atualização reenvia o Excel ou registra outro relatório. PROCESSING_FAILED e INSUFFICIENT_DATA têm mensagens próprias.
 

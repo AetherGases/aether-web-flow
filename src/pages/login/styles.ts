@@ -172,3 +172,28 @@ export const SubmitButton = styled.button`
 
   min-height: 2.75rem;
 `
+
+export const PasswordField = styled.div`
+  position: relative;
+  width: 100%;
+  input { padding-right: 3.25rem; }
+  input::-ms-reveal { display: none; }
+`
+
+export const PasswordToggle = styled.button`
+  position: absolute;
+  top: 50%;
+  right: 0.125rem;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  &:disabled { cursor: default; opacity: 0.5; }
+`

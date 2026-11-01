@@ -2,7 +2,7 @@ import { useState, useRef, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from '../../hooks/useTranslation'
 import { useAuth } from '../../hooks/useAuth'
-import { getAnalysisScope, isAnalysisScope } from '../../utils/analysis'
+import { isAnalysisScope } from '../../utils/analysis'
 import { validateReportFile } from '../../utils/reports'
 import { uploadReport, registerReport } from '../../services/reports'
 import Sidebar from '../../components/Sidebar'
@@ -24,12 +24,12 @@ export default function DataUploadPage() {
   const [phase, setPhase] = useState<'idle' | 'uploading' | 'registering' | 'uncertain'>('idle')
   const [error, setError] = useState('')
   if (!user) return null
-  if (routeScope !== undefined && (!isAnalysisScope(routeScope) || (routeScope === 'company' && user.role !== 'administrator'))) return <ErrorPage />
-  const scope = getAnalysisScope(user.role, routeScope ?? params.get('scope'))
+  const scope = routeScope ?? params.get('scope')
+  if (scope != null && !isAnalysisScope(scope)) return <ErrorPage />
   const sending = phase === 'uploading' || phase === 'registering'
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (busy.current || phase === 'uncertain' || !file || scope === 'company') return
+    if (busy.current || phase === 'uncertain' || !file) return
     const validation = validateReportFile(file)
     if (validation) { setError(validation); return }
     busy.current = true
@@ -50,10 +50,10 @@ export default function DataUploadPage() {
   return <S.Page>
     <Sidebar userName={user.name} userRole={user.role} onLogout={() => { void logout() }} />
     <S.Content id="main-content">
-      {user.role === 'administrator' && <S.BackLink as={Link} to="/data-analysis/select">← {t('Voltar à escolha de análise')}</S.BackLink>}
+      <S.BackLink as={Link} to="/data-analysis/select">← {t('Voltar à escolha de análise')}</S.BackLink>
       <S.Eyebrow>{t('Análise de dados')}</S.Eyebrow>
-      <S.Title>{t(scope === 'company' ? 'Análise - Empresa completa' : 'Análise - Plantas individuais')}</S.Title>
-      {scope === 'company' ? <S.UploadPanel><p>{t('A análise da empresa completa está pendente de suporte no back-end.')}</p></S.UploadPanel> : <S.UploadPanel as="form" onSubmit={submit} aria-busy={sending}>
+      <S.Title>{t('Análise - Plantas individuais')}</S.Title>
+      <S.UploadPanel as="form" onSubmit={submit} aria-busy={sending}>
         <S.UploadIcon aria-hidden="true"><img data-theme-icon src={uploadFileIcon} alt="" /></S.UploadIcon>
         <S.UploadText><strong>{t('Carregue seus dados')}</strong><span>{t('Excel (.xlsx), até 10 MB. O relatório será vinculado à sua unidade.')}</span></S.UploadText>
         <S.Fields disabled={sending || phase === 'uncertain'}>
@@ -81,7 +81,7 @@ export default function DataUploadPage() {
         <p role="status">{sending ? t('Aguarde a confirmação antes de sair desta página.') : ''}</p>
         {error && <S.ErrorMessage role="alert">{t(error)}</S.ErrorMessage>}
         {phase === 'uncertain' && <Link to="/overview">{t('Consultar meus relatórios')}</Link>}
-      </S.UploadPanel>}
+      </S.UploadPanel>
     </S.Content>
   </S.Page>
 }
