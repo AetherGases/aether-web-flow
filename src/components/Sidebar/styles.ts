@@ -81,7 +81,7 @@ export const NavigationLink = styled(Link)`
     outline-offset: 2px;
   }
 
-  html:not([data-high-contrast='true']) &[aria-current='page'] img { filter: brightness(0) opacity(0.85); }
+  html:not([data-high-contrast='true']) &[aria-current='page'] img:not([data-aeko-icon]) { filter: brightness(0) opacity(0.85); }
 
   &[aria-current='page'] {
     color: var(--color-on-brand);
@@ -90,9 +90,11 @@ export const NavigationLink = styled(Link)`
 `
 
 export const Icon = styled.img`
+  object-fit: contain;
   flex-shrink: 0;
   width: 1.3rem;
   height: 1.3rem;
+  &[data-aeko-icon] { width: 1.8rem; height: 1.8rem; margin: -0.25rem; }
 `
 
 export const UserFooter = styled.footer`

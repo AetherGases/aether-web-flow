@@ -10,7 +10,7 @@ import MetricCard from '../../components/MetricCard'
 import SectionState from '../../components/SectionState'
 import AnalysisIcon from '../../assets/icons/analise-dados.svg'
 import ManagementIcon from '../../assets/icons/empresa.svg'
-import AssistantIcon from '../../assets/icons/chatbot.svg'
+import AssistantIcon from '../../assets/icons/aeko.png'
 import * as S from './styles'
 
 export default function AdministratorOverviewPage() {
@@ -50,7 +50,7 @@ export default function AdministratorOverviewPage() {
         <S.FastAcessGrid>
           <S.FastAcessDiv><S.Icon src={AnalysisIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/data-analysis/select">{t('Análises da organização')}</S.FastAcessLink><p>{t('Analise uma unidade por vez')}</p></S.FastAcessContent></S.FastAcessDiv>
           <S.FastAcessDiv><S.Icon src={ManagementIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/administration">{t('Gestão administrativa')}</S.FastAcessLink><p>{t('Funcionários, unidades, setores e permissões')}</p></S.FastAcessContent></S.FastAcessDiv>
-          <S.FastAcessDiv><S.Icon src={AssistantIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t('Assistente Aeko')}</S.FastAcessLink><p>{t('Converse com o Aeko')}</p></S.FastAcessContent></S.FastAcessDiv>
+          <S.FastAcessDiv><S.Icon data-aeko-icon src={AssistantIcon} alt="" /><S.FastAcessContent><S.FastAcessLink to="/assistant">{t('Assistente Aeko')}</S.FastAcessLink><p>{t('Converse com o Aeko')}</p></S.FastAcessContent></S.FastAcessDiv>
         </S.FastAcessGrid>
       </S.FastAcessSection>
       <S.History aria-labelledby="admin-reports-title">
