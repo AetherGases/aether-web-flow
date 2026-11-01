@@ -103,6 +103,8 @@ export const FastAcessLink = styled(Link)`
 `
 
 export const Icon = styled.img`
+  &[data-aeko-icon] { padding: 0.4rem 0.125rem 0; object-position: center; }
+  object-fit: contain;
   html[data-theme='light']:not([data-high-contrast='true']) & {
     background: var(--gradient-brand);
   }
