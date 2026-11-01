@@ -2,7 +2,7 @@ import styled, { createGlobalStyle } from 'styled-components'
 import type { InventoryReport, ReportAnalysis } from '../../types/report'
 import { reportTotals } from '../../utils/reports'
 import { useTranslation } from '../../hooks/useTranslation'
-import logo from '../../assets/logos/logo-aether-light.png'
+import logo from '../../assets/logos/icon-light.svg'
 
 const PrintStyles = createGlobalStyle`
   @media print {
@@ -20,7 +20,7 @@ const Document = styled.article`
     text-align: left; overflow-wrap: anywhere;
     * { color: inherit !important; background: transparent !important; }
     header { display: flex; justify-content: space-between; align-items: center; gap: 10mm; border-bottom: 2pt solid #087b53; padding-bottom: 4mm; margin-bottom: 6mm; }
-    header img { width: 36mm; height: auto; }
+    header img { width: 18mm; height: auto; }
     h1, h2, h3 { letter-spacing: normal; }
     h1 { font: bold 22pt/1.2 Arial, sans-serif; margin: 0 0 3mm; }
     h2 { font: bold 13pt/1.3 Arial, sans-serif; margin: 6mm 0 2mm; break-after: avoid; }

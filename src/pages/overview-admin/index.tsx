@@ -35,7 +35,7 @@ export default function AdministratorOverviewPage() {
     <S.Content id="main-content">
       <S.Header>
         <p data-page-eyebrow>{t('Visão geral')}</p>
-        <h1>{t('Olá,')} {user.name}</h1>
+        <h1>{t('Olá,')} {user.name}👋🏻</h1>
         <p>{t('Acompanhe os relatórios do seu departamento e acesse os recursos administrativos.')}</p>
       </S.Header>
       <S.MetricsSection aria-label={t('Indicadores')}>

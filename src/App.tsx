@@ -9,7 +9,12 @@ import { getHomePath } from './utils/auth'
 
 const LoginPage = lazy(() => import('./pages/login'))
 const OverviewPage = lazy(() => import('./pages/overview'))
-const DataAnalysisPage = lazy(() => import('./pages/data-analysis'))
+const loadDataAnalysis = () => import('./pages/data-analysis')
+const DataAnalysisPage = lazy(loadDataAnalysis)
+// Fetch public page code while the session is recovered; API access stays protected.
+if (window.location.pathname.replace(/\/$/, '') === '/dashboard/data-analysis') {
+  void loadDataAnalysis().catch(() => { /* PageBoundary handles a failed navigation load. */ })
+}
 const AdministratorOverviewPage = lazy(() => import('./pages/overview-admin'))
 const AdministrationPage = lazy(() => import('./pages/administration'))
 const DataUploadPage = lazy(() => import('./pages/data-upload'))

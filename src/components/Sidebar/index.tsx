@@ -1,4 +1,4 @@
-import lightLogo from '../../assets/logos/logo-aether-light.png'
+import lightLogo from '../../assets/logos/icon-light.svg'
 import { usePreferences } from '../../hooks/usePreferences'
 import { useTranslation } from '../../hooks/useTranslation'
 import aetherLogo from '../../assets/logos/logo-aether.svg'
@@ -38,7 +38,7 @@ function Sidebar({
       : t("Analista")
   return (
     <S.Container aria-label={t("Navegação principal")}>
-      <S.Logo src={lightMode && !highContrast ? lightLogo : aetherLogo} alt="Aether" />
+      <S.Logo width={lightMode && !highContrast ? 610 : 132} height={lightMode && !highContrast ? 440 : 50} src={lightMode && !highContrast ? lightLogo : aetherLogo} alt="Aether" />
 
       <S.Navigation aria-label={t("Navegação principal")}>
         <S.NavigationList>

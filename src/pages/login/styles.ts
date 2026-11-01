@@ -46,9 +46,9 @@ export const Presentation = styled.section`
 export const Logo = styled.img`
   position: relative;
   z-index: 1;
-  width: min(100%, 24rem);
+  width: min(100%, 12rem);
   height: auto;
-  @media (min-width: 64.01rem) { margin-bottom: -6rem; }
+  @media (min-width: 64.01rem) { margin-bottom: var(--space-6); }
   @media (max-width: 64rem) { width: 8rem; }
 `
 

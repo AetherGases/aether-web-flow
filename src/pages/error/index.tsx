@@ -1,3 +1,4 @@
+import './fonts.css'
 import { useTranslation } from '../../hooks/useTranslation'
 import errorAether from '../../assets/logos/error-aether.svg'
 import * as S from './styles'

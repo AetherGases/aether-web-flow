@@ -1,5 +1,6 @@
 import AnalysisMetricIcon from '../../components/AnalysisMetricIcon'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { flushSync } from 'react-dom'
 import AnalysisReport from '../../components/AnalysisReport'
 import { EmissionBars, EmissionDonut } from '../../components/EmissionCharts'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
@@ -21,6 +22,18 @@ export default function DataAnalysisPage() {
   const data = useMemo(() => report ? { totals: reportTotals(report), breakdown: reportBreakdown(report) } : null, [report])
   const number = useMemo(() => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }), [locale])
   const dateFormat = useMemo(() => new Intl.DateTimeFormat(locale, { timeZone: 'UTC' }), [locale])
+  const [printPrepared, setPrintPrepared] = useState(false)
+  useEffect(() => {
+    // Native Ctrl+P also prepares the document synchronously.
+    const prepare = () => flushSync(() => setPrintPrepared(true))
+    window.addEventListener('beforeprint', prepare)
+    return () => window.removeEventListener('beforeprint', prepare)
+  }, [])
+  async function exportPdf() {
+    flushSync(() => setPrintPrepared(true))
+    await Promise.all(Array.from(document.querySelectorAll<HTMLImageElement>('[data-analysis-report] img')).map(image => image.decode().catch(() => undefined)))
+    window.print()
+  }
   if (!user) return null
   if (!raw) return <Navigate to={user.role === 'administrator' ? '/data-analysis/select' : '/data-analysis/upload/plant'} replace />
   const date = (value?: string | null) => value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? dateFormat.format(new Date(value + 'T00:00:00Z')) : t('Não informado')
@@ -49,7 +62,7 @@ export default function DataAnalysisPage() {
           <S.LowerGrid>
             <S.Card><h2>{t('Distribuição por gás')}</h2><S.Caption>{t('Participação nas emissões em CO₂ equivalente')}</S.Caption><EmissionDonut groups={data.breakdown.gases} total={data.totals.emissions} /></S.Card>
             <S.Card><h2>{t('Dados do relatório')}</h2><dl><div><dt>{t('Nome do relatório')}</dt><dd>{report.name}</dd></div><div><dt>{t('Período do inventário')}</dt><dd>{date(report.inventoryPeriodStart)} — {date(report.inventoryPeriodEnd)}</dd></div><div><dt>{t('Abordagem de consolidação')}</dt><dd>{t(report.consolidationApproach ?? 'Não informado')}</dd></div><div><dt>{t('Unidade de medida')}</dt><dd>tCO₂e</dd></div></dl></S.Card>
-            <S.Card><h2>{t('Ações da análise')}</h2><S.ReportActions><button className="primary" type="button" disabled={!analysis} onClick={() => window.print()}>{t('Exportar PDF')}</button><Link to="/assistant">{t('Perguntar ao Assistente')}</Link><p>{t('O PDF inclui os dados do inventário e o plano de melhoria disponíveis nesta análise.')}</p>{!analysis && <p>{t('A exportação será liberada quando o plano de melhoria estiver disponível.')}</p>}</S.ReportActions></S.Card>
+            <S.Card><h2>{t('Ações da análise')}</h2><S.ReportActions><button className="primary" type="button" disabled={!analysis} onClick={() => { void exportPdf() }}>{t('Exportar PDF')}</button><Link to="/assistant">{t('Perguntar ao Assistente')}</Link><p>{t('O PDF inclui os dados do inventário e o plano de melhoria disponíveis nesta análise.')}</p>{!analysis && <p>{t('A exportação será liberada quando o plano de melhoria estiver disponível.')}</p>}</S.ReportActions></S.Card>
           </S.LowerGrid>
           <S.Card><h2>{t('Plano de melhoria')}</h2>{report.description && <S.Caption>{report.description}</S.Caption>}{planError && <p role="status">{t(planError)}</p>}{!analysis && !planError && <p role="status">{t('Carregando análise…')}</p>}{analysis && <>
             <h3>{t('Problema identificado')}</h3><p>{analysis.defined_problem}</p><h3>{t('Método proposto')}</h3><p>{analysis.solving_method}</p>
@@ -60,6 +73,6 @@ export default function DataAnalysisPage() {
         </>}
       </>}
     </S.Content>
-    {finished && report && analysis && <AnalysisReport report={report} analysis={analysis} userName={user.name} />}
+    {printPrepared && finished && report && analysis && <AnalysisReport report={report} analysis={analysis} userName={user.name} />}
   </S.Page>
 }
