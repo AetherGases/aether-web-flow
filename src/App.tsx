@@ -57,6 +57,7 @@ function App() {
     <Route path="/" element={user ? <Navigate to={getHomePath(user.role)} replace /> : <PageBoundary><LoginPage /></PageBoundary>} />
     <Route element={<PrivateRoute />}>
       <Route path="/overview" element={<AuthenticatedPage page="overview" />} />
+      <Route path="/data-analysis/select" element={<AuthenticatedPage page="select" />} />
       <Route path="/data-analysis" element={<AuthenticatedPage page="analysis" />} />
       <Route path="/data-analysis/upload" element={<AuthenticatedPage page="upload" />} />
       <Route path="/data-analysis/upload/:scope" element={<AuthenticatedPage page="upload" />} />
@@ -67,7 +68,6 @@ function App() {
       <Route path="/profile" element={<AuthenticatedPage page="profile" />} />
       <Route element={<PrivateRoute allowedRoles={['administrator']} />}>
         <Route path="/administration" element={<AuthenticatedPage page="administration" />} />
-        <Route path="/data-analysis/select" element={<AuthenticatedPage page="select" />} />
       </Route>
     </Route>
     <Route path="*" element={<PageBoundary><ErrorPage /></PageBoundary>} />

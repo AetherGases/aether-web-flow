@@ -13,7 +13,7 @@ Os links relativos apontam para o código da mesma versão deste documento. Apó
 | useState, agrupamento dos estados relacionados e atualizações imutáveis | [src/pages/profile/index.tsx](../src/pages/profile/index.tsx#L17); [src/components/ProfileField/index.tsx](../src/components/ProfileField/index.tsx#L29); [src/pages/data-analysis/index.tsx](../src/pages/data-analysis/index.tsx#L49) | Implementado |
 | useEffect com dependências e cleanup | [src/hooks/useOverview.ts](../src/hooks/useOverview.ts#L1); [src/hooks/useProfile.ts](../src/hooks/useProfile.ts#L1) | Implementado; preparar demonstração oral |
 | Listas com keys estáveis | [src/pages/overview/index.tsx](../src/pages/overview/index.tsx#L72); [src/pages/assistant/index.tsx](../src/pages/assistant/index.tsx#L41) | Implementado |
-| useParams com presença e validação | [src/pages/data-upload/index.tsx](../src/pages/data-upload/index.tsx#L15); [src/utils/analysis.ts](../src/utils/analysis.ts#L7) | Implementado: scope plant/company |
+| useParams com presença e validação | [src/pages/data-upload/index.tsx](../src/pages/data-upload/index.tsx#L15); [src/utils/analysis.ts](../src/utils/analysis.ts#L7) | Implementado: scope plant, com rejeição de outros valores |
 | React Router com mais de três rotas, Link/useNavigate e 404 | [src/App.tsx](../src/App.tsx#L50); [src/pages/error/index.tsx](../src/pages/error/index.tsx#L23) | Implementado |
 | Acessibilidade: botões, labels, alt, contraste, erros e teclado | [src/pages/login/index.tsx](../src/pages/login/index.tsx#L94); [src/pages/data-upload/index.tsx](../src/pages/data-upload/index.tsx#L68); [src/styles/tokens.css](../src/styles/tokens.css#L19); [src/styles/global.css](../src/styles/global.css#L41) | Correções implementadas; navegação e leitor de tela devem ser demonstrados na entrega |
 | Feedback de carregamento, sucesso e erro | [src/hooks/useProfile.ts](../src/hooks/useProfile.ts#L11); [src/components/Toast/index.tsx](../src/components/Toast/index.tsx#L10); [src/pages/calculator/index.tsx](../src/pages/calculator/index.tsx#L71) | Implementado nos fluxos integrados; análise real continua pendente |
@@ -24,7 +24,7 @@ Os links relativos apontam para o código da mesma versão deste documento. Apó
 
 - Executar build, lint, testes do front e BFF e verificação de tipos.
 - Percorrer login, sidebar, perfil e formulários somente com teclado, com foco visível. Demonstrar o fluxo de editar/cancelar e mensagens de erro no DOM.
-- Demonstrar `/data-analysis/upload/plant`, `/company` para admin e um escopo inválido. O link antigo sem parâmetro usa o escopo padrão com segurança.
+- Demonstrar `/data-analysis/upload/plant` e a rejeição de `/company` e de outros escopos inválidos. O link antigo sem parâmetro usa o escopo padrão com segurança.
 - Demonstrar carregamento, resposta e erro em uma consulta real. Nunca expor tokens ou credenciais nas evidências.
 - Validar o portal e o BFF em produção e registrar URL, versão e data de conferência. Confirmar a plataforma de hospedagem com o professor: o PDF cita Vercel/GitHub Pages, enquanto o workflow atual utiliza EKS.
 - Registrar links dos commits/PRs, respeitando o prazo e Conventional Commits.

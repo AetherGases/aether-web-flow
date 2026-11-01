@@ -7,7 +7,7 @@ import * as S from './styles'
 export default function AdministrationPage() {
   const { user, logout } = useAuth()
   const { t } = useTranslation()
-  const managementUrl = getAdministrationUrl(import.meta.env.VITE_ADMIN_URL)
+  const managementUrl = getAdministrationUrl(import.meta.env.VITE_ADMIN_URL || 'https://aethergases.org/login')
   if (!user) return null
 
   return <S.Page>

@@ -53,7 +53,7 @@ function Sidebar({
 
           <li>
             <S.NavigationLink
-              to={userRole === 'administrator' ? '/data-analysis/select' : '/data-analysis/upload/plant'}
+              to="/data-analysis/select"
               aria-current={pathname.startsWith('/data-analysis') ? 'page' : undefined}
             >
               <S.Icon data-theme-icon src={AnaliseLogo} alt="" aria-hidden="true" />
