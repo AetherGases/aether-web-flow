@@ -1,10 +1,23 @@
 import { useEffect } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from '../../hooks/useTranslation'
 
 export default function NavigationAccessibility() {
   const { pathname } = useLocation()
   const { t } = useTranslation()
+  const { user } = useAuth()
+  const section = pathname === '/overview' ? 'Visão geral'
+    : pathname === '/data-analysis' || pathname.startsWith('/data-analysis/')
+      ? user?.role === 'administrator' ? 'Análises da organização' : 'Análise de dados'
+    : pathname === '/administration' ? 'Gestão administrativa'
+    : pathname === '/calculator' ? 'Calculadora'
+    : pathname === '/assistant' ? 'Assistente Aeko'
+    : pathname === '/profile' ? 'Perfil'
+    : pathname === '/' ? 'Entre na sua conta' : 'Erro 404'
+  useEffect(() => {
+    document.title = `${t(section)} | Aether`
+  }, [section, t])
   useEffect(() => {
     let firstFrame = 0
     let secondFrame = 0
@@ -12,7 +25,6 @@ export default function NavigationAccessibility() {
       const heading = document.querySelector<HTMLElement>('#main-content h1')
       if (!heading) return false
       heading.tabIndex = -1
-      document.title = `${heading.textContent?.trim() ?? 'Aether'} | Aether`
       firstFrame = requestAnimationFrame(() => {
         secondFrame = requestAnimationFrame(() => {
           if (heading.isConnected) heading.focus({ preventScroll: true })
