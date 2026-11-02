@@ -58,7 +58,7 @@ export const Actions = styled.div`
   .primary { background: var(--gradient-brand); color: var(--color-on-brand); border-color: transparent; font-weight: var(--font-weight-semibold); }
 `
 export const ReportActions = styled(Actions)`
-  display: grid; align-content: start; > * { width: 100%; text-align: center; }
+  display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; > * { min-width: 0; width: 100%; text-align: center; overflow-wrap: anywhere; }
   p { color: var(--color-text-secondary); font-size: var(--font-size-xs); text-align: left; }
 `
 export const Caption = styled.p`color: var(--color-text-secondary); font-size: var(--font-size-sm); margin: calc(-1 * var(--space-2)) 0 var(--space-5);`
