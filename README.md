@@ -17,6 +17,26 @@ Portal web do projeto Aether, desenvolvido com React e TypeScript no Projeto Int
 
 Os relatórios são vinculados à unidade do usuário. A aprovação e rejeição são feitas no aplicativo e o web consulta os status no backend.
 
+## Arquitetura
+
+O navegador nunca fala direto com os microsserviços. O front estático (Nginx) e o BFF (Node/Express) são dois Deployments no mesmo cluster, ambos atrás do [Kong](https://github.com/AetherGases/aether-kong-gateway).
+
+```mermaid
+flowchart LR
+  B[Navegador] -->|/dashboard| N["Front React<br/>(Nginx :80)"]
+  B -->|/api/v1 + cookie HttpOnly| BFF["BFF aether-web-bff<br/>(Express :3001)"]
+  BFF --> R[(Redis<br/>sessões)]
+  BFF --> AUTH[aether-ms-auth]
+  BFF --> INV[aether-ms-inventory]
+  BFF --> CLD[aether-ms-cloudinary]
+  BFF --> CALC[aether-ms-calculator]
+  BFF --> HUB["ms-aeko-hub (/hub)"]
+```
+
+- Os tokens JWT ficam só no servidor, associados à sessão (Redis). O navegador recebe apenas o cookie `HttpOnly`.
+- A calculadora de redução de custos roda no `aether-ms-calculator`; o front envia os valores e exibe o resultado.
+- O upload da planilha usa uma assinatura do `aether-ms-cloudinary` e envia o arquivo direto ao Cloudinary; depois o BFF registra o inventário no `aether-ms-inventory`.
+
 ## Tecnologias
 
 React, TypeScript, Vite, React Router e styled-components. O BFF fica em `server/` e usa Node.js, Express e Redis para as sessões.
